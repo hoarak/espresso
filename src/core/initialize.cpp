@@ -66,6 +66,7 @@
 #include "cuda_init.hpp"
 #include "cuda_interface.hpp"
 #include "scafacos.hpp"
+#include "shapes/ShapeFactory.hpp"
 
 /** whether the thermostat has to be reinitialized before integration */
 static int reinit_thermo = 1;
@@ -148,6 +149,8 @@ void on_program_start()
     /* interaction_data.c: make sure 0<->0 ia always exists */
     make_particle_type_exist(0);
   }
+
+  Shapes::initialize_factory();
 }
 
 
@@ -280,12 +283,6 @@ void on_particle_change()
   lb_reinit_particles_gpu = 1;
 #endif
 #ifdef CUDA
-  if (reinit_particle_comm_gpu){
-    gpu_change_number_of_part_to_comm();
-    reinit_particle_comm_gpu = 0;
-  }
-  MPI_Bcast(gpu_get_global_particle_vars_pointer_host(), sizeof(CUDA_global_part_vars), MPI_BYTE, 0, comm_cart);
-
   reinit_particle_comm_gpu = 1;
 #endif
   invalidate_obs();
@@ -548,6 +545,10 @@ void on_temperature_change()
       lb_reinit_parameters_gpu();
     }
   }
+#endif
+
+#ifdef ELECTROSTATICS
+  recalc_coulomb_prefactor();
 #endif
 }
 

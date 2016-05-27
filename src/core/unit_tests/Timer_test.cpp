@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2010,2012,2013,2014,2015,2016 The ESPResSo project
+  Copyright (C) 2010,2011,2012,2013,2014,2015,2016 The ESPResSo project
   Copyright (C) 2002,2003,2004,2005,2006,2007,2008,2009,2010 
     Max-Planck-Institute for Polymer Research, Theory Group
   
@@ -19,42 +19,39 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include "RunningAverage.hpp"
+#include <unistd.h>
+#include <iostream>
 
-namespace Utils {
-namespace Statistics {
+#define BOOST_TEST_MODULE Utils::Timing::Timer test
+#include <boost/test/included/unit_test.hpp>
 
-template<typename Scalar>
-void RunningAverage<Scalar>::add_sample(Scalar s) {
-  m_n++;
+#include "../utils/Timer.hpp"
 
-  if(m_n == 1) {
-    m_old_avg = m_new_avg = s;
-    m_old_var = 0.0;
-  } else {
-    m_new_avg = m_old_avg + (s - m_old_avg)/m_n;
-    m_new_var = m_old_var + (s - m_old_avg)*(s - m_new_avg);
+using namespace Utils::Timing;
+using std::cout;
+using std::endl;
 
-    m_old_avg = m_new_avg;
-    m_old_var = m_new_var;
-  }
-}
+BOOST_AUTO_TEST_CASE(sampling) {
+  Timer &t = Timer::get_timer(std::string("test_timer"));
 
-template<typename Scalar>
-Scalar RunningAverage<Scalar>::avg() const { 
-    if(m_n > 0)
-      return m_new_avg;
-    else
-      return 0.0;
+  for(int i = 0; i < 100; i++) {
+    t.start();
+    usleep(1000);
+    t.stop();
   }
 
-template<typename Scalar>
-Scalar RunningAverage<Scalar>::var() const {
-  if(m_n > 1)
-    return m_new_var / (m_n - 1.);
-  else
-    return 0.0;
+  BOOST_CHECK(t.average().n() == 100);
 }
 
-}
+/**
+ * Check that we can get the timer back by name
+ */
+BOOST_AUTO_TEST_CASE(get_timer) {
+  Timer &t = Timer::get_timer(std::string("test_timer"));
+
+  t.start();
+  usleep(1000);
+  t.stop();
+
+  BOOST_CHECK(t.average().n() == 101);
 }

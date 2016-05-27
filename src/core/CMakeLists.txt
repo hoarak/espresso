@@ -11,7 +11,7 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/src/core/config-features.hpp ${CMA
   ${CMAKE_SOURCE_DIR}/src/features.def
   ${CMAKE_BINARY_DIR}/src/core/config-features.hpp
   ${CMAKE_BINARY_DIR}/src/core/config-features.cpp
-  DEPENDS ${CMAKE_SOURCE_DIR}/src/features.def ${CMAKE_BINARY_DIR}/src/core/myconfig-final.hpp ${CMAKE_SOURCE_DIR}/src/core/gen_featureconfig.py
+  DEPENDS ${CMAKE_SOURCE_DIR}/src/features.def ${CMAKE_SOURCE_DIR}/src/core/gen_featureconfig.py
   )
 
 add_custom_command(OUTPUT config-version.cpp
@@ -19,12 +19,13 @@ add_custom_command(OUTPUT config-version.cpp
 )
 
 # Custom target for everything that needs to be triggered when the myconfig changes
-add_custom_target(EspressoConfig DEPENDS config-features.hpp)
+add_custom_target(EspressoConfig DEPENDS config-features.hpp config-features.cpp)
 add_dependencies(EspressoConfig myconfig)
 
-add_library(EspressoCore SHARED ${EspressoCore_SRC} config-features.hpp config-features.cpp config-version.cpp ${MPI_SOURCE})
+add_library(EspressoCore SHARED ${EspressoCore_SRC} config-features.cpp config-version.cpp)
+add_dependencies(EspressoCore EspressoConfig)
 
-target_link_libraries(EspressoCore ${LIBRARIES} Actor ObjectInFluid ImmersedBoundary)
+target_link_libraries(EspressoCore ${LIBRARIES} Actor ObjectInFluid ImmersedBoundary Shapes EspressoUtils)
 
 if(SCAFACOS)
   target_link_libraries(EspressoCore Scafacos)
@@ -48,6 +49,8 @@ if(CUDA)
   target_link_libraries(EspressoCore EspressoCuda)
 endif(CUDA)
 
+# Subdirectories
+
 if(WITH_UNIT_TESTS)
   add_subdirectory(unit_tests)
 endif(WITH_UNIT_TESTS)
@@ -55,4 +58,10 @@ endif(WITH_UNIT_TESTS)
 add_subdirectory(actor)
 add_subdirectory(immersed_boundary)
 add_subdirectory(object-in-fluid)
-add_subdirectory(electrostatics)
+add_subdirectory(shapes)
+
+if(SCAFACOS_FOUND)
+  add_subdirectory(scafacos)
+endif(SCAFACOS_FOUND)
+
+add_subdirectory(utils)

@@ -31,6 +31,9 @@
 #include "forces_inline.hpp"
 #include "electrokinetics.hpp"
 
+#include "utils/Timer.hpp"
+
+#include <cassert>
 ActorList forceActors;
 
 void init_forces()
@@ -177,17 +180,18 @@ espressoSystemInterface.update();
     break;
   case CELL_STRUCTURE_DOMDEC:
     if(dd.use_vList) {
-      if (rebuild_verletlist)
-        build_verlet_lists_and_calc_verlet_ia();
-      else
-    calculate_verlet_ia();
-    }
-    else
+      if (rebuild_verletlist) {
+	build_verlet_lists_and_calc_verlet_ia();
+      } else {
+	calculate_verlet_ia();
+      }
+    } else {
       calc_link_cell();
+    }
     break;
   case CELL_STRUCTURE_NSQUARE:
     nsq_calculate_ia();
-
+    break;
   }
 
 #ifdef OIF_GLOBAL_FORCES
@@ -213,6 +217,8 @@ espressoSystemInterface.update();
 #ifdef COMFORCE
   calc_comforce();
 #endif
+
+
 
 #ifdef METADYNAMICS
   /* Metadynamics main function */
@@ -303,7 +309,8 @@ void calc_long_range_forces()
     break;
 #ifdef SCAFACOS
   case COULOMB_SCAFACOS:
-    Electrostatics::Scafacos::add_long_range_force();
+    assert(! Scafacos::dipolar());
+    Scafacos::add_long_range_force();
     break;
 #endif
   default:
@@ -348,6 +355,11 @@ void calc_long_range_forces()
   case DIPOLAR_DS_GPU: 
     // Do nothing. It's an actor
     break;
+#ifdef SCAFACOS_DIPOLES
+  case DIPOLAR_SCAFACOS: 
+    assert(Scafacos::dipolar());
+    Scafacos::add_long_range_force();
+#endif
   case DIPOLAR_NONE:
       break;
   default:

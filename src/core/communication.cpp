@@ -79,6 +79,8 @@
 #include "scafacos.hpp"
 #include "mpiio.hpp"
 
+#include "utils/Timer.hpp"
+
 using namespace std;
 
 int this_node = -1;
@@ -291,7 +293,6 @@ void mpi_init(int *argc, char ***argv)
   boost_comm = boost::mpi::communicator(comm_cart, boost::mpi::comm_attach);      
 }
 
-#ifdef HAVE_MPI
 void mpi_call(SlaveCallback cb, int node, int param) {
   request_map_type::iterator req_it = request_map.find(cb);
   if (req_it == request_map.end())
@@ -313,11 +314,6 @@ void mpi_call(SlaveCallback cb, int node, int param) {
   MPI_Bcast(request, 3, MPI_INT, 0, comm_cart);
   COMM_TRACE(fprintf(stderr, "%d: finished sending.\n", this_node));
 }
-#else
-
-void mpi_call(SlaveCallback cb, int node, int param) {}
-
-#endif
 
 /**************** REQ_TERM ************/
 
@@ -1407,6 +1403,7 @@ int mpi_integrate(int n_steps, int reuse_forces)
       autoupdate_correlations();
     }
   }
+  
   return mpi_check_runtime_errors();
 }
 
@@ -2116,6 +2113,8 @@ void mpi_bcast_coulomb_params_slave(int node, int parm)
     break;   
  case  DIPOLAR_DS_GPU:
     break;   
+  case DIPOLAR_SCAFACOS:
+    break;
   default:
     fprintf(stderr, "%d: INTERNAL ERROR: cannot bcast dipolar params for unknown method %d\n", this_node, coulomb.Dmethod);
     errexit();
@@ -3308,7 +3307,6 @@ void mpi_gather_cuda_devices_slave(int dummy1, int dummy2) {
 
 
 void mpi_mpiio(const char *filename, unsigned fields, int write) {
-#ifdef HAVE_MPI
   size_t flen = strlen(filename) + 1;
   if (flen + 5 > INT_MAX) {
     fprintf(stderr, "Seriously?\n");
@@ -3322,13 +3320,9 @@ void mpi_mpiio(const char *filename, unsigned fields, int write) {
     mpi_mpiio_common_write(filename, fields);
   else
     mpi_mpiio_common_read(filename, fields);
-#else
-  runtimeErrorMsg() << "ESPResSo is compiled without MPI support. No MPI-IO available.";
-#endif
 }
 
 void mpi_mpiio_slave(int dummy, int flen) {
-#ifdef HAVE_MPI
   char *filename = new char[flen];
   unsigned fields;
   int write;
@@ -3340,5 +3334,4 @@ void mpi_mpiio_slave(int dummy, int flen) {
   else
     mpi_mpiio_common_read(filename, fields);
   delete[] filename;
-#endif
 }
