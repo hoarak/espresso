@@ -88,9 +88,6 @@ fi
 
 # CONFIGURE
 start "CONFIGURE"
-if $with_coverage ; then
-    cmake_params="-DCPPFLAGS=\"-coverage -O0\" -DCXXFLAGS=\"-coverage -O0\" -DPYTHON_LIBRARY=/home/travis/miniconda/envs/test/lib/libpython2.7.so.1.0 $cmake_params"
-fi
 
 if $with_mpi; then
     cmake_params="-DWITH_MPI=ON $cmake_params"
@@ -116,6 +113,9 @@ else
     cmake_params="-DWITH_PYTHON=OFF $cmake_params"
 fi
 
+# set up $cmake_params to work with junest.. more info in /.travis.yml
+cmake_params="-DCMAKE_CXX_COMPILER=/usr/bin/g++  -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DNUMPY_INCLUDE_DIR=/usr/lib64/python2.7/site-packages/numpy/core/include/numpy/ -DNUMPY_VERSION=1.11.0-1 $cmake_params"
+
 MYCONFIG_DIR=$srcdir/maintainer/jenkins/configs
 if [ "$myconfig" = "default" ]; then
     echo "Using default myconfig."
@@ -129,9 +129,6 @@ else
     cp $myconfig_file $builddir/myconfig.hpp
 fi
 
-# Acticate anaconda environment
-cmd "source activate test"
-
 cmd "cmake $cmake_params $srcdir" || exit $?
 end "CONFIGURE"
 
@@ -142,27 +139,29 @@ cmd "make" || exit $?
 
 end "BUILD"
 
-# CHECK	cat $srcdir/testsuite/python/Testing/Temporary/LastTest.log
 if $make_check; then
     start "TEST"
 
-    cmd "make check_tcl $make_params"
+    cmd "make check_python $make_params"
     ec=$?
     if [ $ec != 0 ]; then	
-        cat $srcdir/testsuite/Testing/Temporary/LastTest.log
+        cmd "cat $srcdir/testsuite/python/Testing/Temporary/LastTest.log"
         exit $ec
     fi
+    
+    # cmd "make check_tcl $make_params"
+    # ec=$?
+    # if [ $ec != 0 ]; then	
+    #     cmd "cat $srcdir/testsuite/tcl/Testing/Temporary/LastTest.log"
+    #     exit $ec
+    # fi
 
-    cmd "make check_unit_tests $make_params"
-    ec=$?
-    if [ $ec != 0 ]; then	
-        cat $srcdir/testsuite/Testing/Temporary/LastTest.log
-        exit $ec
-    fi
+    # cmd "make check_unit_tests $make_params"
+    # ec=$?
+    # if [ $ec != 0 ]; then	
+    #     cmd "cat $srcdir/src/core/unit_tests/Testing/Temporary/LastTest.log"
+    #     exit $ec
+    # fi
 
     end "TEST"
 fi
-
-for i in `find . -name  "*.gcno"` ; do
-    (cd `dirname $i` ; gcov `basename $i` > coverage.log 2>&1 )
-done
