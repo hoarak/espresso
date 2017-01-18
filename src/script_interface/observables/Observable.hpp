@@ -52,10 +52,7 @@ public:
       observable()->calculate();
       return observable()->last_value;
     }
-    if (method == "update") {
-      observable()->update();
-      return observable()->last_value;
-    }
+
     if (method == "value") {
       return observable()->last_value;
     }

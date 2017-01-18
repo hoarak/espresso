@@ -37,9 +37,6 @@ namespace Observables {
       "Observables::" #name "");
 
 void initialize() {
-  // Manual registration:
-  //  ScriptInterface::register_new<ScriptInterface::Observables::ParticleVelocities>::
-  //    register_new("Observables::ParticleVelocities");
 
   REGISTER(AutoUpdateObservables);
 

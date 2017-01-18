@@ -7,7 +7,6 @@
 
 namespace Observables {
 
-
 class DipoleMoment : public PidObservable {
 public:
     virtual int n_values() const override { return 3; };
