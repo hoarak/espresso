@@ -39,7 +39,6 @@ if CONSTRAINTS == 1:
     from .constraints import Constraints
 
 from .correlators import AutoUpdateCorrelators
-from .observables import AutoUpdateObservables
 from .lbboundaries import LBBoundaries
 from .ekboundaries import EKBoundaries
 
@@ -70,7 +69,6 @@ cdef class System:
     lbboundaries = LBBoundaries()
     ekboundaries = EKBoundaries()
 
-    auto_update_observables = AutoUpdateObservables()
     auto_update_correlators = AutoUpdateCorrelators()
 
     def __init__(self):

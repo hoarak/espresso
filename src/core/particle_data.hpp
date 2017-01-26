@@ -132,7 +132,6 @@ struct ParticleProperties {
   /** dipole moment (absolute value)*/
   double dipm;
 #endif
-
 #ifdef VIRTUAL_SITES
   /** is particle virtual
       0 = real particle

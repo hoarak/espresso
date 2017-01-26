@@ -1,36 +1,46 @@
-int ObservableForceDensityProfile::actual_calculate() {
-  double* A = last_value;
-  int binx, biny, binz;
+#ifndef OBSERVABLES_FORCEDENSITYPROFILE_HPP
+#define OBSERVABLES_FORCEDENSITYPROFILE_HPP
+
+#include "ProfileObservable.hpp"
+#include "particle_data.hpp" 
+#include <vector>
+
+
+namespace Observables {
+
+
+class ForceDensityProfile : public ProfileObservable {
+public:
+    virtual int n_values() const override { return 3 * xbins *ybins*zbins; }
+    virtual int actual_calculate() override {
   double ppos[3];
   int img[3];
-  IntList* ids;
-  profile_data* pdata;
-
   if (!sortPartCfg()) {
       runtimeErrorMsg() <<"could not sort partCfg";
     return -1;
   }
-  pdata=(profile_data*) container;
-  ids=pdata->id_list;
-  double bin_volume=(pdata->maxx-pdata->minx)*(pdata->maxy-pdata->miny)*(pdata->maxz-pdata->minz)/pdata->xbins/pdata->ybins/pdata->zbins;
+  double bin_volume=(maxx-minx)*(maxy-miny)*(maxz-minz)/xbins/ybins/zbins;
     
-  for ( int i = 0; i<n; i++ ) {
-    A[i]=0;
-  }
-  for (int i = 0; i<ids->n; i++ ) {
-    if (ids->e[i] >= n_part)
+  for (int id:ids) {
+    if (id >= n_part)
       return 1;
 /* We use folded coordinates here */
-    memmove(ppos, partCfg[ids->e[i]].r.p, 3*sizeof(double));
-    memmove(img, partCfg[ids->e[i]].l.i, 3*sizeof(int));
+    memmove(ppos, partCfg[id].r.p, 3*sizeof(double));
+    memmove(img, partCfg[id].l.i, 3*sizeof(int));
     fold_position(ppos, img);
-    binx= (int) floor( pdata->xbins*  (ppos[0]-pdata->minx)/(pdata->maxx-pdata->minx));
-    biny= (int) floor( pdata->ybins*  (ppos[1]-pdata->miny)/(pdata->maxy-pdata->miny));
-    binz= (int) floor( pdata->zbins*  (ppos[2]-pdata->minz)/(pdata->maxz-pdata->minz));
-    if (binx>=0 && binx < pdata->xbins && biny>=0 && biny < pdata->ybins && binz>=0 && binz < pdata->zbins) {
+    int binx= (int) floor( xbins*  (ppos[0]-minx)/(maxx-minx));
+    int biny= (int) floor( ybins*  (ppos[1]-miny)/(maxy-miny));
+    int binz= (int) floor( zbins*  (ppos[2]-minz)/(maxz-minz));
+    if (binx>=0 && binx < xbins && biny>=0 && biny < ybins && binz>=0 && binz < zbins) {
       for(int dim = 0; dim < 3; dim++)
-        A[3*(binx*pdata->ybins*pdata->zbins + biny*pdata->zbins + binz) + dim] += partCfg[ids->e[i]].f.f[dim]/bin_volume;
+        last_value[3*(binx*ybins*zbins + biny*zbins + binz) + dim] += partCfg[id].f.f[dim]/bin_volume;
     } 
   }
   return 0;
 }
+};
+
+} // Namespace Observables
+
+#endif
+

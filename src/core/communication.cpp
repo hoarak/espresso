@@ -83,7 +83,7 @@
 #include "tab.hpp"
 #include "topology.hpp"
 #include "virtual_sites.hpp"
-#include "observables/LbRadialVelocityProfile.hpp"
+//#include "observables/LbRadialVelocityProfile.hpp"
 
 using namespace std;
 using Communication::mpiCallbacks;
@@ -1146,7 +1146,7 @@ void mpi_observable_lb_radial_velocity_profile() {
 
 void mpi_observable_lb_radial_velocity_profile_slave(int pnode, int part) {
 #ifdef LB
-  Observables::mpi_observable_lb_radial_velocity_profile_slave_implementation();
+  // Observables::mpi_observable_lb_radial_velocity_profile_slave_implementation();
 #endif
 }
 

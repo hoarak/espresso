@@ -22,91 +22,49 @@
 #ifndef SCRIPT_INTERFACE_OBSERVABLES_PIDOBSERVABLE_HPP
 #define SCRIPT_INTERFACE_OBSERVABLES_PIDOBSERVABLE_HPP
 
-
 #include "ScriptInterface.hpp"
 
-#include <memory>
-
-#include "Observable.hpp" 
+#include "Observable.hpp"
 #include "core/observables/PidObservable.hpp"
-#include "core/observables/ParticlePositions.hpp"
-#include "core/observables/ParticleVelocities.hpp"
-#include "core/observables/ParticleForces.hpp"
-#include "core/observables/ParticleBodyVelocities.hpp"
-#include "core/observables/ParticleAngularMomentum.hpp"
-#include "core/observables/ParticleBodyAngularMomentum.hpp"
-#include "core/observables/ParticleCurrents.hpp"
-#include "core/observables/Current.hpp"
-#include "core/observables/DipoleMoment.hpp"
-#include "core/observables/MagneticDipoleMoment.hpp"
-#include "core/observables/ComPosition.hpp" 
-#include "core/observables/ComForce.hpp" 
-#include "core/observables/ComVelocity.hpp" 
 
 namespace ScriptInterface {
 namespace Observables {
 
-class PidObservable : public Observable {
+template <typename ParticleProperty> class PidObservable : public Observable {
+  using obs_t = ::Observables::PidObservable<ParticleProperty>;
+
 public:
-  PidObservable() : m_observable(new ::Observables::PidObservable()) {};
-  
-  const std::string name() const override { return "Observables::PidObservable"; };
+  PidObservable() : m_observable(new obs_t) {}
 
   VariantMap get_parameters() const override {
-    return {{"ids", pid_observable()->ids}};
-  };
+    auto params = Observable::get_parameters();
+    params["ids"] = m_observable->ids();
+
+    return params;
+  }
 
   ParameterMap valid_parameters() const override {
-    return {{"ids", {ParameterType::INT_VECTOR, true}}};
-  };
+    auto params = Observable::valid_parameters();
+    params["ids"] = {ParameterType::INT_VECTOR, true};
+    return params;
+  }
 
   void set_parameter(std::string const &name, Variant const &value) override {
-    SET_PARAMETER_HELPER("ids", pid_observable()->ids);
-  };
-  virtual std::shared_ptr<::Observables::Observable> observable() const {
-    return m_observable;
-  };
-  virtual std::shared_ptr<::Observables::PidObservable> pid_observable() const {
-    return m_observable;
-  };
-  private:
-  mutable std::shared_ptr<::Observables::PidObservable> m_observable;
+    if (name == "ids") {
+      m_observable->set_ids(get_value<std::vector<int>>(value));
+      return;
+    }
+    Observable::set_parameter(name, value);
+  }
+
+  virtual std::shared_ptr<::Observables::Observable>
+  observable() const override {
+    return std::static_pointer_cast<::Observables::Observable>(m_observable);
+  }
+
+private:
+  std::shared_ptr<obs_t> m_observable;
 };
-
-
-#define NEW_PID_OBSERVABLE(obs_name) \
-class obs_name : public PidObservable { \
-public: \
-  obs_name() : m_observable(new ::Observables::obs_name()) {}; \
-  \
-  const std::string name() const override { return "Observables::" #obs_name; } \
-  \
-  virtual std::shared_ptr<::Observables::Observable> observable() override { \
-    return m_observable; \
-  }; \
-  virtual std::shared_ptr<::Observables::PidObservable> pid_observable() const override {\
-    return m_observable;\
-  };\
-  private: \
-  mutable std::shared_ptr<::Observables::obs_name> m_observable; \
-};
-
-NEW_PID_OBSERVABLE(ParticlePositions);
-NEW_PID_OBSERVABLE(ParticleVelocities);
-NEW_PID_OBSERVABLE(ParticleForces);
-NEW_PID_OBSERVABLE(ParticleBodyVelocities);
-NEW_PID_OBSERVABLE(ParticleAngularMomentum);
-NEW_PID_OBSERVABLE(ParticleBodyAngularMomentum);
-NEW_PID_OBSERVABLE(ParticleCurrent);
-NEW_PID_OBSERVABLE(Current);
-NEW_PID_OBSERVABLE(DipoleMoment);
-NEW_PID_OBSERVABLE(MagneticDipoleMoment);
-NEW_PID_OBSERVABLE(ComPosition);
-NEW_PID_OBSERVABLE(ComVelocity);
-NEW_PID_OBSERVABLE(ComForce);
-
-
-
 
 } /* namespace Observables */
 } /* namespace ScriptInterface */

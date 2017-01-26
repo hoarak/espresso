@@ -1,23 +1,36 @@
-int ObservableDipoleMoment::actual_calculate() {
-  double* A = last_value;
-  double charge;
-  double j[3] = {0. , 0., 0. } ;
-  IntList* ids;
+#ifndef OBSERVABLES_DIPOLEMOMENT_HPP
+#define OBSERVABLES_DIPOLEMOMENT_HPP
+
+#include "PidObservable.hpp"
+#include "particle_data.hpp" 
+#include <vector>
+
+namespace Observables {
+
+class DipoleMoment : public PidObservable {
+public:
+    virtual int n_values() const override { return 3; };
+    virtual int actual_calculate() override {
   if (!sortPartCfg()) {
       runtimeErrorMsg() <<"could not sort partCfg";
     return -1;
   }
-  ids=(IntList*) container;
-  for (int i = 0; i<ids->n; i++ ) {
-    if (ids->e[i] > n_part)
+  for (int i = 0; i<ids.size(); i++ ) {
+    if (ids[i] >= n_part)
       return 1;
-    charge = partCfg[ids->e[i]].p.q;
-    j[0] += charge * partCfg[ids->e[i]].r.p[0];
-    j[1] += charge * partCfg[ids->e[i]].r.p[1];
-    j[2] += charge * partCfg[ids->e[i]].r.p[2];
+#ifdef ELECTROSTATICS
+    double charge = partCfg[ids[i]].p.q;
+   
+    last_value[0] += charge * partCfg[ids[i]].r.p[0];
+    last_value[1] += charge * partCfg[ids[i]].r.p[1];
+    last_value[2] += charge * partCfg[ids[i]].r.p[2];
+#endif // ELECTROSTATICS
   }
-  A[0]=j[0];
-  A[1]=j[1];
-  A[2]=j[2];
   return 0;
 }
+};
+
+} // Namespace Observables
+
+#endif
+

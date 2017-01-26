@@ -1,23 +1,36 @@
-int ObservableComPosition::actual_calculate() {
-  double* A = last_value;
-  double p_com[3] = { 0. , 0., 0. } ;
-  double total_mass = 0;
-  IntList* ids;
-  if (!sortPartCfg()) {
-      runtimeErrorMsg() <<"could not sort partCfg";
-    return -1;
-  }
-  ids=(IntList*) container;
-  for (int i = 0; i<ids->n; i++ ) {
-    if (ids->e[i] >= n_part)
-      return 1;
-    p_com[0] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].r.p[0];
-    p_com[1] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].r.p[1];
-    p_com[2] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].r.p[2];
-    total_mass += (partCfg[ids->e[i]]).p.mass;
-  }
-  A[0]=p_com[0]/total_mass;
-  A[1]=p_com[1]/total_mass;
-  A[2]=p_com[2]/total_mass;
-  return 0;
-}
+#ifndef OBSERVABLES_COMPOSITION_HPP
+#define OBSERVABLES_COMPOSITION_HPP
+
+#include "PidObservable.hpp"
+#include "particle_data.hpp"
+#include <vector>
+
+namespace Observables {
+
+class ComPosition : public PidObservable {
+public:
+  virtual int n_values() const override { return 3; }
+  virtual int actual_calculate() override {
+    if (!sortPartCfg()) {
+      runtimeErrorMsg() << "could not sort partCfg";
+      return -1;
+    }
+    double total_mass = 0;
+    for (int i = 0; i < ids.size(); i++) {
+      if (ids[i] >= n_part)
+        return 1;
+      double mass = partCfg[ids[i]].p.mass;
+      last_value[0] += mass * partCfg[ids[i]].r.p[0];
+      last_value[1] += mass * partCfg[ids[i]].r.p[1];
+      last_value[2] += mass * partCfg[ids[i]].r.p[2];
+      total_mass += mass;
+    }
+    last_value[0] /= total_mass;
+    last_value[1] /= total_mass;
+    last_value[2] /= total_mass;
+    return 0;
+  };
+};
+
+} // Namespace Observables
+#endif

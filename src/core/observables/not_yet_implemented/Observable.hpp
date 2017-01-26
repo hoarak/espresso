@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2010,2011,2012,2013,2016 The ESPResSo project
+  Copyright (C) 2010,2011,2012,2013,2014,2015,2016 The ESPResSo project
 
   This file is part of ESPResSo.
 
@@ -16,25 +16,33 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "Observable.hpp"
-#include "integrate.hpp"
+#ifndef OBSERVABLES_OBSERVABLE_HPP
+#define OBSERVABLES_OBSERVABLE_HPP
+
+#include "config.hpp"
+#include <stdexcept>
+#include <vector>
 
 namespace Observables {
 
-Observable::Observable() {
-  last_update = 0;
-  last_value.resize(n_values());
+class Observable {
+public:
+  Observable();
+  virtual ~Observable() {}
 
+  int calculate();
+
+  virtual int actual_update() = 0;
+
+  virtual int n_values() const { return 0; };
+  std::vector<double> last_value;
+
+private:
+  virtual int actual_calculate() {
+    throw std::runtime_error(
+        "Observable did not override actual_caucluate()\n");
+  };
 };
 
-int Observable::calculate() {
-  // Clear last value
-  last_value.resize(n_values());
-  for (int i = 0; i < last_value.size(); i++)
-    last_value[i] = 0;
-
-  last_update = sim_time;
-  return actual_calculate();
-}
-
 } // Namespace Observables
+#endif

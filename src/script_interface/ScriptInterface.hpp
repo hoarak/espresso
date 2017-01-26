@@ -26,20 +26,24 @@
 
 #include "Variant.hpp"
 
-#include "initialize.hpp"
 #include "ScriptInterfaceBase.hpp"
+#include "initialize.hpp"
 #include "utils/Factory.hpp"
 
 namespace ScriptInterface {
-  template <typename T> static void register_new(std::string const &name) {
-    static_assert(std::is_base_of<ScriptInterfaceBase, T>::value, "");
+template <typename T> static void register_new(std::string const &name) {
+  static_assert(std::is_base_of<ScriptInterfaceBase, T>::value, "");
 
-    /* Register with the factory */
-    Utils::Factory<ScriptInterfaceBase>::register_new<T>(name);
-  }
+  /* Register with the factory */
+  Utils::Factory<ScriptInterfaceBase>::register_new<T>(name);
+}
 
-  inline std::shared_ptr<ScriptInterfaceBase> get_instance(Variant value) {
-    const auto id = boost::get<ObjectId>(value);
+template <typename T> static void register_new() {
+  register_new<T>(T().name());
+}
+
+inline std::shared_ptr<ScriptInterfaceBase> get_instance(Variant value) {
+  const auto id = boost::get<ObjectId>(value);
 
   return ScriptInterfaceBase::get_instance(id).lock();
 }

@@ -18,13 +18,14 @@
 */
 
 #include "initialize.hpp"
+#include "ParticleMomentum.hpp"
+#include "ParticlePositions.hpp"
 #include "ScriptInterface.hpp"
+// #include "AutoUpdateObservables.hpp"
 
-#include "AutoUpdateObservables.hpp"
-
-#include "PidObservable.hpp"
-#include "ParamlessObservable.hpp"
-#include "ProfileObservable.hpp"
+// #include "PidObservable.hpp"
+// #include "ParamlessObservable.hpp"
+// #include "ProfileObservable.hpp"
 
 //#include "ParticleVelocities.hpp"
 //#include "ParticlePositions.hpp"
@@ -32,35 +33,43 @@
 namespace ScriptInterface {
 namespace Observables {
 
-#define REGISTER(name)                                                         \
-  ScriptInterface::register_new<ScriptInterface::Observables::name>(           \
-      "Observables::" #name "");
-
 void initialize() {
+  ScriptInterface::register_new<
+      ScriptInterface::Observables::ParticlePositions>();
 
-  REGISTER(AutoUpdateObservables);
-
-  REGISTER(StressTensor);
-  REGISTER(StressTensorAcf);
-  REGISTER(ParticlePositions);
-  REGISTER(ParticleVelocities);
-  REGISTER(ParticleForces);
-  REGISTER(ParticleBodyVelocities);
-  REGISTER(ParticleAngularMomentum);
-  REGISTER(ParticleBodyAngularMomentum);
-  REGISTER(ParticleCurrent);
-  REGISTER(Current);
-  REGISTER(DipoleMoment);
-  REGISTER(MagneticDipoleMoment);
-  REGISTER(ComPosition);
-  REGISTER(ComVelocity);
-  REGISTER(ComForce);
-  REGISTER(DensityProfile);
-  REGISTER(ForceDensityProfile);
-  REGISTER(FluxDensityProfile);
-  REGISTER(LBVelocityProfile);
-
-#undef REGISTER
+  ScriptInterface::register_new<ScriptInterface::Observables::ParticleMomenta>(
+      "Observables::ParticleMomenta");
 }
+
+// #define REGISTER(name)                                                         \
+//   ScriptInterface::register_new<ScriptInterface::Observables::name>(           \
+//       "Observables::" #name "");
+
+// void initialize() {
+
+//   REGISTER(AutoUpdateObservables);
+
+//   REGISTER(StressTensor);
+//   REGISTER(StressTensorAcf);
+//   REGISTER(ParticlePositions);
+//   REGISTER(ParticleVelocities);
+//   REGISTER(ParticleForces);
+//   REGISTER(ParticleBodyVelocities);
+//   REGISTER(ParticleAngularMomentum);
+//   REGISTER(ParticleBodyAngularMomentum);
+//   REGISTER(ParticleCurrent);
+//   REGISTER(Current);
+//   REGISTER(DipoleMoment);
+//   REGISTER(MagneticDipoleMoment);
+//   REGISTER(ComPosition);
+//   REGISTER(ComVelocity);
+//   REGISTER(ComForce);
+//   REGISTER(DensityProfile);
+//   REGISTER(ForceDensityProfile);
+//   REGISTER(FluxDensityProfile);
+//   REGISTER(LBVelocityProfile);
+
+// #undef REGISTER
+// }
 } /* namespace Obseravbles */
 } /* namespace ScriptInterface */

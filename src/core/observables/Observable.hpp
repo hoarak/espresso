@@ -1,49 +1,28 @@
-/*
-  Copyright (C) 2010,2011,2012,2013,2014,2015,2016 The ESPResSo project
+#ifndef CORE_OBSERVABLES_OBSERVABLE_HPP
+#define CORE_OBSERVABLES_OBSERVABLE_HPP
 
-  This file is part of ESPResSo.
-
-  ESPResSo is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  ESPResSo is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-#ifndef OBSERVABLES_OBSERVABLE_HPP
-#define OBSERVABLES_OBSERVABLE_HPP
-
-#include "config.hpp"
-#include <stdexcept>
-#include <vector>
+#include "core/utils/Tensor.hpp"
 
 namespace Observables {
 
 class Observable {
 public:
-  Observable();
-  int calculate();
+  using value_type = Utils::Tensor<double>;
+  using size_type = value_type::size_type;
+  using Tensor = Utils::Tensor<double>;
 
-  virtual int actual_update(){};
+  virtual Tensor calculate() = 0;
 
-  virtual int n_values() const { return 0; };
-  std::vector<double> last_value;
-
-protected:
-  double last_update;
-
-private:
-  virtual int actual_calculate() {
-    throw std::runtime_error(
-        "Observable did not override actual_caucluate()\n");
-  };
+  /**
+   * @brief Tensor rank of the observable.
+   */
+  virtual size_type rank() const = 0;
+  /**
+   * @brief Total number of elements.
+   */
+  virtual size_type size() const = 0;
+  virtual std::vector<size_type> extents() const = 0;
 };
+} /* namespace Observables */
 
-} // Namespace Observables
 #endif

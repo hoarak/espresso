@@ -23,8 +23,6 @@ class Observable(ScriptInterfaceHelper):
     _so_name="Observables::Observable"
     _so_bind_methods = ("value","calculate","update")
 
-
-
 class ComForce(Observable):
     _so_name="Observables::ComForce"
 

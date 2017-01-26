@@ -23,44 +23,38 @@
 #define SCRIPT_INTERFACE_OBSERVABLES_OBSERVABLE_HPP
 
 #include "ScriptInterface.hpp"
-#include "core/utils/Factory.hpp"
-
-#include <memory>
-
-
-#include "core/observables/Observable.hpp"
 #include "core/observables/Observable.hpp"
 
 namespace ScriptInterface {
 namespace Observables {
 
-
-typedef ::Observables::Observable CoreObs;
-
 class Observable : public ScriptInterfaceBase {
+  typedef ::Observables::Observable CoreObs;
+
 public:
-  Observable() {};
-  
   const std::string name() const override { return "Observables::Observable"; }
 
-  virtual std::shared_ptr<CoreObs> observable() {
-    return m_observable;
+  ParameterMap valid_parameters() const override {
+    return {{"rank", {ParameterType::INT, true}}};
   }
+  VariantMap get_parameters() const override {
+    return {{"rank", static_cast<int>(observable()->rank())}};
+  }
+
+  void set_parameter(std::string const &, Variant const &) override {}
+
   virtual Variant call_method(std::string const &method,
-                                   VariantMap const &parameters) {
+                              VariantMap const &parameters) {
     if (method == "calculate") {
-      observable()->calculate();
-      return observable()->last_value;
+      auto value = observable()->calculate();
+
+      return std::vector<double>(value.begin(), value.end());
     }
 
-    if (method == "value") {
-      return observable()->last_value;
-    }
+    return {};
+  }
 
-     return {};
-  };
-  private:
-    std::shared_ptr<::Observables::Observable> m_observable;
+  virtual std::shared_ptr<CoreObs> observable() const = 0;
 };
 } /* namespace Observables */
 } /* namespace ScriptInterface */
