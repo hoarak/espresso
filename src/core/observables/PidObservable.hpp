@@ -11,7 +11,7 @@ namespace Observables {
 template <class ParticleProperty> class PidObservable : public Observable {
 public:
   PidObservable() {
-    auto const property_extent = ParticleProperty::extent;
+    auto const property_extent = ParticleProperty::extent();
     m_extent.resize(property_extent.size() + 1, 0);
     std::copy(property_extent.begin(), property_extent.end(),
               m_extent.begin() + 1);
@@ -25,7 +25,7 @@ public:
 
   std::vector<int> const &ids() const { return m_ids; }
 
-  Tensor calculate() override {
+  Tensor calculate() const override {
     Tensor ret(m_extent);
 
     if (!sortPartCfg()) {
@@ -35,7 +35,7 @@ public:
     auto out = ret.begin();
     for (auto const &i : m_ids) {
       auto const property = ParticleProperty(partCfg[i]);
-      for (size_t j = 0; j < ParticleProperty::size; ++j) {
+      for (size_t j = 0; j < ParticleProperty::size(); ++j) {
         *out++ = property(j);
       }
     }
@@ -43,12 +43,7 @@ public:
     return ret;
   }
 
-  size_type size() const override {
-    return std::accumulate(m_extent.begin(), m_extent.end(), 1,
-                           std::multiplies<size_t>());
-  }
-  size_type rank() const override { return m_extent.size(); }
-  std::vector<size_type> extents() const override { return m_extent; }
+  std::vector<size_type> extent() const override { return m_extent; }
 
 private:
   std::vector<int> m_ids;
