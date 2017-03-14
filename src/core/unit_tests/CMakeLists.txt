@@ -68,3 +68,5 @@ parallel_unit_test(MpiCallbacks_test "${MpiCallbacks_test_SRC}" 2)
 set(ParallelScriptInterface_test_SRC  ParallelScriptInterface_test.cpp)
 parallel_unit_test(ParallelScriptInterface_test "${ParallelScriptInterface_test_SRC}" 2)
 target_link_libraries(ParallelScriptInterface_test EspressoScriptInterface)
+
+unit_test(Tensor_test "Tensor_test.cpp")

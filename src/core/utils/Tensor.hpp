@@ -61,6 +61,8 @@ public:
     resize(extents);
   }
 
+  explicit Tensor(std::initializer_list<size_type> l) { resize(l); }
+
   /**
    * @brief Construct a Tensor with given extents,
    * and fill the elements with value.
@@ -68,6 +70,11 @@ public:
   template <typename Extents> Tensor(Extents extents, T const &value) {
     resize(extents);
 
+    std::fill(begin(), end(), value);
+  }
+
+  explicit Tensor(std::initializer_list<size_type> l, T const &value) {
+    resize(l);
     std::fill(begin(), end(), value);
   }
 
@@ -122,12 +129,12 @@ public:
     return begin(next);
   }
 
-  iterator end(std::initializer_list<size_type> indices) {
-    return end<std::initializer_list<size_type>>(indices);
-  }
-
   iterator begin(std::initializer_list<size_type> indices) {
     return begin<std::initializer_list<size_type>>(indices);
+  }
+
+  iterator end(std::initializer_list<size_type> indices) {
+    return end<std::initializer_list<size_type>>(indices);
   }
 
   /**
@@ -141,6 +148,10 @@ public:
 
   template <typename Indices>
   T const &operator()(Indices const &indices) const {
+    return *(begin(indices));
+  }
+
+  T &operator()(std::initializer_list<size_type> indices) {
     return *(begin(indices));
   }
 
@@ -167,10 +178,6 @@ public:
    */
   bool operator!=(Tensor const &rhs) const { return !(this->operator==(rhs)); }
 
-  T &operator()(std::initializer_list<size_type> indices) {
-    return *(begin(indices));
-  }
-
   /**
    * @brief Swap two Tensors.
    */
@@ -189,7 +196,8 @@ public:
    *
    * May reallocate and invalidates all iterators.
    * The values of the elements are undefiened after
-   * this operation.
+   * this operation if the rank or any extent but the
+   * first has changed.
    */
   template <typename Size> void resize(Size new_size) {
     auto const rank = std::distance(std::begin(new_size), std::end(new_size));
@@ -203,14 +211,7 @@ public:
                         std::multiplies<size_type>());
     m_data.resize(total_size);
 
-    size_type stride = 1;
-    auto jt = make_reverse_iterator(m_strides.end());
-    for (auto it = make_reverse_iterator(new_size.end());
-         it != make_reverse_iterator(new_size.begin()); it++) {
-      *jt = stride;
-      ++jt;
-      stride *= *it;
-    }
+    update_strides();
   }
 
   void resize(std::initializer_list<size_type> new_size) {
@@ -227,7 +228,7 @@ public:
    *
    * The tensor rank is unchainged by this, but the extent for the axis
    * is set to 1.
-   * The storage size of the object can change bis this function,
+   * The storage size of the object can change by this function,
    * and reallocation may occur. It invalidates all iterators
    * into the Tensor.
    */
@@ -246,7 +247,7 @@ public:
       }
     }
     /* copy the elements to front, if axis == 0,
-    * the new values are already at the front,
+    * the new values are already in the front,
     * and there is nothing to copy. */
     if (axis > 0) {
       for (auto it = begin(), jt = begin(); it != end();
@@ -276,6 +277,26 @@ public:
   Tensor &sum(size_type axis = 0) { return reduce(axis, std::plus<T>()); }
 
   /**
+   * @brief Append a row to the end of the Tensor.
+   *
+   * Add a row (codim 1) at the end of the Tensor, so that
+   * the added elements are at [end()-strides()[0], end()).
+   * May realloc and invalidates all iterators into the Tensor.
+   */
+  template <typename Container> void push_back(Container values) {
+    auto const row_size = m_strides[0];
+
+    /* Alloc memory for one new row */
+    m_data.resize(m_data.size() + row_size);
+
+    /* Copy elements in place */
+    std::copy_n(std::begin(values), row_size, m_data.end() - row_size);
+
+    /* Increase logical size */
+    m_extents.front()++;
+  }
+
+  /**
    * @brief the tensor rank.
    *
    * The dimension of the index set.
@@ -286,6 +307,17 @@ public:
   std::vector<size_type> const &extents() const { return m_extents; }
 
 private:
+  void update_strides() {
+    size_type stride = 1;
+    auto jt = make_reverse_iterator(m_strides.end());
+    for (auto it = make_reverse_iterator(m_extents.end());
+         it != make_reverse_iterator(m_extents.begin()); it++) {
+      *jt = stride;
+      ++jt;
+      stride *= *it;
+    }
+  }
+
   std::vector<size_type> m_strides;
   std::vector<size_type> m_extents;
   std::vector<T> m_data;
