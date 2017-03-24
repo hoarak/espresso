@@ -27,7 +27,7 @@ set_target_properties(EspressoCore PROPERTIES SOVERSION ${SOVERSION})
 install(TARGETS EspressoCore LIBRARY DESTINATION ${LIBDIR})
 add_dependencies(EspressoCore EspressoConfig)
 
-target_link_libraries(EspressoCore ${LIBRARIES} Actor ObjectInFluid ImmersedBoundary Shapes Constraints EspressoUtils Correlators Observables)
+target_link_libraries(EspressoCore ${LIBRARIES} Actor ObjectInFluid ImmersedBoundary Shapes Constraints EspressoUtils Observables)
 
 if(SCAFACOS)
   target_link_libraries(EspressoCore Scafacos)
@@ -55,7 +55,7 @@ endif(CUDA)
 # Subdirectories
 add_subdirectory(utils)
 add_subdirectory(observables)
-add_subdirectory(correlators)
+# add_subdirectory(correlators)
 add_subdirectory(io)
 if(HDF5_FOUND)
     target_link_libraries(EspressoCore H5mdCore)

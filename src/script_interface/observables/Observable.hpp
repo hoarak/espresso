@@ -29,22 +29,14 @@ namespace ScriptInterface {
 namespace Observables {
 
 class Observable : public ScriptInterfaceBase {
+  using Super = ScriptInterfaceBase;
   typedef ::Observables::Observable CoreObs;
 
 public:
   const std::string name() const override { return "Observables::Observable"; }
 
-  ParameterMap valid_parameters() const override {
-    return {{"rank", {ParameterType::INT, true}}};
-  }
-  VariantMap get_parameters() const override {
-    return {{"rank", static_cast<int>(observable()->rank())}};
-  }
-
-  void set_parameter(std::string const &, Variant const &) override {}
-
   virtual Variant call_method(std::string const &method,
-                              VariantMap const &parameters) {
+                              VariantMap const &parameters) override {
     if (method == "calculate") {
       auto value = observable()->calculate();
 

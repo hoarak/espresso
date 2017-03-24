@@ -264,13 +264,6 @@ void Correlator::initialize() {
     throw std::runtime_error(init_errors[13]);
   }
 
-  //  if (A_fun == &file_data_source_readline && (B_fun ==
-  //  &file_data_source_readline|| autocorrelation)) {
-  //    is_from_file = 1;
-  //  } else {
-  //    is_from_file = 0;
-  //  }
-
   // Memmory allocation
   A_data = (double *)Utils::malloc((tau_lin + 1) * hierarchy_depth * dim_A *
                                    sizeof(double));

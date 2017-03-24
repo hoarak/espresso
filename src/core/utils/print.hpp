@@ -5,6 +5,8 @@
 
 namespace Utils {
 
+void print() { std::cout << '\n'; }
+
 /**
  * @brief Python style print function.
  */
@@ -12,8 +14,6 @@ template <typename Arg, typename... Args> void print(Arg v, Args... args) {
   std::cout << v << " ";
   print(args...);
 }
-
-template <typename T> void print(T v) { std::cout << v << '\n'; }
 
 } /* namespace Utils */
 
