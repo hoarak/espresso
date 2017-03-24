@@ -1,6 +1,8 @@
 #ifndef OBSERVABLES_PARTICLE_PROPERTIES_HPP
 #define OBSERVABLES_PARTICLE_PROPERTIES_HPP
 
+#include <boost/iterator/iterator_facade.hpp>
+
 #include "core/integrate.hpp"
 #include "core/particle_data.hpp"
 #include "core/rotation.hpp"
@@ -36,6 +38,26 @@ protected:
   Particle const &m_p;
 };
 
+template <typename T>
+class Iterator : public boost::iterator_facade<Iterator, double,
+                                               boost::forward_traversal_tag> {
+  Iterator(int i, T const &obj) : m_i(i), m_obj(obj) {}
+
+private:
+  friend class boost::iterator_core_access;
+
+  void increment() { ++m_i; }
+
+  bool equal(Iterator const &other) const {
+    return (m_obj == other.m_obj) and (m_i == other.m_i);
+  }
+
+  double &dereference() const { return m_obj(m_i); }
+
+  int m_i;
+  T const &m_obj;
+};
+
 struct Mass : Scalar, Property {
   using Property::Property;
   double operator()(size_t) const { return m_p.p.mass; }
@@ -56,16 +78,10 @@ struct Velocity : Vector<3>, Property {
   double operator()(size_t i) const { return m_p.m.v[i] / time_step; }
 };
 
+#ifdef ROTATION
 struct Omega : Vector<3>, Property {
   using Property::Property;
   double operator()(size_t i) const { return m_p.m.omega[i]; }
-};
-
-struct Force : Vector<3>, Property {
-  using Property::Property;
-  double operator()(size_t i) const {
-    return m_p.f.f[i] / time_step / time_step * 2.;
-  }
 };
 
 struct RotationMatrix : Matrix<3, 3> {
@@ -79,13 +95,22 @@ private:
   std::array<double, 9> m_matrix;
 };
 
+using AngularMomentum = MatrixProduct<RotationMatrix, Omega>;
+#endif
+
+struct Force : Vector<3>, Property {
+  using Property::Property;
+  double operator()(size_t i) const {
+    return m_p.f.f[i] / time_step / time_step * 2.;
+  }
+};
+
 template <typename T> using Flux = OuterProduct<T, Velocity>;
 
 using Current = Flux<Charge>;
 using Momentum = Flux<Mass>;
 using StressTensor = Flux<Momentum>;
 using Power = ScalarProduct<Velocity, Force>;
-using AngularMomentum = MatrixProduct<RotationMatrix, Omega>;
 using KineticEnergy = ComponentwiseProduct<RationalConstant<1, 2>,
                                            ScalarProduct<Velocity, Velocity>>;
 }
