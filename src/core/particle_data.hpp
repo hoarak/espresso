@@ -309,6 +309,8 @@ typedef struct {
 
 /** Struct holding all information for one particle. */
 typedef struct {
+  int identity() const { return p.identity; }
+  double (&position())[3] { return r.p; }
   ///
   ParticleProperties p;
   ///
