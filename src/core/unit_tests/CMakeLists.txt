@@ -64,3 +64,4 @@ target_link_libraries(ParallelScriptInterface_test EspressoScriptInterface)
 
 unit_test(NAME ParticleIterator_test SRC ParticleIterator_test.cpp)
 unit_test(NAME Range_test SRC Range_test.cpp)
+unit_test(NAME Interpolation_test SRC Interpolation_test.cpp)

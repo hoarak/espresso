@@ -1,5 +1,5 @@
-#ifndef __INTERPOLATION_BSPLINE_HPP
-#define __INTERPOLATION_BSPLINE_HPP
+#ifndef CORE_INTERPOLATION_BSPLINE_HPP
+#define CORE_INTERPOLATION_BSPLINE_HPP
 
 namespace Interpolation {
   template<typename T>
@@ -7,9 +7,9 @@ namespace Interpolation {
     return x*x;
   }
 
-template <int cao, typename scalar_type = double>
-inline scalar_type bspline(int i, scalar_type x) {
-  switch (cao) {
+template <unsigned order, typename T = double>
+inline T bspline(int i, T x) {
+  switch (order) {
   case 1:
     return 1.0;
   case 2: {
