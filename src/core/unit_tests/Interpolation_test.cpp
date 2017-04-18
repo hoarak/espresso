@@ -63,6 +63,7 @@ BOOST_AUTO_TEST_CASE(number_of_points) {
   check_number_of_points<2>();
   check_number_of_points<3>();
   check_number_of_points<4>();
+  check_number_of_points<7>();
 }
 
 template <size_t order> void cube_test() {
@@ -74,7 +75,7 @@ template <size_t order> void cube_test() {
 
   boost::multi_array<int, 3> A(boost::extents[mesh][mesh][mesh]);
 
-  auto weight = [](int i, double x) { return 1.0; };
+  auto weight = [](int, double) { return 1.0; };
 
   using interpolation_t =
       typename Interpolation::Interpolation<double, order, decltype(weight)>;
@@ -84,7 +85,7 @@ template <size_t order> void cube_test() {
 
   auto kernel = [&A](Particle const &p,
                      typename interpolation_t::index_t const &index,
-                     double weight) { A[index[0]][index[1]][index[2]] += 1; };
+                     double) { A[index[0]][index[1]][index[2]] += 1; };
 
   interpolation(particles, offset, h, kernel);
 
@@ -106,7 +107,7 @@ BOOST_AUTO_TEST_CASE(closest_mesh_point) {
 
   const std::array<double, 3> offset{{0.5 * h, 0.5 * h, 0.5 * h}};
 
-  auto weight = [](int i, double x) { return 1.0; };
+  auto weight = [](int i, double x) { return i + x; };
 
   using interpolation_t =
       typename Interpolation::Interpolation<double, 1, decltype(weight)>;
