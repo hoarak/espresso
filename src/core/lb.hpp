@@ -30,6 +30,8 @@
 #include "utils.hpp"
 #include "lattice_inline.hpp"
 
+using index_t = Lattice::index_t;
+
 extern int lb_components ; // global variable holding the number of fluid components
 
 #ifdef LB

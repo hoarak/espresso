@@ -21,6 +21,8 @@
 #include "communication.hpp"
 #include "integrate.hpp"
 
+using index_t = Lattice::index_t;
+
 ExternalPotential* external_potentials;
 int n_external_potentials;
 
