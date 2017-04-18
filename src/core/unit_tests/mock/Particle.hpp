@@ -14,6 +14,7 @@ public:
       : m_id(-1), m_position({{std::numeric_limits<double>::infinity(),
                                std::numeric_limits<double>::infinity(),
                                std::numeric_limits<double>::infinity()}}) {}
+  explicit Particle(int id) : Particle() {}
   Particle(int id, std::array<double, 3> position)
       : m_id(id), m_position(position) {}
 
