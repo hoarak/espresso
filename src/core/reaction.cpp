@@ -29,6 +29,7 @@
 #include "errorhandling.hpp"
 #include "cells.hpp"
 #include "domain_decomposition.hpp"
+#include "random.hpp"
 #include <vector>
 #include <random>
 #include <algorithm>

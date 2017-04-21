@@ -32,7 +32,6 @@
 #include "global.hpp"
 #include "integrate.hpp"
 #include "cells.hpp"
-#include "lb.hpp"
 #include "dpd.hpp"
 #include "virtual_sites.hpp"
 

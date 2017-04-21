@@ -35,6 +35,9 @@
 #include "constraints.hpp"
 #include "initialize.hpp"
 #include "external_potential.hpp"
+#include "integrate.hpp"
+#include "verlet.hpp"
+#include "utils.hpp"
 
 /************************************************/
 /** \name Defines */

@@ -19,6 +19,7 @@
 
 #include "virtual_sites_relative.hpp"
 #include "rotation.hpp"
+#include "grid.hpp"
 
 #ifdef VIRTUAL_SITES_RELATIVE
 

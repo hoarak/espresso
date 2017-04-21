@@ -88,6 +88,7 @@
 #include "immersed_boundary/ibm_triel.hpp"
 #include "immersed_boundary/ibm_volume_conservation.hpp"
 #endif
+#include "thermostat.hpp"
 
 /** initialize the forces for a ghost particle */
 inline void init_ghost_force(Particle *part) {
