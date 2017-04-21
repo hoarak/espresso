@@ -110,31 +110,7 @@ typedef struct {
    allocates 16 bytes, and
    reallocating to 0 also. To avoid this, we use our own malloc and realloc
    procedures. */
-
 namespace Utils {
-/**
- * \brief Calculate integer powers.
- * This functions calculates x^n, where
- * n is a positive integer that is known
- * at compile time. It uses exponentiation by
- * squaring to construct a efficient function.
- */
-template <unsigned n, typename T> inline T int_pow(T x) {
-  switch (n) {
-  case 0:
-    return T(1);
-  case 1:
-    return x;
-  default:
-    /** Even branch */
-    if (n % 2 == 0) {
-      return int_pow<n / 2, T>(x * x);
-    } else {
-      return x * int_pow<(n - 1) / 2, T>(x * x);
-    }
-  }
-}
-
 /** used instead of realloc.
     Makes sure that resizing to zero FREEs pointer */
 template <typename T> inline T *realloc(T *old, size_t size) {
