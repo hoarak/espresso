@@ -43,6 +43,12 @@
 
 #ifdef P3M
 
+#include "utils/math/int_pow.hpp"
+
+#include "p3m/influence_function/Bspline_hat.hpp"
+#include "p3m/influence_function/G_ewald.hpp"
+#include "p3m/influence_function/ik.hpp"
+
 /************************************************
  * variables
  ************************************************/
@@ -1196,46 +1202,36 @@ inline double perform_aliasing_sums_force(int n[3], double numerator[3]) {
 }
 
 template <int cao> void calc_influence_function_force() {
-  int i, n[3], ind;
+  using G_hat = P3M::InfluenceFunction::G_ewald<double>;
+  using W_hat = P3M::InfluenceFunction::BSpline_hat<double, cao>;
+
+  auto const &mesh_ = p3m.params.mesh;
+  auto g_hat = G_hat{p3m.params.alpha};
+  auto w_hat = W_hat{};
+  auto influence_function = P3M::InfluenceFunction::IK<double, G_hat, W_hat>{
+      {mesh_[0], mesh_[1], mesh_[2]},
+      {box_l[0], box_l[1], box_l[2]},
+      g_hat,
+      w_hat};
+
   int end[3];
   int size = 1;
-  double fak1, fak2, fak3;
-  double nominator[3] = {0.0, 0.0, 0.0};
-
-  p3m_calc_meshift();
-
-  for (i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++) {
     size *= fft.plan[3].new_mesh[i];
     end[i] = fft.plan[3].start[i] + fft.plan[3].new_mesh[i];
   }
   p3m.g_force = (double *)Utils::realloc(p3m.g_force, size * sizeof(double));
 
+  std::array<unsigned, 3> n;
   for (n[0] = fft.plan[3].start[0]; n[0] < end[0]; n[0]++) {
     for (n[1] = fft.plan[3].start[1]; n[1] < end[1]; n[1]++) {
       for (n[2] = fft.plan[3].start[2]; n[2] < end[2]; n[2]++) {
-        ind = (n[2] - fft.plan[3].start[2]) +
-              fft.plan[3].new_mesh[2] *
-                  ((n[1] - fft.plan[3].start[1]) +
-                   (fft.plan[3].new_mesh[1] * (n[0] - fft.plan[3].start[0])));
-
-        if ((n[KX] % (p3m.params.mesh[RX] / 2) == 0) &&
-            (n[KY] % (p3m.params.mesh[RY] / 2) == 0) &&
-            (n[KZ] % (p3m.params.mesh[RZ] / 2) == 0)) {
-          p3m.g_force[ind] = 0.0;
-        } else {
-          const double denominator =
-              perform_aliasing_sums_force<cao>(n, nominator);
-
-          fak1 = p3m.d_op[RX][n[KX]] * nominator[RX] / box_l[RX] +
-                 p3m.d_op[RY][n[KY]] * nominator[RY] / box_l[RY] +
-                 p3m.d_op[RZ][n[KZ]] * nominator[RZ] / box_l[RZ];
-          fak2 = SQR(p3m.d_op[RX][n[KX]] / box_l[RX]) +
-                 SQR(p3m.d_op[RY][n[KY]] / box_l[RY]) +
-                 SQR(p3m.d_op[RZ][n[KZ]] / box_l[RZ]);
-
-          fak3 = fak1 / (fak2 * SQR(denominator));
-          p3m.g_force[ind] = 2 * fak3 / (PI);
-        }
+        auto const ind =
+            (n[2] - fft.plan[3].start[2]) +
+            fft.plan[3].new_mesh[2] *
+                ((n[1] - fft.plan[3].start[1]) +
+                 (fft.plan[3].new_mesh[1] * (n[0] - fft.plan[3].start[0])));
+        p3m.g_force[ind] = influence_function(n);
       }
     }
   }
