@@ -9,6 +9,8 @@
 
 #include "utils/math/sqr.hpp"
 
+#include "AliasingSum.hpp"
+
 namespace P3M {
 namespace InfluenceFunction {
 
@@ -49,25 +51,15 @@ class IK {
 
   std::vector<T> m_data;
   index_t m_mesh;
-  std::array<std::vector<int>, 3> m_shift;
   std::array<std::vector<int>, 3> m_dop;
   std::array<T, 3> m_box;
   G_hat g_hat;
-  W_hat w_hat;
 
-  void calc_shift() {
-    for (int i = 0; i < 3; i++) {
-      auto &shift = m_shift[i];
-      shift.resize(m_mesh[i]);
+  AliasingSum<T, W_hat, m_max, index_t> m_aliasing_sum;
 
-      shift[0] = 0;
-      for (int j = 1; j <= m_mesh[i] / 2; j++) {
-        shift[j] = j;
-        shift[m_mesh[i] - j] = -j;
-      }
-    }
-  }
-
+  /** Calculates the Fourier transformed differential operator.
+   *  Remark: This is done on the level of n-vectors and not k-vectors,
+   *           i.e. the prefactor i*2*PI/L is missing! */
   void calc_dop() {
     for (int i = 0; i < 3; i++) {
       auto &dop = m_dop[i];
@@ -82,50 +74,58 @@ class IK {
     }
   }
 
-  std::pair<std::array<T, 3>, T> aliasing_sums(index_t const &n) const {
+  std::pair<std::array<T, 3>, T> aliasing_sums_force(index_t const &n) const {
     std::pair<std::array<T, 3>, T> ret{};
     using Utils::sqr;
 
-    for (int mx = -m_max; mx <= m_max; ++mx) {
-      const int nmx = m_shift[RX][n[KX]] + m_mesh[RX] * mx;
-      auto const sx = sqr(w_hat(nmx / static_cast<T>(m_mesh[RX])));
-      for (int my = -m_max; my <= m_max; ++my) {
-        int const nmy = m_shift[RY][n[KY]] + m_mesh[RY] * my;
-        auto const sxy = sx * sqr(w_hat(nmy / static_cast<T>(m_mesh[RY])));
-        for (int mz = -m_max; mz <= m_max; ++mz) {
-          int const nmz = m_shift[RZ][n[KZ]] + m_mesh[RZ] * mz;
-          auto const sxyz = sxy * sqr(w_hat(nmz / static_cast<T>(m_mesh[RZ])));
+    m_aliasing_sum(n, [&ret, this](int nmx, int nmy, int nmz, T w) {
+      auto const f =
+          w * g_hat(nmx / m_box[RX], nmy / m_box[RY], nmz / m_box[RZ]);
 
-          auto const f = sxyz * g_hat(nmx / m_box[RX], nmy / m_box[RY],
-                                              nmz / m_box[RZ]);
+      ret.first[RX] += f * nmx / m_box[RX];
+      ret.first[RY] += f * nmy / m_box[RY];
+      ret.first[RZ] += f * nmz / m_box[RZ];
 
-          ret.first[RX] += f * nmx / m_box[RX];
-          ret.first[RY] += f * nmy / m_box[RY];
-          ret.first[RZ] += f * nmz / m_box[RZ];
-
-          ret.second += sxyz;
-        }
-      }
-    }
+      ret.second += w;
+    });
 
     return ret;
   }
 
+  T aliasing_sums_energy(index_t const &n) const {
+    T num{0}, denum{0};
+
+    m_aliasing_sum(n, [&num, &denum, this](int nmx, int nmy, int nmz, T w) {
+      num += w * g_hat(nmx / m_box[RX], nmy / m_box[RY], nmz / m_box[RZ]);
+      denum += w;
+    });
+
+    return num / (denum * denum);
+  }
+
 public:
   IK(index_t mesh, std::array<T, 3> box, G_hat g_hat, W_hat w_hat)
-      : g_hat(g_hat), w_hat(w_hat), m_mesh(mesh), m_box(box) {
-    calc_shift();
+      : g_hat(g_hat), m_mesh(mesh), m_box(box), m_aliasing_sum(mesh, w_hat) {
     calc_dop();
   }
 
-  T operator()(index_t const &n) const {
+  T energy(index_t const &n) const {
+    if ((n[KX] % (m_mesh[RX] / 2) == 0) && (n[KY] % (m_mesh[RY] / 2) == 0) &&
+        (n[KZ] % (m_mesh[RZ] / 2) == 0)) {
+      return 0.0;
+    } else {
+      return aliasing_sums_energy(n) / pi;
+    }
+  }
+
+  T force(index_t const &n) const {
     using Utils::sqr;
 
     if ((n[KX] % (m_mesh[RX] / 2) == 0) && (n[KY] % (m_mesh[RY] / 2) == 0) &&
         (n[KZ] % (m_mesh[RZ] / 2) == 0)) {
       return 0.0;
     } else {
-      auto const as = aliasing_sums(n);
+      auto const as = aliasing_sums_force(n);
 
       auto const f1 = m_dop[RX][n[KX]] * as.first[RX] / m_box[RX] +
                       m_dop[RY][n[KY]] * as.first[RY] / m_box[RY] +

@@ -168,9 +168,6 @@ static void p3m_calc_local_ca_mesh(void);
  * are also tabulated in Deserno/Holm. */
 static void p3m_interpolate_charge_assignment_function(void);
 
-/** shifts the mesh points by mesh/2 */
-static void p3m_calc_meshift(void);
-
 /** Calculates the Fourier transformed differential operator.
  *  Remark: This is done on the level of n-vectors and not k-vectors,
  *           i.e. the prefactor i*2*PI/L is missing! */
@@ -267,9 +264,6 @@ void p3m_pre_init(void) {
   for (int i = 0; i < 7; i++)
     p3m.int_caf[i] = NULL;
   p3m.pos_shift = 0.0;
-  p3m.meshift_x = NULL;
-  p3m.meshift_y = NULL;
-  p3m.meshift_z = NULL;
 
   p3m.d_op[0] = NULL;
   p3m.d_op[1] = NULL;
@@ -1115,33 +1109,6 @@ void p3m_realloc_ca_fields(int newsize) {
 }
 #endif
 
-void p3m_calc_meshift(void) {
-  int i;
-
-  p3m.meshift_x = (double *)Utils::realloc(p3m.meshift_x,
-                                           p3m.params.mesh[0] * sizeof(double));
-  p3m.meshift_y = (double *)Utils::realloc(p3m.meshift_y,
-                                           p3m.params.mesh[1] * sizeof(double));
-  p3m.meshift_z = (double *)Utils::realloc(p3m.meshift_z,
-                                           p3m.params.mesh[2] * sizeof(double));
-
-  p3m.meshift_x[0] = p3m.meshift_y[0] = p3m.meshift_z[0] = 0;
-  for (i = 1; i <= p3m.params.mesh[RX] / 2; i++) {
-    p3m.meshift_x[i] = i;
-    p3m.meshift_x[p3m.params.mesh[0] - i] = -i;
-  }
-
-  for (i = 1; i <= p3m.params.mesh[RY] / 2; i++) {
-    p3m.meshift_y[i] = i;
-    p3m.meshift_y[p3m.params.mesh[1] - i] = -i;
-  }
-
-  for (i = 1; i <= p3m.params.mesh[RZ] / 2; i++) {
-    p3m.meshift_z[i] = i;
-    p3m.meshift_z[p3m.params.mesh[2] - i] = -i;
-  }
-}
-
 void p3m_calc_differential_operator() {
   int i, j;
 
@@ -1159,48 +1126,6 @@ void p3m_calc_differential_operator() {
 }
 
 namespace {
-
-template <int cao>
-inline double perform_aliasing_sums_force(int n[3], double numerator[3]) {
-  using Utils::int_pow;
-
-  int i;
-  double denominator = 0.0;
-  /* lots of temporary variables... */
-  double sx, sy, sz, f1, f2, mx, my, mz, nmx, nmy, nmz, nm2, expo;
-  double limit = 30;
-
-  for (i = 0; i < 3; i++)
-    numerator[i] = 0.0;
-
-  f1 = SQR(PI / (p3m.params.alpha));
-
-  for (mx = -P3M_BRILLOUIN; mx <= P3M_BRILLOUIN; mx++) {
-    nmx = p3m.meshift_x[n[KX]] + p3m.params.mesh[RX] * mx;
-    sx = int_pow<2 * cao>(sinc(nmx / (double)p3m.params.mesh[RX]));
-    for (my = -P3M_BRILLOUIN; my <= P3M_BRILLOUIN; my++) {
-      nmy = p3m.meshift_y[n[KY]] + p3m.params.mesh[RY] * my;
-      sy = sx * int_pow<2 * cao>(sinc(nmy / (double)p3m.params.mesh[RY]));
-      for (mz = -P3M_BRILLOUIN; mz <= P3M_BRILLOUIN; mz++) {
-        nmz = p3m.meshift_z[n[KZ]] + p3m.params.mesh[RZ] * mz;
-        sz = sy * int_pow<2 * cao>(sinc(nmz / (double)p3m.params.mesh[RZ]));
-
-        nm2 =
-            SQR(nmx / box_l[RX]) + SQR(nmy / box_l[RY]) + SQR(nmz / box_l[RZ]);
-        expo = f1 * nm2;
-        f2 = (expo < limit) ? sz * exp(-expo) / nm2 : 0.0;
-
-        numerator[RX] += f2 * nmx / box_l[RX];
-        numerator[RY] += f2 * nmy / box_l[RY];
-        numerator[RZ] += f2 * nmz / box_l[RZ];
-
-        denominator += sz;
-      }
-    }
-  }
-  return denominator;
-}
-
 template <int cao> void calc_influence_function_force() {
   using G_hat = P3M::InfluenceFunction::G_ewald<double>;
   using W_hat = P3M::InfluenceFunction::BSpline_hat<double, cao>;
@@ -1231,7 +1156,7 @@ template <int cao> void calc_influence_function_force() {
             fft.plan[3].new_mesh[2] *
                 ((n[1] - fft.plan[3].start[1]) +
                  (fft.plan[3].new_mesh[1] * (n[0] - fft.plan[3].start[0])));
-        p3m.g_force[ind] = influence_function(n);
+        p3m.g_force[ind] = influence_function.force(n);
       }
     }
   }
@@ -1267,70 +1192,40 @@ void p3m_calc_influence_function_force() {
 
 namespace {
 
-template <int cao> inline double perform_aliasing_sums_energy(int n[3]) {
-  using Utils::int_pow;
-  double numerator = 0.0, denominator = 0.0;
-  /* lots of temporary variables... */
-  double sx, sy, sz, f1, f2, mx, my, mz, nmx, nmy, nmz, nm2, expo;
-  double limit = 30;
-
-  f1 = SQR(PI / (p3m.params.alpha));
-
-  for (mx = -P3M_BRILLOUIN; mx <= P3M_BRILLOUIN; mx++) {
-    nmx = p3m.meshift_x[n[KX]] + p3m.params.mesh[RX] * mx;
-    sx = int_pow<2 * cao>(sinc(nmx / (double)p3m.params.mesh[RX]));
-    for (my = -P3M_BRILLOUIN; my <= P3M_BRILLOUIN; my++) {
-      nmy = p3m.meshift_y[n[KY]] + p3m.params.mesh[RY] * my;
-      sy = sx * int_pow<2 * cao>(sinc(nmy / (double)p3m.params.mesh[RY]));
-      for (mz = -P3M_BRILLOUIN; mz <= P3M_BRILLOUIN; mz++) {
-        nmz = p3m.meshift_z[n[KZ]] + p3m.params.mesh[RZ] * mz;
-        sz = sy * int_pow<2 * cao>(sinc(nmz / (double)p3m.params.mesh[RZ]));
-        /* k = 2*pi * (nx/lx, ny/ly, nz/lz); expo = -k^2 / 4*alpha^2 */
-        nm2 =
-            SQR(nmx / box_l[RX]) + SQR(nmy / box_l[RY]) + SQR(nmz / box_l[RZ]);
-        expo = f1 * nm2;
-        f2 = (expo < limit) ? sz * exp(-expo) / nm2 : 0.0;
-
-        numerator += f2;
-        denominator += sz;
-      }
-    }
-  }
-
-  return numerator / SQR(denominator);
-}
-
 template <int cao> void calc_influence_function_energy() {
-  int i, n[3], ind;
+  using G_hat = P3M::InfluenceFunction::G_ewald<double>;
+  using W_hat = P3M::InfluenceFunction::BSpline_hat<double, cao>;
+
+  auto const &mesh_ = p3m.params.mesh;
+  auto g_hat = G_hat{p3m.params.alpha};
+  auto w_hat = W_hat{};
+  auto influence_function = P3M::InfluenceFunction::IK<double, G_hat, W_hat>{
+      {mesh_[0], mesh_[1], mesh_[2]},
+      {box_l[0], box_l[1], box_l[2]},
+      g_hat,
+      w_hat};
+
   int end[3];
   int start[3];
   int size = 1;
-
-  p3m_calc_meshift();
-
-  for (i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++) {
     size *= fft.plan[3].new_mesh[i];
     end[i] = fft.plan[3].start[i] + fft.plan[3].new_mesh[i];
     start[i] = fft.plan[3].start[i];
   }
 
   p3m.g_energy = (double *)Utils::realloc(p3m.g_energy, size * sizeof(double));
-  ind = 0;
 
+  std::array<unsigned, 3> n;
   for (n[0] = start[0]; n[0] < end[0]; n[0]++) {
     for (n[1] = start[1]; n[1] < end[1]; n[1]++) {
       for (n[2] = start[2]; n[2] < end[2]; n[2]++) {
-        ind = (n[2] - start[2]) + fft.plan[3].new_mesh[2] * (n[1] - start[1]) +
-              fft.plan[3].new_mesh[2] * fft.plan[3].new_mesh[1] *
-                  (n[0] - start[0]);
-        if ((n[KX] % (p3m.params.mesh[RX] / 2) == 0) &&
-            (n[KY] % (p3m.params.mesh[RY] / 2) == 0) &&
-            (n[KZ] % (p3m.params.mesh[RZ] / 2) == 0)) {
-          p3m.g_energy[ind] = 0.0;
-        }
+        auto const ind = (n[2] - start[2]) +
+                         fft.plan[3].new_mesh[2] * (n[1] - start[1]) +
+                         fft.plan[3].new_mesh[2] * fft.plan[3].new_mesh[1] *
+                             (n[0] - start[0]);
 
-        else
-          p3m.g_energy[ind] = perform_aliasing_sums_energy<cao>(n) / PI;
+        p3m.g_energy[ind] = influence_function.energy(n);
       }
     }
   }
@@ -2384,29 +2279,6 @@ void p3m_calc_kspace_stress(double *stress) {
     free(node_k_space_stress);
     free(k_space_stress);
   }
-}
-
-/************************************************/
-
-/*********************** miscelanea of functions
- * *************************************/
-
-/************************************************
- * Debug functions printing p3m structures
- ************************************************/
-
-void p3m_p3m_print_struct(p3m_parameter_struct ps) {
-  fprintf(stderr, "%d: p3m_parameter_struct: \n", this_node);
-  fprintf(stderr, "   alpha_L=%f, r_cut_iL=%f \n", ps.alpha_L, ps.r_cut_iL);
-  fprintf(stderr, "   mesh=(%d,%d,%d), mesh_off=(%.4f,%.4f,%.4f)\n", ps.mesh[0],
-          ps.mesh[1], ps.mesh[2], ps.mesh_off[0], ps.mesh_off[1],
-          ps.mesh_off[2]);
-  fprintf(stderr, "   cao=%d, inter=%d, epsilon=%f\n", ps.cao, ps.inter,
-          ps.epsilon);
-  fprintf(stderr, "   cao_cut=(%f,%f,%f)\n", ps.cao_cut[0], ps.cao_cut[1],
-          ps.cao_cut[2]);
-  fprintf(stderr, "   a=(%f,%f,%f), ai=(%f,%f,%f)\n", ps.a[0], ps.a[1], ps.a[2],
-          ps.ai[0], ps.ai[1], ps.ai[2]);
 }
 
 #endif /* of P3M */
