@@ -45,6 +45,7 @@
 
 #include "utils/math/int_pow.hpp"
 
+#include "p3m/DOp.hpp"
 #include "p3m/influence_function/Bspline_hat.hpp"
 #include "p3m/influence_function/G_ewald.hpp"
 #include "p3m/influence_function/ik.hpp"
@@ -168,11 +169,6 @@ static void p3m_calc_local_ca_mesh(void);
  * are also tabulated in Deserno/Holm. */
 static void p3m_interpolate_charge_assignment_function(void);
 
-/** Calculates the Fourier transformed differential operator.
- *  Remark: This is done on the level of n-vectors and not k-vectors,
- *           i.e. the prefactor i*2*PI/L is missing! */
-static void p3m_calc_differential_operator(void);
-
 /** Calculates the optimal influence function of Hockney and Eastwood.
  * (optimised for force calculations)
  *
@@ -265,9 +261,6 @@ void p3m_pre_init(void) {
     p3m.int_caf[i] = NULL;
   p3m.pos_shift = 0.0;
 
-  p3m.d_op[0] = NULL;
-  p3m.d_op[1] = NULL;
-  p3m.d_op[2] = NULL;
   p3m.g_force = NULL;
   p3m.g_energy = NULL;
 
@@ -379,8 +372,7 @@ void p3m_init() {
     P3M_TRACE(
         fprintf(stderr, "%d: p3m.rs_mesh ADR=%p\n", this_node, p3m.rs_mesh));
 
-    /* k-space part: */
-    p3m_calc_differential_operator();
+    p3m.d_op = DOp(p3m.params.mesh);
 
     p3m_count_charged_particles();
 
@@ -827,8 +819,6 @@ double p3m_calc_kspace_forces(int force_flag, int energy_flag) {
   double force_prefac;
   /* k space energy */
   double k_space_energy = 0.0, node_k_space_energy = 0.0;
-  /* directions */
-  double *d_operator = NULL;
 
   P3M_TRACE(fprintf(stderr, "%d: p3m_perform: \n", this_node));
   //     fprintf(stderr, "calculating kspace forces\n");
@@ -895,15 +885,11 @@ double p3m_calc_kspace_forces(int force_flag, int energy_flag) {
 
     /* Force component loop */
     for (d = 0; d < 3; d++) {
-      if (d == KX)
-        d_operator = p3m.d_op[RX];
-      else if (d == KY)
-        d_operator = p3m.d_op[RY];
-      else if (d == KZ)
-        d_operator = p3m.d_op[RZ];
-
-      /* direction in k space: */
+      /* direction in r space: */
       d_rs = (d + p3m.ks_pnum) % 3;
+
+      auto const &d_operator = p3m.d_op[d_rs];
+
       /* srqt(-1)*k differentiation */
       ind = 0;
       for (j[0] = 0; j[0] < fft.plan[3].new_mesh[0]; j[0]++) {
@@ -1109,22 +1095,6 @@ void p3m_realloc_ca_fields(int newsize) {
 }
 #endif
 
-void p3m_calc_differential_operator() {
-  int i, j;
-
-  for (i = 0; i < 3; i++) {
-    p3m.d_op[i] = (double *)Utils::realloc(p3m.d_op[i],
-                                           p3m.params.mesh[i] * sizeof(double));
-    p3m.d_op[i][0] = 0;
-    p3m.d_op[i][p3m.params.mesh[i] / 2] = 0.0;
-
-    for (j = 1; j < p3m.params.mesh[i] / 2; j++) {
-      p3m.d_op[i][j] = j;
-      p3m.d_op[i][p3m.params.mesh[i] - j] = -j;
-    }
-  }
-}
-
 namespace {
 template <int cao> void calc_influence_function_force() {
   using G_hat = P3M::InfluenceFunction::G_ewald<double>;
@@ -1133,11 +1103,13 @@ template <int cao> void calc_influence_function_force() {
   auto const &mesh_ = p3m.params.mesh;
   auto g_hat = G_hat{p3m.params.alpha};
   auto w_hat = W_hat{};
-  auto influence_function = P3M::InfluenceFunction::IK<double, G_hat, W_hat>{
-      {mesh_[0], mesh_[1], mesh_[2]},
-      {box_l[0], box_l[1], box_l[2]},
-      g_hat,
-      w_hat};
+  auto influence_function =
+      P3M::InfluenceFunction::IK<double, G_hat, W_hat, DOp>{
+          {mesh_[0], mesh_[1], mesh_[2]},
+          {box_l[0], box_l[1], box_l[2]},
+          g_hat,
+          w_hat,
+          p3m.d_op};
 
   int end[3];
   int size = 1;
@@ -1199,11 +1171,13 @@ template <int cao> void calc_influence_function_energy() {
   auto const &mesh_ = p3m.params.mesh;
   auto g_hat = G_hat{p3m.params.alpha};
   auto w_hat = W_hat{};
-  auto influence_function = P3M::InfluenceFunction::IK<double, G_hat, W_hat>{
-      {mesh_[0], mesh_[1], mesh_[2]},
-      {box_l[0], box_l[1], box_l[2]},
-      g_hat,
-      w_hat};
+  auto influence_function =
+      P3M::InfluenceFunction::IK<double, G_hat, W_hat, DOp>{
+          {mesh_[0], mesh_[1], mesh_[2]},
+          {box_l[0], box_l[1], box_l[2]},
+          g_hat,
+          w_hat,
+          p3m.d_op};
 
   int end[3];
   int start[3];

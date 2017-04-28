@@ -37,8 +37,8 @@ struct NotTransposed {
 /**
  * @brief Implementation of doi: 10.1063/1.477414, Eq. (31).
  */
-template <typename T, typename G_hat, typename W_hat, int m_max = 0,
-          typename index_t = std::array<unsigned, 3>>
+template <typename T, typename G_hat, typename W_hat, typename DOp,
+          int m_max = 0, typename index_t = std::array<unsigned, 3>>
 class IK {
   constexpr static T pi = boost::math::constants::pi<T>();
   constexpr static std::size_t RX = 0;
@@ -51,28 +51,11 @@ class IK {
 
   std::vector<T> m_data;
   index_t m_mesh;
-  std::array<std::vector<int>, 3> m_dop;
   std::array<T, 3> m_box;
   G_hat g_hat;
+  DOp m_dop;
 
   AliasingSum<T, W_hat, m_max, index_t> m_aliasing_sum;
-
-  /** Calculates the Fourier transformed differential operator.
-   *  Remark: This is done on the level of n-vectors and not k-vectors,
-   *           i.e. the prefactor i*2*PI/L is missing! */
-  void calc_dop() {
-    for (int i = 0; i < 3; i++) {
-      auto &dop = m_dop[i];
-      dop.resize(m_mesh[i]);
-
-      dop[0] = 0;
-      dop[m_mesh[i] / 2] = 0;
-      for (int j = 1; j < m_mesh[i] / 2; j++) {
-        dop[j] = j;
-        dop[m_mesh[i] - j] = -j;
-      }
-    }
-  }
 
   std::pair<std::array<T, 3>, T> aliasing_sums_force(index_t const &n) const {
     std::pair<std::array<T, 3>, T> ret{};
@@ -104,10 +87,9 @@ class IK {
   }
 
 public:
-  IK(index_t mesh, std::array<T, 3> box, G_hat g_hat, W_hat w_hat)
-      : g_hat(g_hat), m_mesh(mesh), m_box(box), m_aliasing_sum(mesh, w_hat) {
-    calc_dop();
-  }
+  IK(index_t mesh, std::array<T, 3> box, G_hat g_hat, W_hat w_hat, DOp dop)
+      : g_hat(g_hat), m_mesh(mesh), m_box(box), m_dop(dop),
+        m_aliasing_sum(mesh, w_hat) {}
 
   T energy(index_t const &n) const {
     if ((n[KX] % (m_mesh[RX] / 2) == 0) && (n[KY] % (m_mesh[RY] / 2) == 0) &&

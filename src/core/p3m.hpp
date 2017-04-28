@@ -49,14 +49,18 @@
  *  </ul>
  */
 
+
+
 #include "config.hpp"
+
+#ifdef P3M
 #include "debug.hpp"
 #include "utils.hpp"
 
 #include "interaction_data.hpp"
 #include "p3m-common.hpp"
 
-#ifdef P3M
+#include "p3m/DOp.hpp"
 
 /************************************************
  * data types
@@ -87,7 +91,7 @@ typedef struct {
 
   /** Spatial differential operator in k-space. We use an i*k differentiation.
    */
-  double *d_op[3];
+  DOp d_op;
   /** Force optimised influence function (k-space) */
   double *g_force;
   /** Energy optimised influence function (k-space) */
