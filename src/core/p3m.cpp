@@ -252,7 +252,6 @@ void p3m_pre_init(void) {
   /* p3m.sm is uninitialized */
 
   p3m.rs_mesh = NULL;
-  p3m.ks_mesh = NULL;
   p3m.sum_qpart = 0;
   p3m.sum_q2 = 0.0;
   p3m.square_sum_q = 0.0;
@@ -260,9 +259,6 @@ void p3m_pre_init(void) {
   for (int i = 0; i < 7; i++)
     p3m.int_caf[i] = NULL;
   p3m.pos_shift = 0.0;
-
-  p3m.g_force = NULL;
-  p3m.g_energy = NULL;
 
 #ifdef P3M_STORE_CA_FRAC
   p3m.ca_num = 0;
@@ -287,7 +283,6 @@ void p3m_free() {
   free(p3m.send_grid);
   free(p3m.recv_grid);
   free(p3m.rs_mesh);
-  free(p3m.ks_mesh);
   for (i = 0; i < p3m.params.cao; i++)
     free(p3m.int_caf[i]);
 }
@@ -366,11 +361,8 @@ void p3m_init() {
     int ca_mesh_size =
         fft_init(&p3m.rs_mesh, p3m.local_mesh.dim, p3m.local_mesh.margin,
                  p3m.params.mesh, p3m.params.mesh_off, &p3m.ks_pnum);
-    p3m.ks_mesh =
-        (double *)Utils::realloc(p3m.ks_mesh, ca_mesh_size * sizeof(double));
-
-    P3M_TRACE(
-        fprintf(stderr, "%d: p3m.rs_mesh ADR=%p\n", this_node, p3m.rs_mesh));
+    
+    p3m.ks_mesh.resize(ca_mesh_size);
 
     p3m.d_op = DOp(p3m.params.mesh);
 
@@ -953,11 +945,11 @@ double p3m_calc_dipole_term(int force_flag, int energy_flag) {
   Particle *part;
   double pref = coulomb.prefactor * 4 * M_PI * box_l_i[0] * box_l_i[1] *
                 box_l_i[2] / (2 * p3m.params.epsilon + 1);
-  double lcl_dm[3], gbl_dm[3];
+  double local_dm[3], gbl_dm[3];
   double en;
 
   for (j = 0; j < 3; j++)
-    lcl_dm[j] = 0;
+    local_dm[j] = 0;
 
   for (c = 0; c < local_cells.n; c++) {
     np = local_cells.cell[c]->n;
@@ -965,16 +957,18 @@ double p3m_calc_dipole_term(int force_flag, int energy_flag) {
     for (i = 0; i < np; i++) {
       for (j = 0; j < 3; j++)
         /* dipole moment with unfolded coordinates */
-        lcl_dm[j] += part[i].p.q * (part[i].r.p[j] + part[i].l.i[j] * box_l[j]);
+        local_dm[j] +=
+            part[i].p.q * (part[i].r.p[j] + part[i].l.i[j] * box_l[j]);
     }
   }
 
-  MPI_Allreduce(lcl_dm, gbl_dm, 3, MPI_DOUBLE, MPI_SUM, comm_cart);
+  MPI_Allreduce(local_dm, gbl_dm, 3, MPI_DOUBLE, MPI_SUM, comm_cart);
 
   if (energy_flag)
     en = 0.5 * pref * (SQR(gbl_dm[0]) + SQR(gbl_dm[1]) + SQR(gbl_dm[2]));
   else
     en = 0;
+
   if (force_flag) {
     for (j = 0; j < 3; j++)
       gbl_dm[j] *= pref;
@@ -1117,7 +1111,7 @@ template <int cao> void calc_influence_function_force() {
     size *= fft.plan[3].new_mesh[i];
     end[i] = fft.plan[3].start[i] + fft.plan[3].new_mesh[i];
   }
-  p3m.g_force = (double *)Utils::realloc(p3m.g_force, size * sizeof(double));
+  p3m.g_force.resize(size);
 
   std::array<unsigned, 3> n;
   for (n[0] = fft.plan[3].start[0]; n[0] < end[0]; n[0]++) {
@@ -1188,7 +1182,7 @@ template <int cao> void calc_influence_function_energy() {
     start[i] = fft.plan[3].start[i];
   }
 
-  p3m.g_energy = (double *)Utils::realloc(p3m.g_energy, size * sizeof(double));
+  p3m.g_energy.resize(size);
 
   std::array<unsigned, 3> n;
   for (n[0] = start[0]; n[0] < end[0]; n[0]++) {

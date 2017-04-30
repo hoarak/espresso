@@ -54,6 +54,8 @@
 #include "config.hpp"
 
 #ifdef P3M
+#include <vector>
+
 #include "debug.hpp"
 #include "utils.hpp"
 
@@ -74,7 +76,7 @@ typedef struct {
   /** real space mesh (local) for CA/FFT.*/
   double *rs_mesh;
   /** k space mesh (local) for k space calculation and FFT.*/
-  double *ks_mesh;
+  std::vector<double> ks_mesh;
 
   /** number of charged particles (only on master node). */
   int sum_qpart;
@@ -93,9 +95,9 @@ typedef struct {
    */
   DOp d_op;
   /** Force optimised influence function (k-space) */
-  double *g_force;
+  std::vector<double> g_force;
   /** Energy optimised influence function (k-space) */
-  double *g_energy;
+  std::vector<double> g_energy;
 
 #ifdef P3M_STORE_CA_FRAC
   /** number of charged particles on the node. */
