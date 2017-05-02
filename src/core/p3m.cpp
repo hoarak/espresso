@@ -701,10 +701,6 @@ void p3m_shrink_wrap_charge_grid(int n_charges) {
 /* assign the forces obtained from k-space */
 template <int cao>
 static void P3M_assign_forces(double force_prefac, int d_rs) {
-  Cell *cell;
-  Particle *p;
-  int i, c, np, i0, i1, i2;
-  double q;
   /* charged particle counter, charge fraction counter */
   int cp_cnt = 0;
 #ifdef P3M_STORE_CA_FRAC
@@ -719,12 +715,12 @@ static void P3M_assign_forces(double force_prefac, int d_rs) {
   int q_ind = 0;
 
   for (auto &p : local_cells.particles()) {
-    if ((q = p.p.q) != 0.0) {
+    if (p.p.q != 0.0) {
 #ifdef P3M_STORE_CA_FRAC
       q_ind = p3m.ca_fmp[cp_cnt];
-      for (i0 = 0; i0 < cao; i0++) {
-        for (i1 = 0; i1 < cao; i1++) {
-          for (i2 = 0; i2 < cao; i2++) {
+      for (int i0 = 0; i0 < cao; i0++) {
+        for (int i1 = 0; i1 < cao; i1++) {
+          for (int i2 = 0; i2 < cao; i2++) {
             p.f.f[d_rs] -=
                 force_prefac * p3m.ca_frac[cf_cnt] * p3m.rs_mesh[q_ind];
             q_ind++;
@@ -758,12 +754,12 @@ static void P3M_assign_forces(double force_prefac, int d_rs) {
       }
 
       if (p3m.params.inter == 0) {
-        for (i0 = 0; i0 < cao; i0++) {
+        for (int i0 = 0; i0 < cao; i0++) {
           tmp0 = p3m_caf(i0, dist[0], cao);
-          for (i1 = 0; i1 < cao; i1++) {
+          for (int i1 = 0; i1 < cao; i1++) {
             tmp1 = tmp0 * p3m_caf(i1, dist[1], cao);
-            for (i2 = 0; i2 < cao; i2++) {
-              cur_ca_frac_val = q * tmp1 * p3m_caf(i2, dist[2], cao);
+            for (int i2 = 0; i2 < cao; i2++) {
+              cur_ca_frac_val = p.p.q * tmp1 * p3m_caf(i2, dist[2], cao);
               p.f.f[d_rs] -=
                   force_prefac * cur_ca_frac_val * p3m.rs_mesh[q_ind];
               q_ind++;
@@ -773,12 +769,12 @@ static void P3M_assign_forces(double force_prefac, int d_rs) {
           q_ind += p3m.local_mesh.q_21_off;
         }
       } else {
-        for (i0 = 0; i0 < cao; i0++) {
+        for (int i0 = 0; i0 < cao; i0++) {
           tmp0 = p3m.int_caf[i0][arg[0]];
-          for (i1 = 0; i1 < cao; i1++) {
+          for (int i1 = 0; i1 < cao; i1++) {
             tmp1 = tmp0 * p3m.int_caf[i1][arg[1]];
-            for (i2 = 0; i2 < cao; i2++) {
-              cur_ca_frac_val = q * tmp1 * p3m.int_caf[i2][arg[2]];
+            for (int i2 = 0; i2 < cao; i2++) {
+              cur_ca_frac_val = p.p.q * tmp1 * p3m.int_caf[i2][arg[2]];
               p.f.f[d_rs] -=
                   force_prefac * cur_ca_frac_val * p3m.rs_mesh[q_ind];
               q_ind++;
@@ -791,8 +787,8 @@ static void P3M_assign_forces(double force_prefac, int d_rs) {
 #endif
 
       ONEPART_TRACE(if (p.p.identity == check_id) fprintf(
-          stderr, "%d: OPT: P3M  f = (%.3e,%.3e,%.3e) in dir %d add %.5f\n",
-          this_node, p.f.f[0], p.f.f[1], p.f.f[2], d_rs, -db_fsum));
+          stderr, "%d: OPT: P3M  f = (%.3e,%.3e,%.3e) in dir %d\n", this_node,
+          p.f.f[0], p.f.f[1], p.f.f[2], d_rs));
     }
   }
 }
