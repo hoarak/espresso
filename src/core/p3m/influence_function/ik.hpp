@@ -14,25 +14,25 @@
 namespace P3M {
 namespace InfluenceFunction {
 
-struct Transposed {
-  constexpr static std::size_t RX = 0;
-  constexpr static std::size_t RY = 1;
-  constexpr static std::size_t RZ = 2;
+// struct Transposed {
+//   constexpr static std::size_t RX = 0;
+//   constexpr static std::size_t RY = 1;
+//   constexpr static std::size_t RZ = 2;
 
-  constexpr static std::size_t KX = 2;
-  constexpr static std::size_t KY = 0;
-  constexpr static std::size_t KZ = 1;
-};
+//   constexpr static std::size_t KX = 2;
+//   constexpr static std::size_t KY = 0;
+//   constexpr static std::size_t KZ = 1;
+// };
 
-struct NotTransposed {
-  constexpr static std::size_t RX = 0;
-  constexpr static std::size_t RY = 1;
-  constexpr static std::size_t RZ = 2;
+// struct NotTransposed {
+//   constexpr static std::size_t RX = 0;
+//   constexpr static std::size_t RY = 1;
+//   constexpr static std::size_t RZ = 2;
 
-  constexpr static std::size_t KX = 0;
-  constexpr static std::size_t KY = 1;
-  constexpr static std::size_t KZ = 2;
-};
+//   constexpr static std::size_t KX = 0;
+//   constexpr static std::size_t KY = 1;
+//   constexpr static std::size_t KZ = 2;
+// };
 
 /**
  * @brief Implementation of doi: 10.1063/1.477414, Eq. (31).
@@ -41,13 +41,9 @@ template <typename T, typename G_hat, typename W_hat, typename DOp,
           int m_max = 0, typename index_t = std::array<unsigned, 3>>
 class IK {
   constexpr static T pi = boost::math::constants::pi<T>();
-  constexpr static std::size_t RX = 0;
-  constexpr static std::size_t RY = 1;
-  constexpr static std::size_t RZ = 2;
-
-  constexpr static std::size_t KX = 2;
-  constexpr static std::size_t KY = 0;
-  constexpr static std::size_t KZ = 1;
+  constexpr static std::size_t X = 0;
+  constexpr static std::size_t Y = 1;
+  constexpr static std::size_t Z = 2;
 
   std::vector<T> m_data;
   index_t m_mesh;
@@ -62,12 +58,11 @@ class IK {
     using Utils::sqr;
 
     m_aliasing_sum(n, [&ret, this](int nmx, int nmy, int nmz, T w) {
-      auto const f =
-          w * g_hat(nmx / m_box[RX], nmy / m_box[RY], nmz / m_box[RZ]);
+      auto const f = w * g_hat(nmx / m_box[X], nmy / m_box[Y], nmz / m_box[Z]);
 
-      ret.first[RX] += f * nmx / m_box[RX];
-      ret.first[RY] += f * nmy / m_box[RY];
-      ret.first[RZ] += f * nmz / m_box[RZ];
+      ret.first[X] += f * nmx / m_box[X];
+      ret.first[Y] += f * nmy / m_box[Y];
+      ret.first[Z] += f * nmz / m_box[Z];
 
       ret.second += w;
     });
@@ -79,7 +74,7 @@ class IK {
     T num{0}, denum{0};
 
     m_aliasing_sum(n, [&num, &denum, this](int nmx, int nmy, int nmz, T w) {
-      num += w * g_hat(nmx / m_box[RX], nmy / m_box[RY], nmz / m_box[RZ]);
+      num += w * g_hat(nmx / m_box[X], nmy / m_box[Y], nmz / m_box[Z]);
       denum += w;
     });
 
@@ -92,8 +87,8 @@ public:
         m_aliasing_sum(mesh, w_hat) {}
 
   T energy(index_t const &n) const {
-    if ((n[KX] % (m_mesh[RX] / 2) == 0) && (n[KY] % (m_mesh[RY] / 2) == 0) &&
-        (n[KZ] % (m_mesh[RZ] / 2) == 0)) {
+    if ((n[X] % (m_mesh[X] / 2) == 0) && (n[Y] % (m_mesh[Y] / 2) == 0) &&
+        (n[Z] % (m_mesh[Z] / 2) == 0)) {
       return 0.0;
     } else {
       return aliasing_sums_energy(n) / pi;
@@ -103,19 +98,19 @@ public:
   T force(index_t const &n) const {
     using Utils::sqr;
 
-    if ((n[KX] % (m_mesh[RX] / 2) == 0) && (n[KY] % (m_mesh[RY] / 2) == 0) &&
-        (n[KZ] % (m_mesh[RZ] / 2) == 0)) {
+    if ((n[X] % (m_mesh[X] / 2) == 0) && (n[Y] % (m_mesh[Y] / 2) == 0) &&
+        (n[Z] % (m_mesh[Z] / 2) == 0)) {
       return 0.0;
     } else {
       auto const as = aliasing_sums_force(n);
 
-      auto const f1 = m_dop[RX][n[KX]] * as.first[RX] / m_box[RX] +
-                      m_dop[RY][n[KY]] * as.first[RY] / m_box[RY] +
-                      m_dop[RZ][n[KZ]] * as.first[RZ] / m_box[RZ];
+      auto const f1 = m_dop[X][n[X]] * as.first[X] / m_box[X] +
+                      m_dop[Y][n[Y]] * as.first[Y] / m_box[Y] +
+                      m_dop[Z][n[Z]] * as.first[Z] / m_box[Z];
 
-      auto const f2 = sqr(m_dop[RX][n[KX]] / m_box[RX]) +
-                      sqr(m_dop[RY][n[KY]] / m_box[RY]) +
-                      sqr(m_dop[RZ][n[KZ]] / m_box[RZ]);
+      auto const f2 = sqr(m_dop[X][n[X]] / m_box[X]) +
+                      sqr(m_dop[Y][n[Y]] / m_box[Y]) +
+                      sqr(m_dop[Z][n[Z]] / m_box[Z]);
 
       auto const f3 = f1 / (f2 * sqr(as.second));
 

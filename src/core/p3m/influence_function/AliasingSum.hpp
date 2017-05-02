@@ -14,13 +14,9 @@ template <typename T, typename W_hat, int m_max = 0,
           typename index_t = std::array<unsigned, 3>>
 class AliasingSum {
   constexpr static T pi = boost::math::constants::pi<T>();
-  constexpr static unsigned RX = 0;
-  constexpr static unsigned RY = 1;
-  constexpr static unsigned RZ = 2;
-
-  constexpr static unsigned KX = 2;
-  constexpr static unsigned KY = 0;
-  constexpr static unsigned KZ = 1;
+  constexpr static unsigned X = 0;
+  constexpr static unsigned Y = 1;
+  constexpr static unsigned Z = 2;
 
   index_t m_mesh;
   std::array<std::vector<int>, 3> m_shift;
@@ -50,14 +46,14 @@ public:
     using Utils::sqr;
 
     for (int mx = -m_max; mx <= m_max; ++mx) {
-      const int nmx = m_shift[RX][n[KX]] + m_mesh[RX] * mx;
-      auto const sx = sqr(w_hat(nmx / static_cast<T>(m_mesh[RX])));
+      const int nmx = m_shift[X][n[X]] + m_mesh[X] * mx;
+      auto const sx = sqr(w_hat(nmx / static_cast<T>(m_mesh[X])));
       for (int my = -m_max; my <= m_max; ++my) {
-        int const nmy = m_shift[RY][n[KY]] + m_mesh[RY] * my;
-        auto const sxy = sx * sqr(w_hat(nmy / static_cast<T>(m_mesh[RY])));
+        int const nmy = m_shift[Y][n[Y]] + m_mesh[Y] * my;
+        auto const sxy = sx * sqr(w_hat(nmy / static_cast<T>(m_mesh[Y])));
         for (int mz = -m_max; mz <= m_max; ++mz) {
-          int const nmz = m_shift[RZ][n[KZ]] + m_mesh[RZ] * mz;
-          auto const sxyz = sxy * sqr(w_hat(nmz / static_cast<T>(m_mesh[RZ])));
+          int const nmz = m_shift[Z][n[Z]] + m_mesh[Z] * mz;
+          auto const sxyz = sxy * sqr(w_hat(nmz / static_cast<T>(m_mesh[Z])));
 
           kernel(nmx, nmy, nmz, sxyz);
         }

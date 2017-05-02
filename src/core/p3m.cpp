@@ -361,7 +361,7 @@ void p3m_init() {
     int ca_mesh_size =
         fft_init(&p3m.rs_mesh, p3m.local_mesh.dim, p3m.local_mesh.margin,
                  p3m.params.mesh, p3m.params.mesh_off, &p3m.ks_pnum);
-    
+
     p3m.ks_mesh.resize(ca_mesh_size);
 
     p3m.d_op = DOp(p3m.params.mesh);
@@ -1122,7 +1122,7 @@ template <int cao> void calc_influence_function_force() {
             fft.plan[3].new_mesh[2] *
                 ((n[1] - fft.plan[3].start[1]) +
                  (fft.plan[3].new_mesh[1] * (n[0] - fft.plan[3].start[0])));
-        p3m.g_force[ind] = influence_function.force(n);
+        p3m.g_force[ind] = influence_function.force({n[KX], n[KY], n[KZ]});
       }
     }
   }
@@ -1193,7 +1193,7 @@ template <int cao> void calc_influence_function_energy() {
                          fft.plan[3].new_mesh[2] * fft.plan[3].new_mesh[1] *
                              (n[0] - start[0]);
 
-        p3m.g_energy[ind] = influence_function.energy(n);
+        p3m.g_energy[ind] = influence_function.energy({n[KX], n[KY], n[KZ]});
       }
     }
   }
