@@ -69,3 +69,4 @@ unit_test(NAME Variant_test SRC Variant_test.cpp ../../script_interface/Variant.
 unit_test(NAME ParticleIterator_test SRC ParticleIterator_test.cpp)
 unit_test(NAME Range_test SRC Range_test.cpp)
 unit_test(NAME int_pow_test SRC int_pow_test.cpp)
+unit_test(NAME Interpolation_test SRC Interpolation_test.cpp)
