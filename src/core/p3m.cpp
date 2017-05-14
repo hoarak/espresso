@@ -44,6 +44,7 @@
 #ifdef P3M
 
 #include "utils/math/int_pow.hpp"
+#include "utils/print.hpp"
 
 #include "p3m/DOp.hpp"
 #include "p3m/influence_function/Bspline_hat.hpp"
@@ -537,18 +538,15 @@ void p3m_charge_assign() {
 
 /* assign the charges */
 template <int cao> void p3m_do_charge_assign() {
-  Cell *cell;
-  Particle *p;
-  int i, c, np;
   /* charged particle counter, charge fraction counter */
   int cp_cnt = 0;
   /* prepare local FFT mesh */
-  for (i = 0; i < p3m.local_mesh.size; i++)
+  for (int i = 0; i < p3m.local_mesh.size; i++)
     p3m.rs_mesh[i] = 0.0;
 
   for (auto &p : local_cells.particles()) {
-    if (p.p.q != 0.0) {
-      p3m_do_assign_charge<cao>(p.p.q, p.r.p, cp_cnt);
+    if (p.charge() != 0.0) {
+      p3m_do_assign_charge<cao>(p.charge(), p.position(), cp_cnt);
       cp_cnt++;
     }
   }
@@ -585,6 +583,20 @@ void p3m_assign_charge(double q, double real_pos[3], int cp_cnt) {
   }
 }
 
+namespace Debug {
+struct Particle {
+  Particle() = default;
+  explicit Particle(std::array<double, 3> position) : m_position(position) {}
+  Particle(Particle const &) = default;
+  Particle &operator=(Particle const &) = default;
+
+  std::array<double, 3> const &position() const { return m_position; }
+  double charge() const { return 1.0; }
+
+  std::array<double, 3> m_position;
+};
+}
+
 template <int cao>
 void p3m_do_assign_charge(double q, double real_pos[3], int cp_cnt) {
   int d, i0, i1, i2;
@@ -611,6 +623,8 @@ void p3m_do_assign_charge(double q, double real_pos[3], int cp_cnt) {
   cur_ca_frac = p3m.ca_frac + cao * cao * cao * cp_cnt;
 #endif
 
+  Interpolation::Interpolation<double, cao> interpolation;
+
   for (d = 0; d < 3; d++) {
     /* particle position in mesh coordinates */
     pos = ((real_pos[d] - p3m.local_mesh.ld_pos[d]) * p3m.params.ai[d]) -
@@ -620,10 +634,13 @@ void p3m_do_assign_charge(double q, double real_pos[3], int cp_cnt) {
     /* 3d-array index of nearest mesh point */
     q_ind = (d == 0) ? nmp : nmp + p3m.local_mesh.dim[d] * q_ind;
 
-    if (p3m.params.inter == 0)
+    dist[d] = (pos - nmp) - 0.5;
+
+    if (p3m.params.inter == 0) {
+      Utils::print("no inter");
       /* distance to nearest mesh point */
       dist[d] = (pos - nmp) - 0.5;
-    else
+    } else
       /* distance to nearest mesh point for interpolation */
       arg[d] = (int)((pos - nmp) * p3m.params.inter2);
 
@@ -642,6 +659,35 @@ void p3m_do_assign_charge(double q, double real_pos[3], int cp_cnt) {
     }
 #endif
   }
+
+  auto weights = [](int i, double x) -> double {
+    // return 1.0;
+    return Interpolation::bspline<cao>(i, x);
+  };
+
+  std::vector<Debug::Particle> particles(
+      1, Debug::Particle{{real_pos[0], real_pos[1], real_pos[2]}});
+
+  auto local_mesh = p3m.local_mesh;
+  auto rs_mesh = p3m.rs_mesh;
+
+  auto kernel = [&local_mesh, &q, &rs_mesh](
+      Debug::Particle const &p,
+      typename Interpolation::Interpolation<double, cao>::index_t const &index,
+      double weight) {
+    auto const q_ind = index[0] * local_mesh.dim[2] * local_mesh.dim[1] +
+                       index[1] * local_mesh.dim[2] + index[2];
+    rs_mesh[q_ind] += weight * q;
+  };
+
+  auto const h = p3m.params.a[0];
+  std::array<double, 3> offset;
+  for (int i = 0; i < 3; i++) {
+    offset[i] =
+        (p3m.local_mesh.ld_ind[i] + p3m.params.mesh_off[i]) * p3m.params.a[i];
+  }
+
+  interpolation(particles, weights, offset, h, kernel);
 
 #ifdef P3M_STORE_CA_FRAC
   if (cp_cnt >= 0)
@@ -674,7 +720,6 @@ void p3m_do_assign_charge(double q, double real_pos[3], int cp_cnt) {
         tmp1 = tmp0 * p3m.int_caf[i1][arg[1]];
         for (i2 = 0; i2 < cao; i2++) {
           cur_ca_frac_val = q * tmp1 * p3m.int_caf[i2][arg[2]];
-          p3m.rs_mesh[q_ind] += cur_ca_frac_val;
 #ifdef P3M_STORE_CA_FRAC
           /* store current ca frac */
           if (cp_cnt >= 0)
@@ -713,6 +758,36 @@ static void P3M_assign_forces(double force_prefac, int d_rs) {
 #endif
   /* index, index jumps for rs_mesh array */
   int q_ind = 0;
+
+  Interpolation::Interpolation<double, cao> interpolation;
+
+  auto weights = [](int i, double x) -> double {
+    // return 1.0;
+    return Interpolation::bspline<cao>(i, x);
+  };
+
+  auto local_mesh = p3m.local_mesh;
+  auto rs_mesh = p3m.rs_mesh;
+
+  auto kernel = [&local_mesh, &rs_mesh, &force_prefac, &d_rs](
+      Particle &p,
+      typename Interpolation::Interpolation<double, cao>::index_t const &index,
+      double weight) {
+    auto const q_ind = index[0] * local_mesh.dim[2] * local_mesh.dim[1] +
+                       index[1] * local_mesh.dim[2] + index[2];
+    p.f.f[d_rs] -= weight * p.p.q * force_prefac * rs_mesh[q_ind];
+  };
+
+  auto const h = p3m.params.a[0];
+  std::array<double, 3> offset;
+  for (int i = 0; i < 3; i++) {
+    offset[i] =
+        (p3m.local_mesh.ld_ind[i] + p3m.params.mesh_off[i]) * p3m.params.a[i];
+  }
+
+  interpolation(local_cells.particles(), weights, offset, h, kernel);
+
+  return;
 
   for (auto &p : local_cells.particles()) {
     if (p.p.q != 0.0) {
