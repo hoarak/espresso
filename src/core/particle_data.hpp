@@ -310,6 +310,7 @@ typedef struct {
 /** Struct holding all information for one particle. */
 typedef struct {
   double (&position())[3] { return r.p; }
+  double charge() { return p.q; }
   ///
   ParticleProperties p;
   ///
