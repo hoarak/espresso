@@ -19,15 +19,15 @@ public:
 
   template <typename Particles, typename Offset, typename Weights,
             typename Kernel>
-  void operator()(Particles const &parts, Weights const &weights,
+  void operator()(Particles &&parts, Weights const &weights,
                   Offset const &offset, T h, Kernel const &kernel) const {
     using array_t = std::array<T, 3>;
 
     const T hi = 1. / h;
-    for (auto const &p : parts) {
+    for (auto &p : parts) {
       /* Distance to the nearest mesh point in units of h \in [-0.5, 0.5) */
       array_t dist;
-      /* Index of the lower left corner of the assinment cube */
+      /* Index of the lower left corner of the assignment cube */
       index_t ll;
 
       auto const &pos = p.position();
