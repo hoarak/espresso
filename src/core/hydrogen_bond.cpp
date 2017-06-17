@@ -271,10 +271,10 @@ int calc_hydrogen_bond_force(Particle *s1, Particle *b1, Particle *b2, Particle 
 #ifdef CG_DNA_DEBUG
   if(big_force) {  
     puts("Big Force Basepair.");
-    PS(s1->p.identity);
-    PS(b1->p.identity);
-    PS(b2->p.identity);
-    PS(s2->p.identity);
+    PS(s1->id());
+    PS(b1->id());
+    PS(b2->id());
+    PS(s2->id());
     PV(s1->r.p);
     PV(b1->r.p);
     PV(b2->r.p);

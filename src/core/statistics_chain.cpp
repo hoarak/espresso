@@ -51,7 +51,7 @@ void update_mol_ids_setchains() {
     p  = cell->part;
     np = cell->n;
     for(i = 0; i < np; i++) {
-      p[i].p.mol_id = floor((p[i].p.identity - chain_start)/(double)chain_length);
+      p[i].p.mol_id = floor((p[i].id() - chain_start)/(double)chain_length);
     }
   }
 }

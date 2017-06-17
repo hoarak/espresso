@@ -812,7 +812,7 @@ static void P3M_assign_forces(double force_prefac, int d_rs) {
         }
 #endif
 
-        ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+        ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
             stderr, "%d: OPT: P3M  f = (%.3e,%.3e,%.3e) in dir %d add %.5f\n",
             this_node, p[i].f.f[0], p[i].f.f[1], p[i].f.f[2], d_rs, -db_fsum));
       }

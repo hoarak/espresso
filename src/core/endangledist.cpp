@@ -185,7 +185,7 @@ int calc_endangledist_pair_force(Particle *p1, Particle *p2,
 //
 ///*
 //fprintf(stdout,"  Bead %4d: Cl.wall=%2d  distwallmin=%9.6f
-//\n",p1->p.identity,clconstr,distwallmin);
+//\n",p1->id(),clconstr,distwallmin);
 //fprintf(stdout,"    vector=(%f %f %f)\n",vec[0],vec[1],vec[2]);
 //fprintf(stdout,"pos1=(%f %f %f)  pos2=(%f %f %f)  distwallmin=%9.6f
 //angle=%9.6f\n",p1->r.p[0],p1->r.p[1],p1->r.p[2],p2->r.p[0],p2->r.p[1],p2->r.p[2],distwallmin,phi*180.0/PI);
@@ -221,15 +221,15 @@ int calc_endangledist_pair_force(Particle *p1, Particle *p2,
 //  }
 //#endif
 //
-//  ONEPART_TRACE(if (p1->p.identity == check_id) fprintf(
+//  ONEPART_TRACE(if (p1->id() == check_id) fprintf(
 //      stderr, "%d: OPT: ENDANGLEDIST f = (%.3e,%.3e,%.3e) "
 //              "with part id=%d at dist %f fac %.3e %.3e\n",
-//      this_node, p1->f.f[0], p1->f.f[1], p1->f.f[2], p2->p.identity, dist,
+//      this_node, p1->f.f[0], p1->f.f[1], p1->f.f[2], p2->id(), dist,
 //      fac_a, fac_b));
-//  ONEPART_TRACE(if (p2->p.identity == check_id) fprintf(
+//  ONEPART_TRACE(if (p2->id() == check_id) fprintf(
 //      stderr, "%d: OPT: ENDANGLEDIST f = (%.3e,%.3e,%.3e) "
 //              "with part id=%d at dist %f fac %.3e %.3e\n",
-//      this_node, p2->f.f[0], p2->f.f[1], p2->f.f[2], p1->p.identity, dist,
+//      this_node, p2->f.f[0], p2->f.f[1], p2->f.f[2], p1->id(), dist,
 //      fac_a, fac_b));
 //
 //  return 0;

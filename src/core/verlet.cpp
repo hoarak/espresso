@@ -273,11 +273,11 @@ void build_verlet_lists_and_calc_verlet_ia()
           {
           dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
 
-          VERLET_TRACE(fprintf(stderr,"%d: pair %d %d has distance %f\n",this_node,p1[i].p.identity,p2[j].p.identity,sqrt(dist2)));
+          VERLET_TRACE(fprintf(stderr,"%d: pair %d %d has distance %f\n",this_node,p1[i].id(),p2[j].id(),sqrt(dist2)));
 
           if(verlet_list_criterion(p1+i, p2+j,dist2)) {
-            ONEPART_TRACE(if(p1[i].p.identity==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d,%d %d,%d dist %f)\n",this_node,p1[i].p.identity,p2[j].p.identity,c,i,n,j,sqrt(dist2)));
-            ONEPART_TRACE(if(p2[j].p.identity==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d %d dist %f)\n",this_node,p1[i].p.identity,p2[j].p.identity,c,n,sqrt(dist2)));
+            ONEPART_TRACE(if(p1[i].id()==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d,%d %d,%d dist %f)\n",this_node,p1[i].id(),p2[j].id(),c,i,n,j,sqrt(dist2)));
+            ONEPART_TRACE(if(p2[j].id()==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d %d dist %f)\n",this_node,p1[i].id(),p2[j].id(),c,n,sqrt(dist2)));
             add_pair(pl, &p1[i], &p2[j]);
 #ifdef MULTI_TIMESTEP
       if (smaller_time_step < 0.
@@ -340,7 +340,7 @@ void calculate_verlet_energies()
         p1 = pairs[i];                    /* pointer to particle 1 */
         p2 = pairs[i+1];                  /* pointer to particle 2 */
         dist2 = distance2vec(p1->r.p, p2->r.p, vec21);
-        VERLET_TRACE(fprintf(stderr, "%d: %d <-> %d: dist2 dist2\n",this_node,p1->p.identity,p2->p.identity));
+        VERLET_TRACE(fprintf(stderr, "%d: %d <-> %d: dist2 dist2\n",this_node,p1->id(),p2->id()));
         add_non_bonded_pair_energy(p1, p2, vec21, sqrt(dist2), dist2);
       }
     }

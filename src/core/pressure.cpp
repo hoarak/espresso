@@ -831,7 +831,7 @@ int get_nonbonded_interaction(Particle *p1, Particle *p2, double *force)
   force[0]=0; force[1]=0; force[2]=0; 
   
 
-  if ((p1->p.identity != p2->p.identity)&&(checkIfParticlesInteract(p1->p.type, p2->p.type))) {
+  if ((p1->id() != p2->id())&&(checkIfParticlesInteract(p1->p.type, p2->p.type))) {
     /* distance calculation */
     get_mi_vector(d, p1->r.p, p2->r.p);
     dist2 = SQR(d[0]) + SQR(d[1]) + SQR(d[2]);
@@ -962,7 +962,7 @@ int local_stress_tensor_calc(DoubleList *TensorInBin, int bins[3], int periodic[
       p1 = &(particles[i]);
       whichbin(p1->r.p,bins,centre, range, &bin); 
       if (bin >= 0) {
-	PTENSOR_TRACE(fprintf(stderr,"%d:Got particle number %d i is %d pos is %f %f %f \n",this_node,p1->p.identity,i,p1->r.p[0],p1->r.p[1],p1->r.p[2]));
+	PTENSOR_TRACE(fprintf(stderr,"%d:Got particle number %d i is %d pos is %f %f %f \n",this_node,p1->id(),i,p1->r.p[0],p1->r.p[1],p1->r.p[2]));
 	PTENSOR_TRACE(fprintf(stderr,"%d:Ideal gas component is {",this_node));
 	for(k=0;k<3;k++) {
 	  for(l=0;l<3;l++) {
@@ -984,7 +984,7 @@ int local_stress_tensor_calc(DoubleList *TensorInBin, int bins[3], int periodic[
 	p2 = local_particles[p1->bl.e[j++]];
 	get_mi_vector(dx, p1->r.p, p2->r.p);
 	calc_bonded_force(p1,p2,iaparams,&j,dx,force);
-	PTENSOR_TRACE(fprintf(stderr,"%d: Bonded to particle %d with force %f %f %f\n",this_node,p2->p.identity,force[0],force[1],force[2]));
+	PTENSOR_TRACE(fprintf(stderr,"%d: Bonded to particle %d with force %f %f %f\n",this_node,p2->id(),force[0],force[1],force[2]));
 	if ((pow(force[0],2)+pow(force[1],2)+pow(force[2],2)) > 0) {
 	  if (distribute_tensors(TensorInBin,force,bins,range_start,range,p1->r.p, p2->r.p) != 1) return 0;
 	}
@@ -1002,12 +1002,12 @@ int local_stress_tensor_calc(DoubleList *TensorInBin, int bins[3], int periodic[
 	p2 = pairs[i+1];                  // pointer to particle 2
 	if ((incubewithskin(p1->r.p,centre,range)) && (incubewithskin(p2->r.p,centre,range))) {
 	  get_nonbonded_interaction(p1,p2, force);
-	  PTENSOR_TRACE(fprintf(stderr,"%d:Looking at pair %d %d force is %f %f %f\n",this_node,p1->p.identity, p2->p.identity,force[0],force[1], force[2]));
+	  PTENSOR_TRACE(fprintf(stderr,"%d:Looking at pair %d %d force is %f %f %f\n",this_node,p1->id(), p2->id(),force[0],force[1], force[2]));
 	  if ((pow(force[0],2)+pow(force[1],2)+pow(force[2],2)) > 0) {
 	    if (distribute_tensors(TensorInBin,force,bins,range_start,range,p1->r.p, p2->r.p) != 1) return 0;
 	  }
 	} else {
-	  // PTENSOR_TRACE(fprintf(stderr,"%d:Looking at pair %d %d not in cube with skin\n",this_node,p1->p.identity, p2->p.identity));
+	  // PTENSOR_TRACE(fprintf(stderr,"%d:Looking at pair %d %d not in cube with skin\n",this_node,p1->id(), p2->id()));
 	}
       }
     }

@@ -2940,7 +2940,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
       && !(p->p.ext_flag & COORD_FIXED(1)) && !(p->p.ext_flag & COORD_FIXED(2)))
     {
       ONEPART_TRACE(
-                    if(p->p.identity == check_id) 
+                    if(p->id() == check_id) 
                       {
                         fprintf(stderr,
                                 "%d: OPT: f = (%.3e,%.3e,%.3e)\n",
@@ -2955,7 +2955,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
   lblattice.map_position_to_lattice(p->r.p,node_index,delta);
   
   ONEPART_TRACE(
-                if(p->p.identity == check_id) 
+                if(p->id() == check_id) 
                   {
                     fprintf(stderr,
                             "%d: OPT: LB delta=(%.3f,%.3f,%.3f,%.3f,%.3f,%.3f) pos=(%.3f,%.3f,%.3f)\n",
@@ -2970,7 +2970,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
   lb_lbfluid_get_interpolated_velocity(p->r.p, interpolated_u);
   
   ONEPART_TRACE(
-                if (p->p.identity==check_id) 
+                if (p->id()==check_id) 
                   {
                     fprintf(stderr,
                             "%d: OPT: LB u = (%.16e,%.3e,%.3e) v = (%.16e,%.3e,%.3e)\n",
@@ -3010,7 +3010,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
 #endif
 
   ONEPART_TRACE(
-                if (p->p.identity == check_id)
+                if (p->id() == check_id)
                   {
                     fprintf(stderr,
                             "%d: OPT: LB f_drag = (%.6e,%.3e,%.3e)\n",
@@ -3019,7 +3019,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
                 );
 
   ONEPART_TRACE(
-                if (p->p.identity == check_id)
+                if (p->id() == check_id)
                   {
                     fprintf(stderr,
                             "%d: OPT: LB f_random = (%.6e,%.3e,%.3e)\n",
@@ -3032,7 +3032,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
   force[2] = force[2] + p->lc.f_random[2];
 
   ONEPART_TRACE(
-                if (p->p.identity == check_id) 
+                if (p->id() == check_id) 
                   {
                     fprintf(stderr,
                             "%d: OPT: LB f_tot = (%.6e,%.3e,%.3e)\n",
@@ -3324,7 +3324,7 @@ void calc_particle_lattice_ia() {
           p[i].f.f[1] += force[1];
           p[i].f.f[2] += force[2];
         
-          ONEPART_TRACE( if (p->p.identity == check_id)  {
+          ONEPART_TRACE( if (p->id() == check_id)  {
                           fprintf(stderr, "%d: OPT: LB f = (%.6e,%.3e,%.3e)\n", this_node, p->f.f[0], p->f.f[1], p->f.f[2]);  } );
         }
       }
@@ -3347,7 +3347,7 @@ void calc_particle_lattice_ia() {
             && p[i].r.p[2] < my_right[2]+0.5*lblattice.agrid[2]) 
           {
             ONEPART_TRACE(
-                          if (p[i].p.identity == check_id)
+                          if (p[i].id() == check_id)
                             {
                               fprintf(stderr,
                                       "%d: OPT: LB coupling of ghost particle:\n",
@@ -3364,7 +3364,7 @@ void calc_particle_lattice_ia() {
             
             /* ghosts must not have the force added! */
             ONEPART_TRACE(
-                          if (p->p.identity == check_id)
+                          if (p->id() == check_id)
                             {
                               fprintf(stderr,
                                       "%d: OPT: LB f = (%.6e,%.3e,%.3e)\n",

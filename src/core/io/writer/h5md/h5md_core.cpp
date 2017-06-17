@@ -312,7 +312,7 @@ void File::fill_arrays_for_h5md_write_with_particle_property(
   bool write_mass = write_dat & W_MASS;
   bool write_charge = write_dat & W_CHARGE;
 
-  id[0][particle_index][0] = current_particle->p.identity;
+  id[0][particle_index][0] = current_particle->id();
   if (write_species)
     typ[0][particle_index][0] = current_particle->p.type;
   if (write_mass)
@@ -349,7 +349,7 @@ void File::fill_arrays_for_h5md_write_with_particle_property(
     int nbonds_local = bond.shape()[1];
     for (int i = 1; i < current_particle->bl.n; i = i + 2) {
       bond.resize(boost::extents[1][nbonds_local + 1][2]);
-      bond[0][nbonds_local][0] = current_particle->p.identity;
+      bond[0][nbonds_local][0] = current_particle->id();
       bond[0][nbonds_local][1] = current_particle->bl.e[i];
     }
   }

@@ -27,6 +27,7 @@
 
 #include "config.hpp"
 #include "utils.hpp"
+#include "Vector.hpp"
 
 /************************************************
  * defines
@@ -309,6 +310,11 @@ typedef struct {
 
 /** Struct holding all information for one particle. */
 typedef struct {
+  int id() const { return p.identity; }
+
+  /* Position, folded up to skin */
+  double(&pos())[3] { return r.p; }
+
   ///
   ParticleProperties p;
   ///
@@ -324,13 +330,15 @@ typedef struct {
   ParticleLatticeCoupling lc;
 #endif
   /** bonded interactions list. The format is pretty simple:
-      Just the bond type, and then the particle ids. The number of particle ids
+      Just the bond type, and then the particle ids. The number of particle
+     ids
      can be determined
       easily from the bonded_ia_params entry for the type. */
   IntList bl;
 
 #ifdef EXCLUSIONS
-  /** list of particles, with which this particle has no nonbonded interactions
+  /** list of particles, with which this particle has no nonbonded
+   * interactions
    */
   IntList el;
 #endif
@@ -338,7 +346,6 @@ typedef struct {
 #ifdef ENGINE
   ParticleParametersSwimming swim;
 #endif
-
 } Particle;
 
 /** List of particles. The particle array is resized using a sophisticated
@@ -481,7 +488,8 @@ Particle *move_indexed_particle(ParticleList *destList,
 /*    Other Functions                           */
 /************************************************/
 
-/** Update the entries in \ref local_particles for all particles in the list pl.
+/** Update the entries in \ref local_particles for all particles in the list
+   pl.
     @param pl the list to put in.
 */
 void update_local_particles(ParticleList *pl);
@@ -647,7 +655,8 @@ int set_particle_mol_id(int part, int mid);
 */
 int set_particle_quat(int part, double quat[4]);
 
-/** Call only on the master node: set particle angular velocity from lab frame.
+/** Call only on the master node: set particle angular velocity from lab
+   frame.
     @param part the particle.
     @param omega its new angular velocity.
     @return ES_OK if particle existed
@@ -761,7 +770,8 @@ int set_particle_fix(int part, int flag);
 /** Call only on the master node: change particle bond.
     @param part     identity of principal atom of the bond.
     @param bond     field containing the bond type number and the
-    identity of all bond partners (secundary atoms of the bond). If NULL, delete
+    identity of all bond partners (secundary atoms of the bond). If NULL,
+   delete
    all bonds.
     @param _delete   if true, do not add the bond, rather delete it if found
     @return ES_OK on success or ES_ERROR if no success
@@ -772,7 +782,8 @@ int change_particle_bond(int part, int *bond, int _delete);
 #ifdef EXCLUSIONS
 /** Call only on the master node: change particle constraints.
     @param part     identity of particle for which the exclusion is set.
-    @param part2    identity of particle for which the exclusion is set. If -1,
+    @param part2    identity of particle for which the exclusion is set. If
+   -1,
    delete all exclusions.
     @param _delete   if true, do not add the exclusion, rather delete it if
    found
@@ -832,7 +843,8 @@ int sortPartCfg();
     be on the local node!
     @param part the identity of the particle to move
     @param p    its new position
-    @param _new  if true, the particle is allocated, else has to exists already
+    @param _new  if true, the particle is allocated, else has to exists
+   already
 */
 void local_place_particle(int part, double p[3], int _new);
 
@@ -892,9 +904,10 @@ void recv_particles(ParticleList *particles, int node);
  * calculated */
 inline int do_nonbonded(Particle *p1, Particle *p2) {
   int i, i2;
-  /* check for particle 2 in particle 1's exclusion list. The exclusion list is
+  /* check for particle 2 in particle 1's exclusion list. The exclusion list
+     is
      symmetric, so this is sufficient. */
-  i2 = p2->p.identity;
+  i2 = p2->id();
   for (i = 0; i < p1->el.n; i++)
     if (i2 == p1->el.e[i])
       return 0;
@@ -915,11 +928,13 @@ void try_add_exclusion(Particle *part, int part2);
  exclusion list.
  This uses the bond topology obtained directly from the particles, since only
  this contains
- the full topology, in contrast to \ref topology::topology. To easily setup the
+ the full topology, in contrast to \ref topology::topology. To easily setup
+ the
  bonds, all data
  should be on a single node, therefore the \ref partCfg array is used. With
  large amounts
- of particles, you should avoid this function and setup exclusions manually. */
+ of particles, you should avoid this function and setup exclusions manually.
+ */
 void auto_exclusion(int distance);
 
 /* keep a unique list for particle i. Particle j is only added if it is not i
@@ -929,7 +944,8 @@ void add_partner(IntList *il, int i, int j, int distance);
 // value that is returned in the case there was no error, but the type was not
 // yet indexed
 #define NOT_INDEXED -3
-// struct that associates the index used for the type_list and the real particle
+// struct that associates the index used for the type_list and the real
+// particle
 // type
 typedef struct {
   int max_entry;

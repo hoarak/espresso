@@ -92,7 +92,7 @@ void ShapeBasedConstraint::add_force(Particle *p, double *folded_pos) {
         reflect_particle(p, vec, folded_pos);
       } else {
         runtimeErrorMsg() << "Constraint"
-                          << " violated by particle " << p->p.identity
+                          << " violated by particle " << p->id()
                           << " dist " << dist;
       }
     }
@@ -130,7 +130,7 @@ void ShapeBasedConstraint::add_energy(Particle *p, double *folded_pos,
       }
     } else {
       runtimeErrorMsg() << "Constraint "
-                        << " violated by particle " << p->p.identity;
+                        << " violated by particle " << p->id();
     }
   }
   if (part_rep.p.type >= 0)

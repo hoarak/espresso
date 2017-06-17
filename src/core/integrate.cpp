@@ -659,7 +659,7 @@ void rescale_forces() {
       p[i].f.f[1] *= scale / (p[i]).p.mass;
       p[i].f.f[2] *= scale / (p[i]).p.mass;
 
-      ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+      ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr,
           "%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",
           this_node, p[i].f.f[0], p[i].f.f[1], p[i].f.f[2], p[i].m.v[0],
@@ -703,7 +703,7 @@ void rescale_forces_propagate_vel() {
       p[i].f.f[1] *= scale / (p[i]).p.mass;
       p[i].f.f[2] *= scale / (p[i]).p.mass;
 
-      ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+      ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr,
           "%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",
           this_node, p[i].f.f[0], p[i].f.f[1], p[i].f.f[2], p[i].m.v[0],
@@ -738,7 +738,7 @@ void rescale_forces_propagate_vel() {
 #endif
       }
 
-      ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+      ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr, "%d: OPT: PV_2 v_new = (%.3e,%.3e,%.3e)\n", this_node,
           p[i].m.v[0], p[i].m.v[1], p[i].m.v[2]));
     }
@@ -887,10 +887,10 @@ void propagate_press_box_pos_and_rescale_npt() {
           }
 #endif
         }
-        ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+        ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
             stderr, "%d: OPT:PV_1 v_new=(%.3e,%.3e,%.3e)\n", this_node,
             p[i].m.v[0], p[i].m.v[1], p[i].m.v[2]));
-        ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+        ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
             stderr, "%d: OPT:PPOS p=(%.3f,%.3f,%.3f)\n", this_node, p[i].r.p[0],
             p[i].r.p[1], p[i].r.p[2]));
 #ifdef ADDITIONAL_CHECKS
@@ -974,7 +974,7 @@ void propagate_vel() {
 #endif
         }
 
-        ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+        ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
             stderr, "%d: OPT: PV_1 v_new = (%.3e,%.3e,%.3e)\n", this_node,
             p[i].m.v[0], p[i].m.v[1], p[i].m.v[2]));
 #ifdef ADDITIONAL_CHECKS
@@ -1083,10 +1083,10 @@ void propagate_vel_pos() {
         }
       }
 
-      ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+      ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr, "%d: OPT: PV_1 v_new = (%.3e,%.3e,%.3e)\n", this_node,
           p[i].m.v[0], p[i].m.v[1], p[i].m.v[2]));
-      ONEPART_TRACE(if (p[i].p.identity == check_id) fprintf(
+      ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr, "%d: OPT: PPOS p = (%.3e,%.3e,%.3e)\n", this_node,
           p[i].r.p[0], p[i].r.p[1], p[i].r.p[2]));
 
@@ -1171,7 +1171,7 @@ void force_and_velocity_check(Particle *p) {
     if (fabs(p->r.p[i] - p->l.p_old[i]) > local_box_l[i]) {
       fprintf(stderr, "%d: particle %d moved further than local box length by "
                       "%lf %lf %lf\n",
-              this_node, p->p.identity, p->r.p[0] - p->l.p_old[0],
+              this_node, p->id(), p->r.p[0] - p->l.p_old[0],
               p->r.p[1] - p->l.p_old[1], p->r.p[2] - p->l.p_old[2]);
     }
 
@@ -1179,19 +1179,19 @@ void force_and_velocity_check(Particle *p) {
   db_force = SQR(p->f.f[0]) + SQR(p->f.f[1]) + SQR(p->f.f[2]);
   if (db_force > skin2)
     fprintf(stderr, "%d: Part %d has force %f (%f,%f,%f)\n", this_node,
-            p->p.identity, sqrt(db_force), p->f.f[0], p->f.f[1], p->f.f[2]);
+            p->id(), sqrt(db_force), p->f.f[0], p->f.f[1], p->f.f[2]);
   if (db_force > db_max_force) {
     db_max_force = db_force;
-    db_maxf_id = p->p.identity;
+    db_maxf_id = p->id();
   }
   /* velocity check */
   db_vel = SQR(p->m.v[0]) + SQR(p->m.v[1]) + SQR(p->m.v[2]);
   if (db_vel > skin2)
     fprintf(stderr, "%d: Part %d has velocity %f (%f,%f,%f)\n", this_node,
-            p->p.identity, sqrt(db_vel), p->m.v[0], p->m.v[1], p->m.v[2]);
+            p->id(), sqrt(db_vel), p->m.v[0], p->m.v[1], p->m.v[2]);
   if (db_vel > db_max_vel) {
     db_max_vel = db_vel;
-    db_maxv_id = p->p.identity;
+    db_maxv_id = p->id();
   }
 #endif
 }

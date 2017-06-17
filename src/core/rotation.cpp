@@ -223,7 +223,7 @@ void propagate_omega_quat_particle(Particle* p)
   for(int j=0; j < 3; j++){
     p->m.omega[j]+= time_step_half*Wd[j];
   }
-  ONEPART_TRACE(if(p->p.identity==check_id) fprintf(stderr,"%d: OPT: PV_1 v_new = (%.3e,%.3e,%.3e)\n",this_node,p->m.v[0],p->m.v[1],p->m.v[2]));
+  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: PV_1 v_new = (%.3e,%.3e,%.3e)\n",this_node,p->m.v[0],p->m.v[1],p->m.v[2]));
   
   p->r.quat[0]+= time_step*(Qd[0] + time_step_half*Qdd[0]) - lambda*p->r.quat[0];
   p->r.quat[1]+= time_step*(Qd[1] + time_step_half*Qdd[1]) - lambda*p->r.quat[1];
@@ -237,7 +237,7 @@ void propagate_omega_quat_particle(Particle* p)
 #endif
   
   
-  ONEPART_TRACE(if(p->p.identity==check_id) fprintf(stderr,"%d: OPT: PPOS p = (%.3f,%.3f,%.3f)\n",this_node,p->r.p[0],p->r.p[1],p->r.p[2]));
+  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: PPOS p = (%.3f,%.3f,%.3f)\n",this_node,p->r.p[0],p->r.p[1],p->r.p[2]));
 }
 
 /** convert the torques to the body-fixed frames and propagate angular velocities */
@@ -352,7 +352,7 @@ void convert_torques_propagate_omega()
       }
 #endif
 
-      ONEPART_TRACE(if(p[i].p.identity==check_id) fprintf(stderr,"%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",this_node,p[i].f.f[0],p[i].f.f[1],p[i].f.f[2],p[i].m.v[0],p[i].m.v[1],p[i].m.v[2]));
+      ONEPART_TRACE(if(p[i].id()==check_id) fprintf(stderr,"%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",this_node,p[i].f.f[0],p[i].f.f[1],p[i].f.f[2],p[i].m.v[0],p[i].m.v[1],p[i].m.v[2]));
 
 #ifdef ROTATIONAL_INERTIA
       p[i].m.omega[0]+= time_step_half*p[i].f.torque[0]/p[i].p.rinertia[0];
@@ -387,7 +387,7 @@ void convert_torques_propagate_omega()
         p[i].m.omega[2] = omega_0[2] + time_step_half*Wd[2];
       }
 
-      ONEPART_TRACE(if(p[i].p.identity==check_id) fprintf(stderr,"%d: OPT: PV_2 v_new = (%.3e,%.3e,%.3e)\n",this_node,p[i].m.v[0],p[i].m.v[1],p[i].m.v[2]));
+      ONEPART_TRACE(if(p[i].id()==check_id) fprintf(stderr,"%d: OPT: PV_2 v_new = (%.3e,%.3e,%.3e)\n",this_node,p[i].m.v[0],p[i].m.v[1],p[i].m.v[2]));
 
     }
   }
@@ -442,7 +442,7 @@ void convert_initial_torques()
       
 #endif
 
-      ONEPART_TRACE(if(p[i].p.identity==check_id) fprintf(stderr,"%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",this_node,p[i].f.f[0],p[i].f.f[1],p[i].f.f[2],p[i].m.v[0],p[i].m.v[1],p[i].m.v[2]));
+      ONEPART_TRACE(if(p[i].id()==check_id) fprintf(stderr,"%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",this_node,p[i].f.f[0],p[i].f.f[1],p[i].f.f[2],p[i].m.v[0],p[i].m.v[1],p[i].m.v[2]));
     }
   }
 }
@@ -494,12 +494,11 @@ void convert_vec_space_to_body(Particle *p, double *v,double* res)
 void multiply_quaternions(double a[4], double b[4], double result[4])
 {
  // Formula from http://www.j3d.org/matrix_faq/matrfaq_latest.html
- result[0] = a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3];
- result[1] = a[0] * b[1] + a[1] * b[0] + a[2] * b[3] - a[3] * b[2];
- result[2] = a[0] * b[2] + a[2] * b[0] + a[3] * b[1] - a[1] * b[3]; 
- result[3] = a[0] * b[3] + a[3] * b[0] + a[1] * b[2] - a[2] * b[1];
+  result[0] = a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3];
+  result[1] = a[0] * b[1] + a[1] * b[0] + a[2] * b[3] - a[3] * b[2];
+  result[2] = a[0] * b[2] + a[2] * b[0] + a[3] * b[1] - a[1] * b[3];
+  result[3] = a[0] * b[3] + a[3] * b[0] + a[1] * b[2] - a[2] * b[1];
 }
-
 
 /** Rotate the particle p around the NORMALIZED axis aSpaceFrame by amount phi */
 void rotate_particle(Particle* p, double* aSpaceFrame, double phi)

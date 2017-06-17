@@ -70,13 +70,13 @@ inline int calc_fene_pair_force(Particle *p1, Particle *p2,
     fac = 0.0;
   }
   
-  FENE_TRACE(if(fac > 50) fprintf(stderr,"WARNING: FENE force factor between Pair (%d,%d) large: %f at distance %f\n", p1->p.identity,p2->p.identity,fac,sqrt(len2)) );
+  FENE_TRACE(if(fac > 50) fprintf(stderr,"WARNING: FENE force factor between Pair (%d,%d) large: %f at distance %f\n", p1->id(),p2->id(),fac,sqrt(len2)) );
   
   for(i=0;i<3;i++)
     force[i] = fac*dx[i];
 
-  ONEPART_TRACE(if(p1->p.identity==check_id) fprintf(stderr,"%d: OPT: FENE f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->p.identity,sqrt(len2),fac));
-  ONEPART_TRACE(if(p2->p.identity==check_id) fprintf(stderr,"%d: OPT: FENE f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->p.identity,sqrt(len2),fac));
+  ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: FENE f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),sqrt(len2),fac));
+  ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: FENE f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),sqrt(len2),fac));
   
   return 0;
 }
@@ -89,7 +89,7 @@ inline int fene_pair_energy(Particle *p1, Particle *p2,
 
   /* check bond stretching */
   if(dr >= iaparams->p.fene.drmax) {
-    runtimeErrorMsg() <<"FENE bond broken between particles "<< p1->p.identity << " and " << p2->p.identity;
+    runtimeErrorMsg() <<"FENE bond broken between particles "<< p1->id() << " and " << p2->id();
     return 1;
   }
 

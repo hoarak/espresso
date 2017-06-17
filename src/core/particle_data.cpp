@@ -385,7 +385,7 @@ int sortPartCfg()
 
   sorted = (Particle*)Utils::malloc(n_part*sizeof(Particle));
   for(i = 0; i < n_part; i++)
-    memmove(&sorted[partCfg[i].p.identity], &partCfg[i], sizeof(Particle));
+    memmove(&sorted[partCfg[i].id()], &partCfg[i], sizeof(Particle));
   free(partCfg);
   partCfg = sorted;
 
@@ -479,7 +479,7 @@ void update_local_particles(ParticleList *pl)
   Particle *p = pl->part;
   int n = pl->n, i;
   for (i = 0; i < n; i++)
-    local_particles[p[i].p.identity] = &p[i];
+    local_particles[p[i].id()] = &p[i];
 }
 
 Particle *got_particle(ParticleList *l, int id)
@@ -487,7 +487,7 @@ Particle *got_particle(ParticleList *l, int id)
   int i;
 
   for (i = 0; i < l->n; i++)
-    if (l->part[i].p.identity == id)
+    if (l->part[i].id() == id)
       break;
   if (i == l->n)
     return NULL;
@@ -518,7 +518,7 @@ Particle *append_indexed_particle(ParticleList *l, Particle *part)
   if (re)
     update_local_particles(l);
   else
-    local_particles[p->p.identity] = p;
+    local_particles[p->id()] = p;
   return p;
 }
 
@@ -550,11 +550,11 @@ Particle *move_indexed_particle(ParticleList *dl, ParticleList *sl, int i)
     //fprintf(stderr, "%d: m_i_p: update destination list after realloc\n",this_node);
     update_local_particles(dl); }
   else {
-    //fprintf(stderr, "%d: m_i_p: update loc_part entry for moved particle (id %d)\n",this_node,dst->p.identity);
-    local_particles[dst->p.identity] = dst;
+    //fprintf(stderr, "%d: m_i_p: update loc_part entry for moved particle (id %d)\n",this_node,dst->id());
+    local_particles[dst->id()] = dst;
   }
   if ( src != end ) {
-    //fprintf(stderr, "%d: m_i_p: copy end particle in source list (id %d)\n",this_node,end->p.identity);
+    //fprintf(stderr, "%d: m_i_p: copy end particle in source list (id %d)\n",this_node,end->id());
     memmove(src, end, sizeof(Particle));
 
   }
@@ -562,8 +562,8 @@ Particle *move_indexed_particle(ParticleList *dl, ParticleList *sl, int i)
     //fprintf(stderr, "%d: m_i_p: update source list after realloc\n",this_node);
     update_local_particles(sl); }
   else if ( src != end ) {
-    //fprintf(stderr, "%d: m_i_p: update loc_part entry for end particle (id %d)\n",this_node,src->p.identity);
-    local_particles[src->p.identity] = src; }
+    //fprintf(stderr, "%d: m_i_p: update loc_part entry for end particle (id %d)\n",this_node,src->id());
+    local_particles[src->id()] = src; }
   return dst;
 }
 
@@ -1316,13 +1316,13 @@ void local_remove_particle(int part)
   free_particle(p);
 
   /* remove local_particles entry */
-  local_particles[p->p.identity] = NULL;
+  local_particles[p->id()] = NULL;
 
   if (&pl->part[pl->n - 1] != p) {
     /* move last particle to free position */
     memmove(p, &pl->part[pl->n - 1], sizeof(Particle));
     /* update the local_particles array for the moved particle */
-    local_particles[p->p.identity] = p;
+    local_particles[p->id()] = p;
   }
 
   pl->n--;
@@ -1361,7 +1361,7 @@ void local_place_particle(int part, double p[3], int _new)
     if (rl)
       update_local_particles(cell);
     else
-      local_particles[pt->p.identity] = pt;
+      local_particles[pt->id()] = pt;
   }
   else
     pt = local_particles[part];
@@ -1529,7 +1529,7 @@ void remove_all_bonds_to(int identity)
       }
       if (i != bl->n) {
 	fprintf(stderr, "%d: INTERNAL ERROR: bond information corrupt for particle %d, exiting...\n",
-		this_node, part[p].p.identity);
+		this_node, part[p].id());
 	errexit();
       }
     }
@@ -1638,7 +1638,7 @@ void send_particles(ParticleList *particles, int node)
 
   /* remove particles from this nodes local list and free data */
   for (pc = 0; pc < particles->n; pc++) {
-    local_particles[particles->part[pc].p.identity] = NULL;
+    local_particles[particles->part[pc].id()] = NULL;
     free_particle(&particles->part[pc]);
   }
 
@@ -1670,10 +1670,10 @@ void recv_particles(ParticleList *particles, int node)
     local_dyn.n += p->el.n;
 #endif
 
-    PART_TRACE(fprintf(stderr, "%d: recv_particles got particle %d\n", this_node, p->p.identity));
+    PART_TRACE(fprintf(stderr, "%d: recv_particles got particle %d\n", this_node, p->id()));
 #ifdef ADDITIONAL_CHECKS
-    if (local_particles[p->p.identity] != NULL) {
-      fprintf(stderr, "%d: transmitted particle %d is already here...\n", this_node, p->p.identity);
+    if (local_particles[p->id()] != NULL) {
+      fprintf(stderr, "%d: transmitted particle %d is already here...\n", this_node, p->id());
       errexit();
     }
 #endif
@@ -1767,7 +1767,7 @@ void auto_exclusion(int distance)
   /* determine initial connectivity */
   for (p = 0; p < n_part; p++) {
     part1 = &partCfg[p];
-    p1    = part1->p.identity;
+    p1    = part1->id();
     for (i = 0; i < part1->bl.n;) {
       ia_params = &bonded_ia_params[part1->bl.e[i++]];
       if (ia_params->num == 1) {
@@ -1889,7 +1889,7 @@ for ( int i = 0; i<Index.max_entry; i++ )
 	type_array[Index.type[type]].id_list = (int *) Utils::malloc (sizeof (int) * n_part);
 	for (int i=0; i<n_part; i++) {
 		if ( partCfg[i].p.type==type ) 
-			type_array[Index.type[type]].id_list[t_c++]=partCfg[i].p.identity;
+			type_array[Index.type[type]].id_list[t_c++]=partCfg[i].id();
 	}
 	int max_size=n_part;
 	if ( t_c != 0 ) { 
@@ -1968,7 +1968,7 @@ int update_particle_array(int type) {
 	int t_c = 0;
 	for (int i=0; i<n_part; i++) {
 		if (partCfg[i].p.type == type ) {
-			type_array[Index.type[type]].id_list[t_c++] = partCfg[i].p.identity;
+			type_array[Index.type[type]].id_list[t_c++] = partCfg[i].id();
 		}	
 		if ( t_c > (double) type_array[Index.type[type]].cur_size/2.0 ) {
 			if ( reallocate_type_array(type) == ES_ERROR ) 

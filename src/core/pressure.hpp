@@ -196,7 +196,7 @@ inline void calc_bonded_force(Particle *p1, Particle *p2, Bonded_ia_parameters *
 
 #ifdef TABULATED
     case BONDED_IA_TABULATED:
-      // printf("BONDED TAB, Particle: %d, P2: %d TYPE_TAB: %d\n",p1->p.identity,p2->p.identity,iparams->p.tab.type);
+      // printf("BONDED TAB, Particle: %d, P2: %d TYPE_TAB: %d\n",p1->id(),p2->id(),iparams->p.tab.type);
       switch(iaparams->p.tab.type) {
         case TAB_BOND_LENGTH:
 	  calc_tab_bond_force(p1, p2, iaparams, dx, force); break;
@@ -205,14 +205,14 @@ inline void calc_bonded_force(Particle *p1, Particle *p2, Bonded_ia_parameters *
         case TAB_BOND_DIHEDRAL:
           (*i)+=2; force[0] = force[1] = force[2] = 0; break;
         default:
-          runtimeErrorMsg() <<"calc_bonded_force: tabulated bond type of atom " << p1->p.identity << " unknown\n";
+          runtimeErrorMsg() <<"calc_bonded_force: tabulated bond type of atom " << p1->id() << " unknown\n";
 	  return;
       }
       break;
 #endif
 #ifdef OVERLAPPED
     case BONDED_IA_OVERLAPPED:
-      // printf("BONDED OVERLAP, Particle: %d, P2: %d TYPE_OVERLAP: %d\n",p1->p.identity,p2->p.identity,iparams->p.tab.type);
+      // printf("BONDED OVERLAP, Particle: %d, P2: %d TYPE_OVERLAP: %d\n",p1->id(),p2->id(),iparams->p.tab.type);
       //char *errtxt;
       switch(iaparams->p.overlap.type) {
         case OVERLAP_BOND_LENGTH:
@@ -222,7 +222,7 @@ inline void calc_bonded_force(Particle *p1, Particle *p2, Bonded_ia_parameters *
         case OVERLAP_BOND_DIHEDRAL:
           (*i)+=2; force[0] = force[1] = force[2] = 0; break;
         default:
-          runtimeErrorMsg() <<"calc_bonded_force: overlapped bond type of atom " << p1->p.identity << " unknown\n";
+          runtimeErrorMsg() <<"calc_bonded_force: overlapped bond type of atom " << p1->id() << " unknown\n";
           return;
       }
       break;
@@ -236,8 +236,8 @@ inline void calc_bonded_force(Particle *p1, Particle *p2, Bonded_ia_parameters *
       force[0] = force[1] = force[2] = 0; break;
 #endif
     default :
-      //      fprintf(stderr,"add_bonded_virials: WARNING: Bond type %d of atom %d unhandled\n",bonded_ia_params[type_num].type,p1->p.identity);
-      fprintf(stderr,"add_bonded_virials: WARNING: Bond type %d , atom %d unhandled, Atom 2: %d\n",iaparams->type,p1->p.identity,p2->p.identity);
+      //      fprintf(stderr,"add_bonded_virials: WARNING: Bond type %d of atom %d unhandled\n",bonded_ia_params[type_num].type,p1->id());
+      fprintf(stderr,"add_bonded_virials: WARNING: Bond type %d , atom %d unhandled, Atom 2: %d\n",iaparams->type,p1->id(),p2->id());
       force[0] = force[1] = force[2] = 0;
       break;
     }
@@ -282,7 +282,7 @@ inline void calc_three_body_bonded_forces(Particle *p1, Particle *p2, Particle *
         calc_angle_3body_tabulated_forces(p1, p2, p3, iaparams, force1, force2, force3);
         break;
       default:
-        runtimeErrorMsg() <<"calc_bonded_force: tabulated bond type of atom " << p1->p.identity << " unknown\n";
+        runtimeErrorMsg() <<"calc_bonded_force: tabulated bond type of atom " << p1->id() << " unknown\n";
         return;
       }
       break;
@@ -290,7 +290,7 @@ inline void calc_three_body_bonded_forces(Particle *p1, Particle *p2, Particle *
   default :
     fprintf(stderr,"calc_three_body_bonded_forces: \
             WARNING: Bond type %d , atom %d unhandled, Atom 2: %d\n", \
-            iaparams->type, p1->p.identity, p2->p.identity);
+            iaparams->type, p1->id(), p2->id());
     break;
   }
 }
@@ -322,7 +322,7 @@ inline void add_bonded_virials(Particle *p1)
       // for harmonic spring:
       // if cutoff was defined and p2 is not there it is anyway outside the cutoff, see calc_maximal_cutoff()
       if ((type_num==BONDED_IA_HARMONIC)&&(iaparams->p.harmonic.r_cut>0)) return;
-      runtimeErrorMsg() <<"bond broken between particles " << p1->p.identity << " and " << p1->bl.e[i-1] << " (particles not stored on the same node)";
+      runtimeErrorMsg() <<"bond broken between particles " << p1->id() << " and " << p1->bl.e[i-1] << " (particles not stored on the same node)";
       return;
     }
 
@@ -461,7 +461,7 @@ inline void add_three_body_bonded_stress(Particle *p1) {
         i = i + 4;
       }
       else {
-        runtimeErrorMsg() <<"add_three_body_bonded_stress: match not found for particle " << p1->p.identity << ".\n";
+        runtimeErrorMsg() <<"add_three_body_bonded_stress: match not found for particle " << p1->id() << ".\n";
       }
     }
 #endif
@@ -476,7 +476,7 @@ inline void add_three_body_bonded_stress(Particle *p1) {
     }
 #endif
     else {
-      runtimeErrorMsg() <<"add_three_body_bonded_stress: match not found for particle " << p1->p.identity << ".\n";
+      runtimeErrorMsg() <<"add_three_body_bonded_stress: match not found for particle " << p1->id() << ".\n";
     }
   } 
 }

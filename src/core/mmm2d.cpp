@@ -612,7 +612,7 @@ static void add_z_force()
     for (i = 0; i < np; i++) {
       part[i].f.f[2] += part[i].p.q*(add+field_tot);
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].p.identity, part[i].f.f[0],
+			 this_node, part[i].id(), part[i].f.f[0],
 			 part[i].f.f[1], part[i].f.f[2]));
     }
   }
@@ -921,7 +921,7 @@ static void add_P_force()
 	partblk[size*ic + POQECP]*othcblk[POQECM] - partblk[size*ic + POQESP]*othcblk[POQESM];
 
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].p.identity, part[i].f.f[0],
+			 this_node, part[i].id(), part[i].f.f[0],
 			 part[i].f.f[1], part[i].f.f[2]));
       ic++;
     }
@@ -971,7 +971,7 @@ static void add_Q_force()
 	partblk[size*ic + POQECP]*othcblk[POQECM] - partblk[size*ic + POQESP]*othcblk[POQESM];
 
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].p.identity, part[i].f.f[0],
+			 this_node, part[i].id(), part[i].f.f[0],
 			 part[i].f.f[1], part[i].f.f[2]));
       ic++;
     }
@@ -1150,7 +1150,7 @@ static void add_PQ_force(int p, int q, double omega)
 	        partblk[size*ic + PQESCP]*othcblk[PQESCM] - partblk[size*ic + PQESSP]*othcblk[PQESSM]);
 
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].p.identity, part[i].f.f[0],
+			 this_node, part[i].id(), part[i].f.f[0],
 			 part[i].f.f[1], part[i].f.f[2]));
       ic++;
     }

@@ -164,7 +164,7 @@ inline void add_non_bonded_pair_force_iccp3m(Particle *p1, Particle *p2,
   double force[3] = { 0, 0, 0 };
   int j;
 
-  FORCE_TRACE(fprintf(stderr, "%d: interaction %d<->%d dist %f\n", this_node, p1->p.identity, p2->p.identity, dist));
+  FORCE_TRACE(fprintf(stderr, "%d: interaction %d<->%d dist %f\n", this_node, p1->id(), p2->id(), dist));
 
   /***********************************************/
   /* long range electrostatics                   */

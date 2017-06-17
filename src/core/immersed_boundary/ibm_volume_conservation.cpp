@@ -192,7 +192,7 @@ void CalcVolumes()
             {
               ostringstream msg;
               msg << "{IBM_CalcVolumes: 078 bond broken between particles "
-                << p1.p.identity << " and " << p1.bl.e[j+1] << " (particles not stored on the same node)} ";
+                << p1.id() << " and " << p1.bl.e[j+1] << " (particles not stored on the same node)} ";
               runtimeError(msg);
               return;
             }
@@ -201,7 +201,7 @@ void CalcVolumes()
             {
               ostringstream msg;
               msg << "{IBM_CalcVolumes: 078 bond broken between particles "
-                << p1.p.identity << " and " << p1.bl.e[j+2] << " (particles not stored on the same node)} ";
+                << p1.id() << " and " << p1.bl.e[j+2] << " (particles not stored on the same node)} ";
               runtimeError(msg);
               return;
             }

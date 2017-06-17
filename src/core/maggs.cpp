@@ -1899,7 +1899,7 @@ void maggs_add_current_on_segment(Particle *p, int ghost_cell)
     if(icoord == 2) delta = v_inva[icoord];
     else            delta = 0.5 * v_inva[icoord];
 		
-    f_crossing = maggs_check_intersect_1D(delta, r_temp[icoord], icoord, first[icoord], &t_step, p->p.identity);
+    f_crossing = maggs_check_intersect_1D(delta, r_temp[icoord], icoord, first[icoord], &t_step, p->id());
 		
     /* calculate flux */
     if(flag_update_flux) {
@@ -1965,7 +1965,7 @@ void maggs_couple_current_to_Dfield()
     np = cell->n;
     for(i = 0; i < np; i++) {
       if((q=p[i].p.q) != 0.) {
-	/*	if(sim_time>49.08&&p[i].p.identity==231) */
+	/*	if(sim_time>49.08&&p[i].id()==231) */
 	/*	  fprintf(stderr,"time=%f, v=(%f,%f,%f)\n",sim_time, p[i].m.v[0], p[i].m.v[1],p[i].m.v[2]); */
 	maggs_add_current_on_segment(&p[i], 0);
       }/* if particle.q != ZERO */

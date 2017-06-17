@@ -207,7 +207,7 @@ inline void add_affinity_pair_force(Particle * p1, Particle * p2, IA_parameters 
 					double tmpPon = 1.0 - exp( - ia_params->affinity_Kon*time_step);
 					fp = fopen("affinity_check.dat","a");
 					fprintf(fp,"sim_time %f, period_for_output %d aff type: %d ",sim_time,period_for_output,aff_type_extracted);
-					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->p.identity, Poff,tmpF,tmpKoff,tmpK0,len);
+					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->id(), Poff,tmpF,tmpKoff,tmpK0,len);
 					fclose(fp);
 				}
 			}
@@ -411,7 +411,7 @@ inline void add_affinity_pair_force(Particle * p1, Particle * p2, IA_parameters 
 					double tmpPon = 1.0 - exp( - ia_params->affinity_Kon*time_step);
 					fp = fopen("affinity_check.dat","a");
 					fprintf(fp,"sim_time %f, period_for_output %d aff type: %d ",sim_time,period_for_output,aff_type_extracted);
-					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->p.identity, Poff,tmpF,tmpKoff,tmpK0,len);
+					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->id(), Poff,tmpF,tmpKoff,tmpK0,len);
 					fclose(fp);
 				}
 			}
@@ -526,7 +526,7 @@ inline void add_affinity_pair_force(Particle * p1, Particle * p2, IA_parameters 
 					double tmpPon = 1.0 - exp( - ia_params->affinity_Kon*time_step);
 					fp = fopen("affinity_check.dat","a");
 					fprintf(fp,"sim_time %f, period_for_output %d aff type: %d ",sim_time,period_for_output,aff_type_extracted);
-					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->p.identity, Poff,tmpF,tmpKoff,tmpK0,len);
+					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->id(), Poff,tmpF,tmpKoff,tmpK0,len);
 					fclose(fp);
 				}
 			}
@@ -641,7 +641,7 @@ inline void add_affinity_pair_force(Particle * p1, Particle * p2, IA_parameters 
 					double tmpPon = 1.0 - exp( - ia_params->affinity_Kon*time_step);
 					fp = fopen("affinity_check.dat","a");
 					fprintf(fp,"sim_time %f, period_for_output %d aff type: %d ",sim_time,period_for_output,aff_type_extracted);
-					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->p.identity, Poff,tmpF,tmpKoff,tmpK0,len);
+					fprintf(fp,"Pon %f, Kon %f, particle %d, Poff = %f, F = %f, Koff = %f, K0 = %f, len = %f \n",tmpPon, ia_params->affinity_Kon, p1->id(), Poff,tmpF,tmpKoff,tmpK0,len);
 					fclose(fp);
 				}
 			}

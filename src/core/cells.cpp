@@ -213,7 +213,7 @@ void print_local_particle_positions() {
     np = cell->n;
     for (i = 0; i < np; i++) {
       fprintf(stderr, "%d: local cell %d contains part id=%d pos=(%f,%f,%f)\n",
-              this_node, c, part[i].p.identity, part[i].r.p[0], part[i].r.p[1],
+              this_node, c, part[i].id(), part[i].r.p[0], part[i].r.p[1],
               part[i].r.p[2]);
       cnt++;
     }
@@ -236,7 +236,7 @@ static void dump_particle_ordering() {
 
     /* Loop cell particles */
     for (int i = 0; i < np; i++) {
-      fprintf(stderr, " %d", p[i].p.identity);
+      fprintf(stderr, " %d", p[i].id());
     }
     fprintf(stderr, "\n");
   }
@@ -367,7 +367,7 @@ void print_ghost_positions() {
     np = cell->n;
     for (i = 0; i < np; i++) {
       fprintf(stderr, "%d: local cell %d contains ghost id=%d pos=(%f,%f,%f)\n",
-              this_node, c, part[i].p.identity, part[i].r.p[0], part[i].r.p[1],
+              this_node, c, part[i].id(), part[i].r.p[0], part[i].r.p[1],
               part[i].r.p[2]);
       cnt++;
     }

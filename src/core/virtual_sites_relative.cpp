@@ -177,7 +177,7 @@ void distribute_mol_force()
 
        // Add forces and torques
        int j;
-//       printf("Particle %d gets torque from %f %f %f of particle %d\n",p_real->p.identity, p[i].f.f[0], p[i].f.f[1],p[i].f.f[2], p[i].p.identity);
+//       printf("Particle %d gets torque from %f %f %f of particle %d\n",p_real->id(), p[i].f.f[0], p[i].f.f[1],p[i].f.f[2], p[i].id());
        for (j=0;j<3;j++) {
          p_real->f.torque[j]+=tmp[j];
 //	 printf("%f ",tmp[j]);

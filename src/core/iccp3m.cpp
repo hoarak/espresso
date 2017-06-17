@@ -183,8 +183,8 @@ int iccp3m_iteration() {
             part = cell->part;
             np   = cell->n;
             for(i=0 ; i < np; i++) {
-                if( part[i].p.identity < iccp3m_cfg.n_ic+iccp3m_cfg.first_id && part[i].p.identity >= iccp3m_cfg.first_id ) {
-                    id = part[i].p.identity - iccp3m_cfg.first_id;
+                if( part[i].id() < iccp3m_cfg.n_ic+iccp3m_cfg.first_id && part[i].id() >= iccp3m_cfg.first_id ) {
+                    id = part[i].id() - iccp3m_cfg.first_id;
                     /* the dielectric-related prefactor: */                     
                     del_eps = (iccp3m_cfg.ein[id]-iccp3m_cfg.eout)/(iccp3m_cfg.ein[id] + iccp3m_cfg.eout);
                     /* calculate the electric field at the certain position */
@@ -397,10 +397,10 @@ void build_verlet_lists_and_calc_verlet_ia_iccp3m()
                         {
                             dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
 
-                            VERLET_TRACE(fprintf(stderr,"%d: pair %d %d has distance %f\n",this_node,p1[i].p.identity,p2[j].p.identity,sqrt(dist2)));
+                            VERLET_TRACE(fprintf(stderr,"%d: pair %d %d has distance %f\n",this_node,p1[i].id(),p2[j].id(),sqrt(dist2)));
                             if(verlet_list_criterion(p1+i,p2+j, dist2)) {
-                                ONEPART_TRACE(if(p1[i].p.identity==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d,%d %d,%d dist %f)\n",this_node,p1[i].p.identity,p2[j].p.identity,c,i,n,j,sqrt(dist2)));
-                                ONEPART_TRACE(if(p2[j].p.identity==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d %d dist %f)\n",this_node,p1[i].p.identity,p2[j].p.identity,c,n,sqrt(dist2)));
+                                ONEPART_TRACE(if(p1[i].id()==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d,%d %d,%d dist %f)\n",this_node,p1[i].id(),p2[j].id(),c,i,n,j,sqrt(dist2)));
+                                ONEPART_TRACE(if(p2[j].id()==check_id) fprintf(stderr,"%d: OPT: Verlet Pair %d %d (Cells %d %d dist %f)\n",this_node,p1[i].id(),p2[j].id(),c,n,sqrt(dist2)));
 
                                 add_pair_iccp3m(pl, &p1[i], &p2[j]);
                                 /* calc non bonded interactions */ 
@@ -737,9 +737,9 @@ void iccp3m_revive_forces() {
         part = cell->part;
         np   = cell->n;
         for(i=0 ; i < np; i++) {
-            part[i].f.f[0]=iccp3m_cfg.fx[part[i].p.identity];
-            part[i].f.f[1]=iccp3m_cfg.fy[part[i].p.identity];
-            part[i].f.f[2]=iccp3m_cfg.fz[part[i].p.identity];
+            part[i].f.f[0]=iccp3m_cfg.fx[part[i].id()];
+            part[i].f.f[1]=iccp3m_cfg.fy[part[i].id()];
+            part[i].f.f[2]=iccp3m_cfg.fz[part[i].id()];
         }
     }
 }
@@ -754,9 +754,9 @@ void iccp3m_store_forces() {
         part = cell->part;
         np   = cell->n;
         for(i=0 ; i < np; i++) {
-            iccp3m_cfg.fx[part[i].p.identity]=part[i].f.f[0];
-            iccp3m_cfg.fy[part[i].p.identity]=part[i].f.f[1];
-            iccp3m_cfg.fz[part[i].p.identity]=part[i].f.f[2];
+            iccp3m_cfg.fx[part[i].id()]=part[i].f.f[0];
+            iccp3m_cfg.fy[part[i].id()]=part[i].f.f[1];
+            iccp3m_cfg.fz[part[i].id()]=part[i].f.f[2];
         }
     }
 }

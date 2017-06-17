@@ -166,9 +166,9 @@ void CalcCotDerivativeGompperAnalyt(Vector3D &cosThetaDeriv, const Particle *con
   const double dxjmLen = Length(dxjm);
   
   // Kronecker-Deltas. "l" stands for "derivativeNodeID".
-  const int ilDelta = (derivativeNodeID == xi->p.identity) ? 1 : 0;
-  const int mlDelta = (derivativeNodeID == xm->p.identity) ? 1 : 0;
-  const int jlDelta = (derivativeNodeID == xj->p.identity) ? 1 : 0;
+  const int ilDelta = (derivativeNodeID == xi->id()) ? 1 : 0;
+  const int mlDelta = (derivativeNodeID == xm->id()) ? 1 : 0;
+  const int jlDelta = (derivativeNodeID == xj->id()) ? 1 : 0;
   
   // Gradient of cosine theta.
   for (int i=0; i < 3; i++)

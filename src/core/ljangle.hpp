@@ -90,15 +90,15 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 	  
     /* Retrieve the bonded partners from parsing */
     if (ia_params->LJANGLE_bonded1type == p1->p.type) {
-      part1p = p1->p.identity + ia_params->LJANGLE_bonded1pos;
-      part1n = p1->p.identity + ia_params->LJANGLE_bonded1neg;
-      part2p = p2->p.identity + ia_params->LJANGLE_bonded2pos;
-      part2n = p2->p.identity + ia_params->LJANGLE_bonded2neg;
+      part1p = p1->id() + ia_params->LJANGLE_bonded1pos;
+      part1n = p1->id() + ia_params->LJANGLE_bonded1neg;
+      part2p = p2->id() + ia_params->LJANGLE_bonded2pos;
+      part2n = p2->id() + ia_params->LJANGLE_bonded2neg;
     } else {
-      part1p = p1->p.identity + ia_params->LJANGLE_bonded2pos;
-      part1n = p1->p.identity + ia_params->LJANGLE_bonded2neg;
-      part2p = p2->p.identity + ia_params->LJANGLE_bonded1pos;
-      part2n = p2->p.identity + ia_params->LJANGLE_bonded1neg;
+      part1p = p1->id() + ia_params->LJANGLE_bonded2pos;
+      part1n = p1->id() + ia_params->LJANGLE_bonded2neg;
+      part2p = p2->id() + ia_params->LJANGLE_bonded1pos;
+      part2n = p2->id() + ia_params->LJANGLE_bonded1neg;
     }
 
     if (part1p >= 0 && part1p < n_part &&
@@ -188,7 +188,7 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 		  
 #ifdef LJ_WARN_WHEN_CLOSE
 	  if(radprime > 1000) fprintf(stderr,"%d: LJANGLE-Warning: Pair (%d-%d) force=%f dist=%f\n",
-				      this_node,p1->p.identity,p2->p.identity,radprime,dist);
+				      this_node,p1->id(),p2->id(),radprime,dist);
 #endif
 	}
 	/* capped part of lj-angle potential. */
@@ -242,7 +242,7 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 	      
 	/* this should not happen! In this case consider only radial potential*/
 	else {
-	  LJ_TRACE(fprintf(stderr, "%d: LJ-angle warning: Particles id1=%d id2=%d exactly on top of each other\n",this_node,p1->p.identity,p2->p.identity));
+	  LJ_TRACE(fprintf(stderr, "%d: LJ-angle warning: Particles id1=%d id2=%d exactly on top of each other\n",this_node,p1->id(),p2->id()));
 		  
 	  frac2 = SQR(ia_params->LJANGLE_sig/ia_params->LJANGLE_capradius);
 	  frac10 = frac2*frac2*frac2*frac2*frac2;
@@ -252,11 +252,11 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 	}
 	      
 	      
-	ONEPART_TRACE(if(p1->p.identity==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->p.identity,dist,radprime));
-	ONEPART_TRACE(if(p2->p.identity==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->p.identity,dist,radprime));
+	ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),dist,radprime));
+	ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),dist,radprime));
 	      
 	LJ_TRACE(fprintf(stderr,"%d: LJANGLE: Pair (%d-%d) dist=%.3f: force+-: (%.3e,%.3e,%.3e)\n",
-			 this_node,p1->p.identity,p2->p.identity,dist,rad*d[0],rad*d[1],rad*d[2]));
+			 this_node,p1->id(),p2->id(),dist,rad*d[0],rad*d[1],rad*d[2]));
       }
     }
 }
@@ -285,15 +285,15 @@ inline double ljangle_pair_energy(Particle *p1, Particle *p2, IA_parameters *ia_
 	
     /* Retrieve the bonded partners from parsing */
     if (ia_params->LJANGLE_bonded1type == p1->p.type) {
-      part1p = p1->p.identity + ia_params->LJANGLE_bonded1pos;
-      part1n = p1->p.identity + ia_params->LJANGLE_bonded1neg;
-      part2p = p2->p.identity + ia_params->LJANGLE_bonded2pos;
-      part2n = p2->p.identity + ia_params->LJANGLE_bonded2neg;
+      part1p = p1->id() + ia_params->LJANGLE_bonded1pos;
+      part1n = p1->id() + ia_params->LJANGLE_bonded1neg;
+      part2p = p2->id() + ia_params->LJANGLE_bonded2pos;
+      part2n = p2->id() + ia_params->LJANGLE_bonded2neg;
     } else {
-      part1p = p1->p.identity + ia_params->LJANGLE_bonded2pos;
-      part1n = p1->p.identity + ia_params->LJANGLE_bonded2neg;
-      part2p = p2->p.identity + ia_params->LJANGLE_bonded1pos;
-      part2n = p2->p.identity + ia_params->LJANGLE_bonded1neg;
+      part1p = p1->id() + ia_params->LJANGLE_bonded2pos;
+      part1n = p1->id() + ia_params->LJANGLE_bonded2neg;
+      part2p = p2->id() + ia_params->LJANGLE_bonded1pos;
+      part2n = p2->id() + ia_params->LJANGLE_bonded1neg;
     }
 	
     if (part1p >= 0 && part1p < n_part &&

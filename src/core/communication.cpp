@@ -396,7 +396,7 @@ void mpi_who_has() {
       for (int c = 0; c < local_cells.n; c++) {
         cell = local_cells.cell[c];
         for (int i = 0; i < cell->n; i++)
-          particle_node[cell->part[i].p.identity] = this_node;
+          particle_node[cell->part[i].id()] = this_node;
       }
     } else if (sizes[pnode] > 0) {
       if (pdata_s < sizes[pnode]) {
@@ -428,7 +428,7 @@ void mpi_who_has_slave(int node, int param) {
   for (c = 0; c < local_cells.n; c++) {
     cell = local_cells.cell[c];
     for (i = 0; i < cell->n; i++)
-      sendbuf[npart++] = cell->part[i].p.identity;
+      sendbuf[npart++] = cell->part[i].id();
   }
   MPI_Send(sendbuf, npart, MPI_INT, 0, SOME_TAG, comm_cart);
 }
@@ -1693,7 +1693,7 @@ void mpi_get_particles(Particle *result, IntList *bi) {
 #ifdef ELECTROSTATICS
   COMM_TRACE(for (i = 0; i < tot_size; i++) {
     printf("%d: %d -> %d %d %f (%f, %f, %f)\n", this_node, i,
-           result[i].p.identity, result[i].p.type, result[i].p.q,
+           result[i].id(), result[i].p.type, result[i].p.q,
            result[i].r.p[0], result[i].r.p[1], result[i].r.p[2]);
   });
 #endif
@@ -1701,7 +1701,7 @@ void mpi_get_particles(Particle *result, IntList *bi) {
 #ifdef DIPOLES
   COMM_TRACE(for (i = 0; i < tot_size; i++) {
     printf("%d: %d -> %d %d  (%f, %f, %f) (%f, %f, %f)\n", this_node, i,
-           result[i].p.identity, result[i].p.type, result[i].r.p[0],
+           result[i].id(), result[i].p.type, result[i].r.p[0],
            result[i].r.p[1], result[i].r.p[2], result[i].r.dip[0],
            result[i].r.dip[1], result[i].r.dip[2]);
   });
@@ -1733,7 +1733,7 @@ void mpi_get_particles(Particle *result, IntList *bi) {
       result[i].bl.e = bonds;
       bonds += result[i].bl.n;
       COMM_TRACE(if (result[i].bl.n > 0) {
-        printf("(%d) part %d: bonds ", i, result[i].p.identity);
+        printf("(%d) part %d: bonds ", i, result[i].id());
         for (g = 0; g < result[i].bl.n; g++)
           printf("%d ", result[i].bl.e[g]);
         printf("\n");

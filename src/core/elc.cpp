@@ -294,7 +294,7 @@ static void clear_log_forces(char *where)
     np   = local_cells.cell[c]->n;
     part = local_cells.cell[c]->part;
     for (i = 0; i < np; i++) {
-      fprintf(stderr, "%d %g %g %g\n", part[i].p.identity,
+      fprintf(stderr, "%d %g %g %g\n", part[i].id(),
 	      part[i].f.f[0], part[i].f.f[1], part[i].f.f[2]);
       for (j = 0; j < 3; j++)
 	part[i].f.f[j] = 0;

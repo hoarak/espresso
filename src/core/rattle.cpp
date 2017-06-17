@@ -147,7 +147,7 @@ void compute_pos_corr_vec(int *repeat_)
 	  cnt++;
 	  p2 = local_particles[p1->bl.e[k++]];
       if (!p2) {
-          runtimeErrorMsg() <<"rigid bond broken between particles " << p1->p.identity << " and " << p1->bl.e[k-1] << " (particles not stored on the same node)";
+          runtimeErrorMsg() <<"rigid bond broken between particles " << p1->id() << " and " << p1->bl.e[k-1] << " (particles not stored on the same node)";
 	    return;
 	  }
 
@@ -297,7 +297,7 @@ void compute_vel_corr_vec(int *repeat_)
 	      {
 		p2 = local_particles[p1->bl.e[k++]];
         if (!p2) {
-            runtimeErrorMsg() <<"rigid bond broken between particles " << p1->p.identity << " and " << p1->bl.e[k-1] << " (particles not stored on the same node)";
+            runtimeErrorMsg() <<"rigid bond broken between particles " << p1->id() << " and " << p1->bl.e[k-1] << " (particles not stored on the same node)";
 		  return;
 		}
 
@@ -439,12 +439,12 @@ void print_bond_len()
              {
 	       Particle *p2 = local_particles[p[i].bl.e[k++]];
            if (!p2) {
-           runtimeErrorMsg() <<"rigid bond broken between particles " << p[i].p.identity << " and " << p[i].bl.e[k-1] << " (particles not stored on the same node)";
+           runtimeErrorMsg() <<"rigid bond broken between particles " << p[i].id() << " and " << p[i].bl.e[k-1] << " (particles not stored on the same node)";
 		 return;
 	       }
 
 	       get_mi_vector(r_ij, p[i].r.p , p2->r.p);
-	       printf(" bl (%d %d): %f\t", p[i].p.identity, p2->p.identity,sqrlen(r_ij));
+	       printf(" bl (%d %d): %f\t", p[i].id(), p2->id(),sqrlen(r_ij));
              }
 	     else
 	       k += b_ia->num;

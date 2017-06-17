@@ -117,7 +117,7 @@ void meta_perform()
       p  = cell->part;
       np = cell->n;
       for(i = 0; i < np; i++) {
-         if (p[i].p.identity == meta_pid1) {
+         if (p[i].id() == meta_pid1) {
             flag1 = 1;
             p1 = &p[i];
             memmove(ppos1, p[i].r.p, 3*sizeof(double));
@@ -130,7 +130,7 @@ void meta_perform()
                break;
             }
          }
-         if (p[i].p.identity == meta_pid2) {
+         if (p[i].id() == meta_pid2) {
             flag2 = 1;
             p2 = &p[i];
             memmove(ppos2, p[i].r.p, 3*sizeof(double));

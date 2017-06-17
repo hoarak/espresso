@@ -337,14 +337,14 @@ void CalcForceGompper(Particle *xi, const int numNeighbors, Particle **const nei
       
       // Derivatives of the two cotangens.
       Vector3D TijDeriv;
-      CalcCotDerivativeGompperAnalyt(TijDeriv, xi, xj, xjM1, xl->p.identity);
+      CalcCotDerivativeGompperAnalyt(TijDeriv, xi, xj, xjM1, xl->id());
       Vector3D tmp;
-      CalcCotDerivativeGompperAnalyt(tmp, xi, xj, xjP1, xl->p.identity);
+      CalcCotDerivativeGompperAnalyt(tmp, xi, xj, xjP1, xl->id());
       AddTo( TijDeriv, tmp);
       
       // Kronecker Deltas.
-      const int ilDelta = (xi->p.identity == xl->p.identity) ? 1 : 0;
-      const int jlDelta = (xj->p.identity == xl->p.identity) ? 1 : 0;
+      const int ilDelta = (xi->id() == xl->id()) ? 1 : 0;
+      const int jlDelta = (xj->id() == xl->id()) ? 1 : 0;
       
       // Update
       Matrix3D tmpM;
@@ -376,8 +376,8 @@ void CalcForceGompper(Particle *xi, const int numNeighbors, Particle **const nei
     
     Multiply(force, force, (-1.0) * (kb / 2.0));
     
-//    if ( xl->p.identity == 0)
-//      printf("  Adding to node = %d when treating node %d: f = %.12e %.12e %.12e\n", xl->p.identity, xi->p.identity, force.el[0], force.el[1], force.el[2]);
+//    if ( xl->id() == 0)
+//      printf("  Adding to node = %d when treating node %d: f = %.12e %.12e %.12e\n", xl->id(), xi->id(), force.el[0], force.el[1], force.el[2]);
     xl->f.f[0] += force.el[0];
     xl->f.f[1] += force.el[1];
     xl->f.f[2] += force.el[2];

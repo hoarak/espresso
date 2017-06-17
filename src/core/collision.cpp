@@ -157,7 +157,7 @@ bool bond_exists(Particle* p, Particle* partner, int bond_type)
       int size = bonded_ia_params[p->bl.e[i]].num;
       
       if (p->bl.e[i] == bond_type &&
-          p->bl.e[i + 1] == partner->p.identity) {
+          p->bl.e[i + 1] == partner->id()) {
         // There's a bond, already. Nothing to do for these particles
         return true;
       }
@@ -193,7 +193,7 @@ void detect_collision(Particle* p1, Particle* p2)
 
   int part1, part2, size;
   int counts[n_nodes];
-  //TRACE(printf("%d: consider particles %d and %d\n", this_node, p1->p.identity, p2->p.identity));
+  //TRACE(printf("%d: consider particles %d and %d\n", this_node, p1->id(), p2->id()));
 
   double vec21[3];
   // Obtain distance between particles
@@ -202,7 +202,7 @@ void detect_collision(Particle* p1, Particle* p2)
   if (dist_betw_part > collision_params.distance)
     return;
 
-  //TRACE(printf("%d: particles %d and %d within bonding distance %lf\n", this_node, p1->p.identity, p2->p.identity, dist_betw_part));
+  //TRACE(printf("%d: particles %d and %d within bonding distance %lf\n", this_node, p1->id(), p2->id(), dist_betw_part));
   // If we are in the glue to surface mode, check that the particles
   // are of the right type
   if (collision_params.mode & COLLISION_MODE_GLUE_TO_SURF) {
@@ -217,8 +217,8 @@ void detect_collision(Particle* p1, Particle* p2)
      }
    }
 
-  part1 = p1->p.identity;
-  part2 = p2->p.identity;
+  part1 = p1->id();
+  part2 = p2->id();
       
   // Retrieving the particles from local_particles is necessary, because the particle might be a
   // ghost, and those can't store bonding info.
@@ -251,7 +251,7 @@ void detect_collision(Particle* p1, Particle* p2)
 
     // do not create bond between ghost particles
     if (p1->l.ghost && p2->l.ghost) {
-       TRACE(printf("Both particles %d and %d are ghost particles", p1->p.identity, p2->p.identity));
+       TRACE(printf("Both particles %d and %d are ghost particles", p1->id(), p2->id()));
        return;
     }
 
@@ -319,7 +319,7 @@ void coldet_do_three_particle_bond(Particle* p, Particle* p1, Particle* p2)
   if (sqrt(sqrlen(vec21)) > collision_params.distance)
     return;
 
-  //TRACE(printf("%d: checking three particle bond %d %d %d\n", this_node, p1->p.identity, p->p.identity, p2->p.identity));
+  //TRACE(printf("%d: checking three particle bond %d %d %d\n", this_node, p1->id(), p->id(), p2->id()));
 
   // Check, if there already is a three-particle bond centered on p 
   // with p1 and p2 as partners. If so, skip this triplet.
@@ -332,7 +332,7 @@ void coldet_do_three_particle_bond(Particle* p, Particle* p1, Particle* p2)
     while (b < p->bl.n) {
       int size = bonded_ia_params[p->bl.e[b]].num;
 
-      //TRACE(printf("%d:--1-- checking bond of type %d and length %d of particle %d\n", this_node, p->bl.e[b], bonded_ia_params[p->bl.e[b]].num, p->p.identity));
+      //TRACE(printf("%d:--1-- checking bond of type %d and length %d of particle %d\n", this_node, p->bl.e[b], bonded_ia_params[p->bl.e[b]].num, p->id()));
  
       if (size==2) {
         // Check if the bond type is within the range used by the collision detection,
@@ -340,9 +340,9 @@ void coldet_do_three_particle_bond(Particle* p, Particle* p1, Particle* p2)
           // check, if p1 and p2 are the bond partners, (in any order)
           // if yes, skip triplet
           if (
-              ((p->bl.e[b+1]==p1->p.identity) && (p->bl.e[b+2] ==p2->p.identity))
+              ((p->bl.e[b+1]==p1->id()) && (p->bl.e[b+2] ==p2->id()))
               ||
-              ((p->bl.e[b+1]==p2->p.identity) && (p->bl.e[b+2] ==p1->p.identity))
+              ((p->bl.e[b+1]==p2->id()) && (p->bl.e[b+2] ==p1->id()))
               )
             return;
         } // if bond type 
@@ -353,7 +353,7 @@ void coldet_do_three_particle_bond(Particle* p, Particle* p1, Particle* p2)
     } // bond loop
   } // if bond list defined
 
-  //TRACE(printf("%d: proceeding to install three particle bond %d %d %d\n", this_node, p1->p.identity, p->p.identity, p2->p.identity));
+  //TRACE(printf("%d: proceeding to install three particle bond %d %d %d\n", this_node, p1->id(), p->id(), p2->id()));
 
   // If we are still here, we need to create angular bond
   // First, find the angle between the particle p, p1 and p2
@@ -396,9 +396,9 @@ void coldet_do_three_particle_bond(Particle* p, Particle* p1, Particle* p2)
   // First, fill bond data structure
   int bondT[3];
   bondT[0] = bond_id;
-  bondT[1] = p1->p.identity;
-  bondT[2] = p2->p.identity;
-  local_change_bond(p->p.identity, bondT, 0);
+  bondT[1] = p1->id();
+  bondT[2] = p2->id();
+  local_change_bond(p->id(), bondT, 0);
 }
 
 // If activated, throws an exception for each collision which can be
@@ -532,7 +532,7 @@ void three_particle_binding_full_search()
   
   		   // Check, whether p is equal to one of the particles in the
   		   // collision. If so, skip
-  		   if ((p->p.identity ==p1->p.identity) || ( p->p.identity == p2->p.identity)) {
+  		   if ((p->id() ==p1->id()) || ( p->id() == p2->id())) {
   		     continue;
   		   }
   
@@ -600,7 +600,7 @@ void three_particle_binding_domain_decomposition()
                         // for all p:
   	                      // Check, whether p is equal to one of the particles in the
   	                      // collision. If so, skip
-  	                      if ((P->p.identity ==p1->p.identity) || (P->p.identity == p2->p.identity)) {
+  	                      if ((P->id() ==p1->id()) || (P->id() == p2->id())) {
                           //TRACE(printf("same particle\n"));
   		                continue;
   	                      }
@@ -616,21 +616,21 @@ void three_particle_binding_domain_decomposition()
   	                      // does not matter, so we don't need non-cyclic permutations):
 
                         if (P->l.ghost) {
-                          //TRACE(printf("%d: center particle is ghost: %d\n", this_node, P->p.identity));
+                          //TRACE(printf("%d: center particle is ghost: %d\n", this_node, P->id()));
                           continue;
                         }
-                        //TRACE(printf("%d: LOOP: %d Handling collision of particles FIRST CONFIGURATION %d %d %d\n", this_node, id, p1->p.identity, P->p.identity, p2->p.identity));
+                        //TRACE(printf("%d: LOOP: %d Handling collision of particles FIRST CONFIGURATION %d %d %d\n", this_node, id, p1->id(), P->id(), p2->id()));
                         coldet_do_three_particle_bond(P,p1,p2);
 
                         if (p1->l.ghost) {
-                          //TRACE(printf("%d: center particle is ghost: %d\n", this_node, p1->p.identity));
+                          //TRACE(printf("%d: center particle is ghost: %d\n", this_node, p1->id()));
                           continue;
                         }
 
                         coldet_do_three_particle_bond(p1,P,p2);
 
                         if (p2->l.ghost) {
-                          //TRACE(printf("%d: center particle is ghost: %d\n", this_node, p2->p.identity));
+                          //TRACE(printf("%d: center particle is ghost: %d\n", this_node, p2->id()));
                           continue;
                         }
 

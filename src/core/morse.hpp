@@ -63,7 +63,7 @@ inline void add_morse_pair_force(const Particle * const p1, const Particle * con
 	force[j] += fac * d[j];
 #ifdef MORSE_WARN_WHEN_CLOSE
       if(fac*dist > 1000) fprintf(stderr,"%d: Morse-Warning: Pair (%d-%d) force=%f dist=%f\n",
-				  this_node,p1->p.identity,p2->p.identity,fac*dist,dist);
+				  this_node,p1->id(),p2->id(),fac*dist,dist);
 #endif
 
     }
@@ -82,7 +82,7 @@ inline void add_morse_pair_force(const Particle * const p1, const Particle * con
     /* this should not happen! */
 
     else {
-      MORSE_TRACE(fprintf(stderr, "%d: Morse warning: Particles id1=%d id2=%d exactly on top of each other\n",this_node,p1->p.identity,p2->p.identity));
+      MORSE_TRACE(fprintf(stderr, "%d: Morse warning: Particles id1=%d id2=%d exactly on top of each other\n",this_node,p1->id(),p2->id()));
 
       add1 = exp(-2.0 * ia_params->MORSE_alpha * (ia_params->MORSE_capradius - ia_params->MORSE_rmin));
       add2 = exp( -ia_params->MORSE_alpha * (ia_params->MORSE_capradius - ia_params->MORSE_rmin));
@@ -91,11 +91,11 @@ inline void add_morse_pair_force(const Particle * const p1, const Particle * con
       force[0] += fac * ia_params->MORSE_capradius;
     }
 
-    ONEPART_TRACE(if(p1->p.identity==check_id) fprintf(stderr,"%d: OPT: MORSE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->p.identity,dist,fac));
-    ONEPART_TRACE(if(p2->p.identity==check_id) fprintf(stderr,"%d: OPT: MORSE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->p.identity,dist,fac));
+    ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: MORSE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),dist,fac));
+    ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: MORSE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),dist,fac));
 
     MORSE_TRACE(fprintf(stderr,"%d: LJ: Pair (%d-%d) dist=%.3f: force+-: (%.3e,%.3e,%.3e)\n",
-		     this_node,p1->p.identity,p2->p.identity,dist,fac*d[0],fac*d[1],fac*d[2]));
+		     this_node,p1->id(),p2->id(),dist,fac*d[0],fac*d[1],fac*d[2]));
 
   }
 }

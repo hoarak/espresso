@@ -546,7 +546,7 @@ int calc_twist_stack_force(Particle *si1, Particle *bi1, Particle *bi2, Particle
 #ifdef TWIST_STACK_DEBUG
   if(big_force) {
     puts("Big Force Twist/Stack.");
-    PS(si1->p.identity);
+    PS(si1->id());
 
     PS(sim_time);
     PS(time_step);

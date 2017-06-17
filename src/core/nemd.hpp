@@ -164,7 +164,7 @@ inline void nemd_get_velocity(Particle part) {
 
       /* first fill fastest array as particles com in */
       if (slab->n_fastest < nemddata.n_exchange) {
-        slab->fastest[slab->n_fastest] = part.p.identity;
+        slab->fastest[slab->n_fastest] = part.id();
         if (part.m.v[0] > slab->v_min) {
           slab->v_min = part.m.v[0];
           slab->ind_min = slab->n_fastest;
@@ -173,7 +173,7 @@ inline void nemd_get_velocity(Particle part) {
       }
       /* then replace the slowest with a new one if necessary... */
       else if (part.m.v[0] < slab->v_min) {
-        slab->fastest[slab->ind_min] = part.p.identity;
+        slab->fastest[slab->ind_min] = part.id();
         /* ... and find again the slowest one now */
         slab->v_min = local_particles[slab->fastest[0]]->m.v[0];
         slab->ind_min = 0;
@@ -188,7 +188,7 @@ inline void nemd_get_velocity(Particle part) {
 
       /* first fill fastest array as particles com in */
       if (slab->n_fastest < nemddata.n_exchange) {
-        slab->fastest[slab->n_fastest] = part.p.identity;
+        slab->fastest[slab->n_fastest] = part.id();
         if (part.m.v[0] < slab->v_min) {
           slab->v_min = part.m.v[0];
           slab->ind_min = slab->n_fastest;
@@ -197,7 +197,7 @@ inline void nemd_get_velocity(Particle part) {
       }
       /* then replace the slowest with a new one if necessary... */
       else if (part.m.v[0] > slab->v_min) {
-        slab->fastest[slab->ind_min] = part.p.identity;
+        slab->fastest[slab->ind_min] = part.id();
         /* ... and find again the slowest one now */
         slab->v_min = local_particles[slab->fastest[0]]->m.v[0];
         slab->ind_min = 0;

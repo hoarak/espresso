@@ -179,7 +179,7 @@ void mpi_mpiio_common_write(const char *filename, unsigned fields)
   for (int c = 0; c < local_cells.n; ++c) {
     cell = local_cells.cell[c];
     for (int j = 0; j < cell->n; ++j) {
-      id[i1] = cell->part[j].p.identity;
+      id[i1] = cell->part[j].id();
       if (fields & MPIIO_OUT_POS) {
         pos[i3] = cell->part[j].r.p[0];
         pos[i3 + 1] = cell->part[j].r.p[1];

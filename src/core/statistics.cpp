@@ -464,7 +464,7 @@ void nbhood(double pt[3], double r, IntList *il, int planedims[3] )
 
     if (sqrlen(d) < r2) {
       realloc_intlist(il, il->n + 1);
-      il->e[il->n] = partCfg[i].p.identity;
+      il->e[il->n] = partCfg[i].id();
       il->n++;
     }
   }
@@ -481,7 +481,7 @@ double distto(double p[3], int pid)
   /* larger than possible */
   mindist=SQR(box_l[0] + box_l[1] + box_l[2]);
   for (i=0; i<n_part; i++) {
-    if (pid != partCfg[i].p.identity) {
+    if (pid != partCfg[i].id()) {
       get_mi_vector(d, p, partCfg[i].r.p);
       mindist = std::min(mindist, sqrlen(d));
     }

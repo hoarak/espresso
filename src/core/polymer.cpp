@@ -61,10 +61,10 @@ int mindist3(int part_id, double r_catch, int *ids) {
   partCfgMD = (Particle *)Utils::malloc(n_part * sizeof(Particle));
   mpi_get_particles(partCfgMD, NULL);
   me = -1; /* Since 'mpi_get_particles' returns the particles unsorted, it's
-              most likely that 'partCfgMD[i].p.identity != i'
+              most likely that 'partCfgMD[i].id() != i'
               --> prevent that! */
   for (i = 0; i < n_part; i++)
-    if (partCfgMD[i].p.identity == part_id)
+    if (partCfgMD[i].id() == part_id)
       me = i;
   if (me == -1) {
     runtimeErrorMsg() << "failed to find desired particle " << part_id;
@@ -79,7 +79,7 @@ int mindist3(int part_id, double r_catch, int *ids) {
       dz = partCfgMD[me].r.p[2] - partCfgMD[i].r.p[2];
       dz -= dround(dz / box_l[2]) * box_l[2];
       if (sqrt(SQR(dx) + SQR(dy) + SQR(dz)) < r_catch)
-        ids[caught++] = partCfgMD[i].p.identity;
+        ids[caught++] = partCfgMD[i].id();
     }
   }
   free(partCfgMD);
@@ -661,7 +661,7 @@ int collectBonds(int mode, int part_id, int N_P, int MPC, int type_bond,
   /* Sort the received informations. */
   sorted = (Particle *)Utils::malloc(n_part * sizeof(Particle));
   for (i = 0; i < n_part; i++)
-    memmove(&sorted[prt[i].p.identity], &prt[i], sizeof(Particle));
+    memmove(&sorted[prt[i].id()], &prt[i], sizeof(Particle));
   free(prt);
   prt = sorted;
 
@@ -680,11 +680,11 @@ int collectBonds(int mode, int part_id, int N_P, int MPC, int type_bond,
         size = bonded_ia_params[prt[k].bl.e[i]].num;
         if (prt[k].bl.e[i++] == type_bond) {
           for (j = 0; j < size; j++) {
-            if ((prt[k].p.identity % MPC == 0) ||
-                ((prt[k].p.identity + 1) % MPC == 0)) {
-              ii = prt[k].p.identity % MPC
-                       ? 2 * (prt[k].p.identity + 1) / MPC - 1
-                       : 2 * prt[k].p.identity / MPC;
+            if ((prt[k].id() % MPC == 0) ||
+                ((prt[k].id() + 1) % MPC == 0)) {
+              ii = prt[k].id() % MPC
+                       ? 2 * (prt[k].id() + 1) / MPC - 1
+                       : 2 * prt[k].id() / MPC;
               bonds[i] =
                   (int *)Utils::realloc(bonds[i], (bond[i] + 1) * sizeof(int));
               bonds[ii][bond[ii]++] = prt[k].bl.e[i];
@@ -694,7 +694,7 @@ int collectBonds(int mode, int part_id, int N_P, int MPC, int type_bond,
                                         : 2 * prt[k].bl.e[i] / MPC;
               bonds[i] =
                   (int *)Utils::realloc(bonds[i], (bond[i] + 1) * sizeof(int));
-              bonds[ii][bond[ii]++] = prt[k].p.identity;
+              bonds[ii][bond[ii]++] = prt[k].id();
             }
             i++;
           }

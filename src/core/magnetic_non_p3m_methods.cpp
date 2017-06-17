@@ -85,15 +85,15 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
     p2->f.f[0] -=coulomb.Dprefactor*ffx;
     p2->f.f[1] -=coulomb.Dprefactor*ffy;
     p2->f.f[2] -=coulomb.Dprefactor*ffz;
-//    if (p1->p.identity==248)
+//    if (p1->id()==248)
 //    {
 //      printf("xxx %g %g %g\n", dr[0],dr[1],dr[2]);
-//      printf("%d %g %g %g - %g %g %g\n",p2->p.identity,ffx,ffy,ffz,p2->r.p[0],p2->r.p[1],p2->r.p[2]);
+//      printf("%d %g %g %g - %g %g %g\n",p2->id(),ffx,ffy,ffz,p2->r.p[0],p2->r.p[1],p2->r.p[2]);
 //     }
-//    if (p2->p.identity==248)
+//    if (p2->id()==248)
  //   {
 //      printf("xxx %g %g %g\n", dr[0],dr[1],dr[2]);
-//      printf("%d %g %g %g - %g %g %g\n",p1->p.identity,-ffx,-ffy,-ffz,p1->r.p[0],p1->r.p[1],p1->r.p[2]);
+//      printf("%d %g %g %g - %g %g %g\n",p1->id(),-ffx,-ffy,-ffz,p1->r.p[0],p1->r.p[1],p1->r.p[2]);
 //     }
 
       // Torques
