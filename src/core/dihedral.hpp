@@ -49,9 +49,9 @@ inline void calc_dihedral_angle(Particle *p1, Particle *p2, Particle *p3, Partic
 {
   int i;
 
-  get_mi_vector(a, p2->r.p, p1->r.p);
-  get_mi_vector(b, p3->r.p, p2->r.p);
-  get_mi_vector(c, p4->r.p, p3->r.p);
+  get_mi_vector(a, p2->pos(), p1->pos());
+  get_mi_vector(b, p3->pos(), p2->pos());
+  get_mi_vector(c, p4->pos(), p3->pos());
 
   /* calculate vector product a X b and b X c */
   vector_product(a, b, aXb);
@@ -142,9 +142,9 @@ inline int calc_dihedral_force(Particle *p2, Particle *p1, Particle *p3, Particl
 #ifdef CONFIGTEMP
   extern double configtemp[2];
   double a[3], b[3], c[3], aXb[3], bXc[3];
-  get_mi_vector(a, p2->r.p, p1->r.p);
-  get_mi_vector(b, p3->r.p, p2->r.p);
-  get_mi_vector(c, p4->r.p, p3->r.p);
+  get_mi_vector(a, p2->pos(), p1->pos());
+  get_mi_vector(b, p3->pos(), p2->pos());
+  get_mi_vector(c, p4->pos(), p3->pos());
   vector_product(a, b, aXb);
   vector_product(b, c, bXc);
   if (p1->p.configtemp) {

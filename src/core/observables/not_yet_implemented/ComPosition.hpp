@@ -11,9 +11,9 @@ int ObservableComPosition::actual_calculate() {
   for (int i = 0; i<ids->n; i++ ) {
     if (ids->e[i] >= n_part)
       return 1;
-    p_com[0] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].r.p[0];
-    p_com[1] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].r.p[1];
-    p_com[2] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].r.p[2];
+    p_com[0] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].pos()[0];
+    p_com[1] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].pos()[1];
+    p_com[2] += (partCfg[ids->e[i]]).p.mass*partCfg[ids->e[i]].pos()[2];
     total_mass += (partCfg[ids->e[i]]).p.mass;
   }
   A[0]=p_com[0]/total_mass;

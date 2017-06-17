@@ -22,9 +22,9 @@ int ObservablePersistenceLength::actual_calculate() {
 	for (int i = 0; i<n_A; i++) {
 		// i : distance between polymer segments
 		for ( int j=cut_off; j<num_parts - i -cut_off; j++ ) {
-			vecsub(partCfg[ids->e[j]].r.p, partCfg[ids->e[j+1]].r.p, v1);
+			vecsub(partCfg[ids->e[j]].pos(), partCfg[ids->e[j+1]].pos(), v1);
 			abs1 = normr(v1);
-			vecsub(partCfg[ids->e[i+j]].r.p, partCfg[ids->e[i+j+1]].r.p, v2);
+			vecsub(partCfg[ids->e[i+j]].pos(), partCfg[ids->e[i+j+1]].pos(), v2);
 			abs2 = normr(v2);
 			A[i] += scalar(v1, v2)/(abs1*abs2 * (double) (num_parts - i - 2*cut_off) );
 		}

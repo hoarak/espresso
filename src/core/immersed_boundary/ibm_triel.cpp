@@ -25,12 +25,12 @@ int IBM_Triel_CalcForce(Particle *p1,Particle *p2, Particle *p3, Bonded_ia_param
   // l = length between 1 and 3
   // get_mi_vector is an Espresso function which considers PBC
   double vec2[3] = {0., 0., 0.};
-  get_mi_vector(vec2, p3->r.p, p1->r.p);
+  get_mi_vector(vec2, p3->pos(), p1->pos());
   const double l = sqrt (sqrlen(vec2));
   
   // lp = lenght between 1 and 2
   double vec1[3] = {0., 0., 0.};
-  get_mi_vector(vec1, p2->r.p, p1->r.p);
+  get_mi_vector(vec1, p2->pos(), p1->pos());
   const double lp = sqrt (sqrlen(vec1));
 
   // angles between these vectors; calculated directly via the products
@@ -246,11 +246,11 @@ int IBM_Triel_SetParams(const int bond_type, const int ind1, const int ind2, con
   // Calculate equilibrium lenghts and angle; Note the sequence of the points!
   // lo = lenght between 1 and 3
   double templo[3];
-  get_mi_vector(templo, part3.r.p, part1.r.p);
+  get_mi_vector(templo, part3.pos(), part1.pos());
   const double l0 = sqrt (sqrlen(templo));
   // lpo = lenght between 1 and 2
   double templpo[3];
-  get_mi_vector(templpo, part2.r.p, part1.r.p);
+  get_mi_vector(templpo, part2.pos(), part1.pos());
   const double lp0 = sqrt (sqrlen(templpo));
 
   // cospo / sinpo angle functions between these vectors; calculated directly via the products

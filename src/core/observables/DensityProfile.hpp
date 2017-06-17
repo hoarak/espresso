@@ -24,7 +24,7 @@ public:
     if (id >= n_part)
       return 1;
 /* We use folded coordinates here */
-    memmove(ppos, partCfg[id].r.p, 3*sizeof(double));
+    memmove(ppos, partCfg[id].pos(), 3*sizeof(double));
     memmove(img, partCfg[id].l.i, 3*sizeof(int));
     fold_position(ppos, img);
     int binx= (int) floor( xbins*  (ppos[0]-minx)/(maxx-minx));

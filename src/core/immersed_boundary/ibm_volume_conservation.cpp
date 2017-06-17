@@ -208,16 +208,16 @@ void CalcVolumes()
             
             // Unfold position of first node
             // this is to get a continuous trajectory with no jumps when box boundaries are crossed
-            double x1[3] = { p1.r.p[0], p1.r.p[1], p1.r.p[2] };
+            double x1[3] = { p1.pos()[0], p1.pos()[1], p1.pos()[2] };
             int img[3] = { p1.l.i[0], p1.l.i[1], p1.l.i[2] };
             unfold_position(x1,img);
             
             // Unfolding seems to work only for the first particle of a triel
             // so get the others from relative vectors considering PBC
             double a12[3];
-            get_mi_vector(a12, p2->r.p, x1);
+            get_mi_vector(a12, p2->pos(), x1);
             double a13[3];
-            get_mi_vector(a13, p3->r.p, x1);
+            get_mi_vector(a13, p3->pos(), x1);
             
             double x2[3];
             double x3[3];
@@ -319,16 +319,16 @@ void CalcVolumeForce()
             
             // Unfold position of first node
             // this is to get a continuous trajectory with no jumps when box boundaries are crossed
-            double x1[3] = { p1.r.p[0], p1.r.p[1], p1.r.p[2] };
+            double x1[3] = { p1.pos()[0], p1.pos()[1], p1.pos()[2] };
             int img[3] = { p1.l.i[0], p1.l.i[1], p1.l.i[2] };
             unfold_position(x1,img);
             
             // Unfolding seems to work only for the first particle of a triel
             // so get the others from relative vectors considering PBC
             double a12[3];
-            get_mi_vector(a12, p2->r.p, x1);
+            get_mi_vector(a12, p2->pos(), x1);
             double a13[3];
-            get_mi_vector(a13, p3->r.p, x1);
+            get_mi_vector(a13, p3->pos(), x1);
             
 
             

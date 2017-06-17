@@ -20,9 +20,9 @@ int ObservableBlockedComPosition::actual_calculate() {
       id = ids->e[block*blocksize+i];
       if (ids->e[i] >= n_part)
         return 1;
-      A[3*block+0] +=  (partCfg[id]).p.mass*partCfg[id].r.p[0];
-      A[3*block+1] +=  (partCfg[id]).p.mass*partCfg[id].r.p[1];
-      A[3*block+2] +=  (partCfg[id]).p.mass*partCfg[id].r.p[2];
+      A[3*block+0] +=  (partCfg[id]).p.mass*partCfg[id].pos()[0];
+      A[3*block+1] +=  (partCfg[id]).p.mass*partCfg[id].pos()[1];
+      A[3*block+2] +=  (partCfg[id]).p.mass*partCfg[id].pos()[2];
       total_mass += (partCfg[ids->e[i]]).p.mass;
     }
     A[3*block+0] /=  total_mass;

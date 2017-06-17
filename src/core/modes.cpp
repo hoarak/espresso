@@ -67,9 +67,9 @@ double stray_cut_off = 10000000.0;
 void fold_all ( void ) {
   int i ;
   for (i = 0 ; i < n_part ; i++) {
-    fold_coordinate(partCfg[i].r.p,partCfg[i].l.i,xdir);
-    fold_coordinate(partCfg[i].r.p,partCfg[i].l.i,ydir);
-    fold_coordinate(partCfg[i].r.p,partCfg[i].l.i,zdir);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].l.i,xdir);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].l.i,ydir);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].l.i,zdir);
   }
 }
 
@@ -86,7 +86,7 @@ double calc_zref ( int tmpzdir ) {
  /* Find the mean z position of folded particles*/
   zref = 0;
   for (i = 0 ; i < n_part ; i++) {
-    zref += partCfg[i].r.p[zdir];
+    zref += partCfg[i].pos()[zdir];
   }
   zref = zref/(double)(n_part);
   return zref;
@@ -302,7 +302,7 @@ int lipid_orientation( int id, Particle* partCfg , double zref, double director[
 
   /* Check for stray lipids only if the system is a flat bilayer and the director is in the zdirection */
   if ( ( refdir[tmpxdir] == 0.0 ) && ( refdir[tmpydir] == 0 ) ) {
-    tailz = partCfg[tail_id].r.p[tmpzdir];
+    tailz = partCfg[tail_id].pos()[tmpzdir];
     distance = sqrt(pow((tailz - zref),2));
     /* Check if the lipid is a stray based on this distance */
     if ( distance > stray_cut_off ) {
@@ -314,8 +314,8 @@ int lipid_orientation( int id, Particle* partCfg , double zref, double director[
      direction of the lipid from tail to head */
   len = 0;
   for ( i = 0 ; i < 3 ; i++ ) {
-    director[i] = (partCfg[head_id].r.p[i] - 
-		   partCfg[tail_id].r.p[i]);
+    director[i] = (partCfg[head_id].pos()[i] - 
+		   partCfg[tail_id].pos()[i]);
     len += director[i]*director[i];
   }
   for ( i = 0 ; i < 3 ; i++ ) {
@@ -374,8 +374,8 @@ int get_lipid_orients(IntList* l_orient) {
 
   for ( i = 0 ; i < n_molecules ; i++) {
     atom = topology[i].part.e[0];
-    gi = floor( partCfg[atom].r.p[xdir]/grid_size[xdir] );
-    gj = floor( partCfg[atom].r.p[ydir]/grid_size[ydir] );
+    gi = floor( partCfg[atom].pos()[xdir]/grid_size[xdir] );
+    gj = floor( partCfg[atom].pos()[ydir]/grid_size[ydir] );
     zreflocal = height_grid[gj+gi*mode_grid_3d[xdir]] + zref;
     l_orient->e[i] = lipid_orientation(atom,partCfg,zreflocal,dir,refdir);
   }
@@ -515,7 +515,7 @@ int bilayer_density_profile_sphere (IntList *beadids, double rrange , DoubleList
     for ( j = 0 ; j < nbeadtypes ; j++ ) {
       if ( beadids->e[j] == partCfg[i].p.type ) {
 	/* What is the relative height compared to the grid */
-	get_mi_vector(rvec,partCfg[i].r.p,center);
+	get_mi_vector(rvec,partCfg[i].pos(),center);
 	relativeradius = sqrt(sqrlen(rvec)) - radius;
 
 	/* If the particle is within our zrange then add it to the profile */
@@ -619,15 +619,15 @@ int bilayer_density_profile ( IntList *beadids, double hrange , DoubleList *dens
 
 	if ( usegrid ) {
 	  /* Where are we on the height grid */
-	  gi = (int)(floor( partCfg[i].r.p[xdir]/grid_size[xdir] ));
-	  gj = (int)(floor( partCfg[i].r.p[ydir]/grid_size[ydir] ));
+	  gi = (int)(floor( partCfg[i].pos()[xdir]/grid_size[xdir] ));
+	  gj = (int)(floor( partCfg[i].pos()[ydir]/grid_size[ydir] ));
 	  zreflocal = tmp_height_grid[gj + gi*mode_grid_3d[xdir]] + zref;
 	} else {
 	  zreflocal = zref;
 	}
 
 	/* What is the relative height compared to the grid */
-	relativeheight = partCfg[i].r.p[tmpzdir] - zreflocal;							       
+	relativeheight = partCfg[i].pos()[tmpzdir] - zreflocal;							       
 	/* If the particle is within our zrange then add it to the profile */
 	if ( (relativeheight*relativeheight - hrange*hrange) <= 0 ) {
 	  thisbin = (int)(floor((relativeheight + hrange)/binwidth));
@@ -763,9 +763,9 @@ int calc_fluctuations ( double* height_grid, int switch_fluc ) {
   
   /* Calculate an initial height function of all particles */
   for (i = 0 ; i < n_part ; i++) {
-    gi = floor( partCfg[i].r.p[xdir]/grid_size[xdir] );
-    gj = floor( partCfg[i].r.p[ydir]/grid_size[ydir] );
-    height_grid[gj + gi*mode_grid_3d[xdir]] += partCfg[i].r.p[zdir];
+    gi = floor( partCfg[i].pos()[xdir]/grid_size[xdir] );
+    gj = floor( partCfg[i].pos()[ydir]/grid_size[ydir] );
+    height_grid[gj + gi*mode_grid_3d[xdir]] += partCfg[i].pos()[zdir];
     grid_parts[gj + gi*mode_grid_3d[xdir]] += 1;
   }
   
@@ -788,8 +788,8 @@ int calc_fluctuations ( double* height_grid, int switch_fluc ) {
   /* Calculate the non normalized height function based on all lipids */
   nup = ndown = nstray = nrealstray = 0;
   for (i = 0 ; i < n_part ; i++) {
-    gi = floor( partCfg[i].r.p[xdir]/grid_size[xdir] );
-    gj = floor( partCfg[i].r.p[ydir]/grid_size[ydir] );
+    gi = floor( partCfg[i].pos()[xdir]/grid_size[xdir] );
+    gj = floor( partCfg[i].pos()[ydir]/grid_size[ydir] );
     
     zreflocal = height_grid[gj+gi*mode_grid_3d[xdir]];
     
@@ -798,11 +798,11 @@ int calc_fluctuations ( double* height_grid, int switch_fluc ) {
     if ( l_orient != LIPID_STRAY && l_orient != REAL_LIPID_STRAY) {
       if ( l_orient == LIPID_UP ) {
 	nup++;
-	height_grid_up[gj + gi*mode_grid_3d[xdir]] += partCfg[i].r.p[zdir] - zref;
+	height_grid_up[gj + gi*mode_grid_3d[xdir]] += partCfg[i].pos()[zdir] - zref;
 	grid_parts_up[gj + gi*mode_grid_3d[xdir]] += 1;
       } else if ( l_orient == LIPID_DOWN ) {
 	ndown++;
-	height_grid_down[gj + gi*mode_grid_3d[xdir]] += partCfg[i].r.p[zdir] - zref;
+	height_grid_down[gj + gi*mode_grid_3d[xdir]] += partCfg[i].pos()[zdir] - zref;
 	grid_parts_down[gj + gi*mode_grid_3d[xdir]] += 1;
       }
     } else {

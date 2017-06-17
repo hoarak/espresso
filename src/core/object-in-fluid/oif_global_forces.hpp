@@ -105,30 +105,30 @@ inline void calc_oif_global(double *area_volume, int molType){ //first-fold-then
 					// first find out which particle out of p1, p2 (possibly p3, p4) is not a ghost particle. In almost all cases it is p1, however, it might be other one. we call this particle reference particle.
 					if (p1->l.ghost != 1) {
 						//unfold non-ghost particle using image, because for physical particles, the structure p->l.i is correctly set
-						memmove(p11, p1->r.p, 3*sizeof(double));
+						memmove(p11, p1->pos(), 3*sizeof(double));
 						memmove(img, p1->l.i, 3*sizeof(int));
 						unfold_position(p11,img);
 						// other coordinates are obtained from its relative positions to the reference particle
-						get_mi_vector(AA, p2->r.p, p11);
-						get_mi_vector(BB, p3->r.p, p11);
+						get_mi_vector(AA, p2->pos(), p11);
+						get_mi_vector(BB, p3->pos(), p11);
 						for (int i=0; i < 3; i++) { p22[i] = p11[i] + AA[i]; p33[i] = p11[i] + BB[i]; }
 					} else {
 						// in case the first particle is a ghost particle
 						if (p2->l.ghost != 1) {
-							memmove(p22, p2->r.p, 3*sizeof(double));
+							memmove(p22, p2->pos(), 3*sizeof(double));
 							memmove(img, p2->l.i, 3*sizeof(int));
 							unfold_position(p22,img);
-							get_mi_vector(AA, p1->r.p, p22);
-							get_mi_vector(BB, p3->r.p, p22);
+							get_mi_vector(AA, p1->pos(), p22);
+							get_mi_vector(BB, p3->pos(), p22);
 							for (int i=0; i < 3; i++) { p11[i] = p22[i] + AA[i]; p33[i] = p22[i] + BB[i]; }
 						} else {
 							// in case the first and the second particle are ghost particles
 							if (p3->l.ghost != 1) {
-								memmove(p33, p3->r.p, 3*sizeof(double));
+								memmove(p33, p3->pos(), 3*sizeof(double));
 								memmove(img, p3->l.i, 3*sizeof(int));
 								unfold_position(p33,img);
-								get_mi_vector(AA, p1->r.p, p33);
-								get_mi_vector(BB, p2->r.p, p33);
+								get_mi_vector(AA, p1->pos(), p33);
+								get_mi_vector(BB, p2->pos(), p33);
 								for (int i=0; i < 3; i++) { p11[i] = p33[i] + AA[i]; p22[i] = p33[i] + BB[i]; }
 							} else {
 								printf("Something wrong in oif_global_forces.hpp: All particles in a bond are ghost particles, impossible to unfold the positions...");
@@ -139,12 +139,12 @@ inline void calc_oif_global(double *area_volume, int molType){ //first-fold-then
 					#endif
 					#ifndef GHOST_FLAG
 						// if ghost flag was not defined we have no other option than to assume the first particle is a physical one.
-						memmove(p11, p1->r.p, 3*sizeof(double));
+						memmove(p11, p1->pos(), 3*sizeof(double));
 						memmove(img, p1->l.i, 3*sizeof(int));
 						unfold_position(p11,img);
 						// other coordinates are obtained from its relative positions to the reference particle
-						get_mi_vector(AA, p2->r.p, p11);
-						get_mi_vector(BB, p3->r.p, p11);
+						get_mi_vector(AA, p2->pos(), p11);
+						get_mi_vector(BB, p3->pos(), p11);
 						for (int i=0; i < 3; i++) { p22[i] = p11[i] + AA[i]; p33[i] = p11[i] + BB[i]; }
 					#endif
 					// unfolded positions correct
@@ -233,30 +233,30 @@ inline void add_oif_global_forces(double *area_volume, int molType){  //first-fo
 					// first find out which particle out of p1, p2 (possibly p3, p4) is not a ghost particle. In almost all cases it is p1, however, it might be other one. we call this particle reference particle.
 					if (p1->l.ghost != 1) {
 						//unfold non-ghost particle using image, because for physical particles, the structure p->l.i is correctly set
-						memmove(p11, p1->r.p, 3*sizeof(double));
+						memmove(p11, p1->pos(), 3*sizeof(double));
 						memmove(img, p1->l.i, 3*sizeof(int));
 						unfold_position(p11,img);
 						// other coordinates are obtained from its relative positions to the reference particle
-						get_mi_vector(AA, p2->r.p, p11);
-						get_mi_vector(BB, p3->r.p, p11);
+						get_mi_vector(AA, p2->pos(), p11);
+						get_mi_vector(BB, p3->pos(), p11);
 						for (int i=0; i < 3; i++) { p22[i] = p11[i] + AA[i]; p33[i] = p11[i] + BB[i]; }
 					} else {
 						// in case the first particle is a ghost particle
 						if (p2->l.ghost != 1) {
-							memmove(p22, p2->r.p, 3*sizeof(double));
+							memmove(p22, p2->pos(), 3*sizeof(double));
 							memmove(img, p2->l.i, 3*sizeof(int));
 							unfold_position(p22,img);
-							get_mi_vector(AA, p1->r.p, p22);
-							get_mi_vector(BB, p3->r.p, p22);
+							get_mi_vector(AA, p1->pos(), p22);
+							get_mi_vector(BB, p3->pos(), p22);
 							for (int i=0; i < 3; i++) { p11[i] = p22[i] + AA[i]; p33[i] = p22[i] + BB[i]; }
 						} else {
 							// in case the first and the second particle are ghost particles
 							if (p3->l.ghost != 1) {
-								memmove(p33, p3->r.p, 3*sizeof(double));
+								memmove(p33, p3->pos(), 3*sizeof(double));
 								memmove(img, p3->l.i, 3*sizeof(int));
 								unfold_position(p33,img);
-								get_mi_vector(AA, p1->r.p, p33);
-								get_mi_vector(BB, p2->r.p, p33);
+								get_mi_vector(AA, p1->pos(), p33);
+								get_mi_vector(BB, p2->pos(), p33);
 								for (int i=0; i < 3; i++) { p11[i] = p33[i] + AA[i]; p22[i] = p33[i] + BB[i]; }
 							} else {
 								printf("Something wrong in oif_global_forces.hpp: All particles in a bond are ghost particles, impossible to unfold the positions...");
@@ -267,12 +267,12 @@ inline void add_oif_global_forces(double *area_volume, int molType){  //first-fo
 					#endif
 					#ifndef GHOST_FLAG
 						// if ghost flag was not defined we have no other option than to assume the first particle is a physical one.
-						memmove(p11, p1->r.p, 3*sizeof(double));
+						memmove(p11, p1->pos(), 3*sizeof(double));
 						memmove(img, p1->l.i, 3*sizeof(int));
 						unfold_position(p11,img);
 						// other coordinates are obtained from its relative positions to the reference particle
-						get_mi_vector(AA, p2->r.p, p11);
-						get_mi_vector(BB, p3->r.p, p11);
+						get_mi_vector(AA, p2->pos(), p11);
+						get_mi_vector(BB, p3->pos(), p11);
 						for (int i=0; i < 3; i++) { p22[i] = p11[i] + AA[i]; p33[i] = p11[i] + BB[i]; }
 					#endif
 					// unfolded positions correct

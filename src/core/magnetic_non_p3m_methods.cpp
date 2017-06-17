@@ -48,7 +48,7 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
  
 	
   // Distance between particles
-  get_mi_vector(dr,p1->r.p,p2->r.p);
+  get_mi_vector(dr,p1->pos(),p2->pos());
 
   // Powers of distance
   r2=dr[0]*dr[0]+dr[1]*dr[1]+dr[2]*dr[2];
@@ -88,12 +88,12 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
 //    if (p1->id()==248)
 //    {
 //      printf("xxx %g %g %g\n", dr[0],dr[1],dr[2]);
-//      printf("%d %g %g %g - %g %g %g\n",p2->id(),ffx,ffy,ffz,p2->r.p[0],p2->r.p[1],p2->r.p[2]);
+//      printf("%d %g %g %g - %g %g %g\n",p2->id(),ffx,ffy,ffz,p2->pos()[0],p2->pos()[1],p2->pos()[2]);
 //     }
 //    if (p2->id()==248)
  //   {
 //      printf("xxx %g %g %g\n", dr[0],dr[1],dr[2]);
-//      printf("%d %g %g %g - %g %g %g\n",p1->id(),-ffx,-ffy,-ffz,p1->r.p[0],p1->r.p[1],p1->r.p[2]);
+//      printf("%d %g %g %g - %g %g %g\n",p1->id(),-ffx,-ffy,-ffz,p1->pos()[0],p1->pos()[1],p1->pos()[2]);
 //     }
 
       // Torques
@@ -262,9 +262,9 @@ double  magnetic_dipolar_direct_sum_calculations(int force_flag, int energy_flag
 
 	/* here we wish the coordinates to be folded into the primary box */
                   
-	ppos[0]=part[i].r.p[0];	  
-	ppos[1]=part[i].r.p[1];	  
-	ppos[2]=part[i].r.p[2];	  
+	ppos[0]=part[i].pos()[0];	  
+	ppos[1]=part[i].pos()[1];	  
+	ppos[2]=part[i].pos()[2];	  
 	img[0]=part[i].l.i[0];	  
 	img[1]=part[i].l.i[1];	  
         img[2]=part[i].l.i[2];	  		  

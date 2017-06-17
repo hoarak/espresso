@@ -71,24 +71,24 @@ void update_mol_pos_particle(Particle *p)
  double tmp;
  for (i=0;i<3;i++)
  {
-  new_pos[i] =p_real->r.p[i] +director[i]/l*p->p.vs_relative_distance;
+  new_pos[i] =p_real->pos()[i] +director[i]/l*p->p.vs_relative_distance;
   // Handle the case that one of the particles had gone over the periodic
   // boundary and its coordinate has been folded
   if (PERIODIC(i)) 
   {
-    tmp =p->r.p[i] -new_pos[i];
+    tmp =p->pos()[i] -new_pos[i];
     //printf("%f\n",tmp);
     if (tmp > box_l[i]/2.) {
      //printf("greater than box_l/2 %f\n",tmp);
-     p->r.p[i] =new_pos[i] + box_l[i];
+     p->pos()[i] =new_pos[i] + box_l[i];
     }
     else if (tmp < -box_l[i]/2.) {
      //printf("smaller than box_l/2 %f\n",tmp);
-     p->r.p[i] =new_pos[i] - box_l[i];
+     p->pos()[i] =new_pos[i] - box_l[i];
     }
-    else p->r.p[i] =new_pos[i];
+    else p->pos()[i] =new_pos[i];
    }
-   else p->r.p[i] =new_pos[i];
+   else p->pos()[i] =new_pos[i];
  }
 }
 
@@ -165,7 +165,7 @@ void distribute_mol_force()
        // Get distance vector pointing from real to virtual particle, respecting periodic boundary i
        // conditions
        double d[3];
-       get_mi_vector(d,p[i].r.p,p_real->r.p);
+       get_mi_vector(d,p[i].pos(),p_real->pos());
 
        // The rules for transfering forces are:
        // F_realParticle +=F_virtualParticle
@@ -207,7 +207,7 @@ int vs_relate_to(int part_num, int relate_to)
     
     // get teh distance between the particles
     double d[3];
-    get_mi_vector(d, p_current.r.p,p_relate_to.r.p);
+    get_mi_vector(d, p_current.pos(),p_relate_to.pos());
     
     
     
@@ -329,7 +329,7 @@ void vs_relative_pressure_and_stress_tensor(double* pressure, double* stress_ten
       // Get distance vector pointing from real to virtual particle, respecting periodic boundary i
       // conditions
       double d[3];
-      get_mi_vector(d,p_real->r.p,p[i].r.p);
+      get_mi_vector(d,p_real->pos(),p[i].pos());
 
       // Stress tensor conribution
       for (int k =0; k<3;k++)

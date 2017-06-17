@@ -41,9 +41,9 @@ void IBM_Tribend_CalcForce(Particle *p1, const int numPartners, Particle **const
     
     //Get vectors making up the two triangles
     double dx1[3], dx2[3], dx3[3];
-    get_mi_vector(dx1, p1->r.p, p3->r.p);
-    get_mi_vector(dx2, p2->r.p, p3->r.p);
-    get_mi_vector(dx3, p4->r.p, p3->r.p);
+    get_mi_vector(dx1, p1->pos(), p3->pos());
+    get_mi_vector(dx2, p2->pos(), p3->pos());
+    get_mi_vector(dx3, p4->pos(), p3->pos());
     
     //Get normals on triangle; pointing outwards by definition of indices sequence
     double n1[3], n2[3];
@@ -111,29 +111,29 @@ void IBM_Tribend_CalcForce(Particle *p1, const int numPartners, Particle **const
     
     // Force for particle 1:
     double tmp[3], tmp2[3], term1[3], term2[3];
-    get_mi_vector(tmp,p2->r.p,p3->r.p);
-    get_mi_vector(tmp2, p3->r.p, p4->r.p);
+    get_mi_vector(tmp,p2->pos(),p3->pos());
+    get_mi_vector(tmp2, p3->pos(), p4->pos());
     vector_product(tmp,v1, term1);
     vector_product(tmp2,v2, term2);
     for (int i = 0; i < 3; i++ )
       p1->f.f[i] += Pre*(term1[i]/Ai + term2[i]/Aj);
     
      // Force for particle 2:
-    get_mi_vector(tmp,p3->r.p,p1->r.p);
+    get_mi_vector(tmp,p3->pos(),p1->pos());
     vector_product(tmp,v1, term1);
     for (int i = 0; i < 3; i++)
       p2->f.f[i] += Pre*(term1[i]/Ai);
     
     // Force for Particle 3:
-    get_mi_vector(tmp,p1->r.p,p2->r.p);
-    get_mi_vector(tmp2, p4->r.p, p1->r.p);
+    get_mi_vector(tmp,p1->pos(),p2->pos());
+    get_mi_vector(tmp2, p4->pos(), p1->pos());
     vector_product(tmp,v1, term1);
     vector_product(tmp2,v2, term2);
     for (int i = 0; i < 3; i++)
       p3->f.f[i] += Pre*(term1[i]/Ai + term2[i]/Aj);
     
     // Force for Particle 4:
-    get_mi_vector(tmp,p1->r.p,p3->r.p);
+    get_mi_vector(tmp,p1->pos(),p3->pos());
     vector_product(tmp,v2, term1);
     for (int i = 0; i < 3; i++) p4->f.f[i] += Pre*(term1[i]/Aj);
   }
@@ -190,9 +190,9 @@ int IBM_Tribend_SetParams(const int bond_type, const int ind1, const int ind2, c
       
       //Get vectors of triangles
       double dx1[3], dx2[3], dx3[3];
-      get_mi_vector(dx1, p1.r.p, p3.r.p);
-      get_mi_vector(dx2, p2.r.p, p3.r.p);
-      get_mi_vector(dx3, p4.r.p, p3.r.p);
+      get_mi_vector(dx1, p1.pos(), p3.pos());
+      get_mi_vector(dx2, p2.pos(), p3.pos());
+      get_mi_vector(dx3, p4.pos(), p3.pos());
       
       //Get normals on triangle; pointing outwards by definition of indices sequence
       double n1l[3], n2l[3];
@@ -260,7 +260,7 @@ int IBM_Tribend_SetParams(const int bond_type, const int ind1, const int ind2, c
 
 void CalcForceGompper(Particle *xi, const int numNeighbors, Particle **const neighbors, const double kb)
 {
-//  if ( xi->r.p[0] > maxX ) maxX = xi->r.p[0];
+//  if ( xi->pos()[0] > maxX ) maxX = xi->pos()[0];
   
   // DEBUG stuff
 /*  for (int i=0; i < numNeighbors; i++)

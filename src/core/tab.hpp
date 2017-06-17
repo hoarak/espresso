@@ -282,12 +282,12 @@ inline int calc_tab_angle_force(Particle *p_mid, Particle *p_left,
   int j;
 
   /* vector from p_left to p_mid */
-  get_mi_vector(vec1, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec1, p_mid->pos(), p_left->pos());
   dist2 = sqrlen(vec1);
   d1i = 1.0 / sqrt(dist2);
   for(j=0;j<3;j++) vec1[j] *= d1i;
   /* vector from p_mid to p_right */
-  get_mi_vector(vec2, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec2, p_right->pos(), p_mid->pos());
   dist2 = sqrlen(vec2);
   d2i = 1.0 / sqrt(dist2);
   for(j=0;j<3;j++) vec2[j] *= d2i;
@@ -335,11 +335,11 @@ inline void calc_angle_3body_tabulated_forces(Particle *p_mid, Particle *p_left,
   double fk[3];
   double phi, dU; // bond angle and d/dphi of U(phi)
 
-  get_mi_vector(vec12, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec12, p_mid->pos(), p_left->pos());
   for(j = 0; j < 3; j++)
     vec21[j] = -vec12[j];
 
-  get_mi_vector(vec31, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec31, p_right->pos(), p_mid->pos());
   vec21_sqr = sqrlen(vec21);
   vec21_magn = sqrt(vec21_sqr);
   vec31_sqr = sqrlen(vec31);
@@ -386,10 +386,10 @@ inline int tab_angle_energy(Particle *p_mid, Particle *p_left,
   double phi, vec1[3], vec2[3], vl1, vl2; 
 
   /* vector from p_mid to p_left */
-  get_mi_vector(vec1, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec1, p_mid->pos(), p_left->pos());
   vl1 = sqrt(sqrlen(vec1));
   /* vector from p_right to p_mid */
-  get_mi_vector(vec2, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec2, p_right->pos(), p_mid->pos());
   vl2 = sqrt(sqrlen(vec2));
   /* calculate phi */
 #ifdef TABANGLEMINUS

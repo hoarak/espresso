@@ -389,12 +389,12 @@ void propagate_pos_sd()
       {
 #ifdef SD_USE_FLOAT
 	for (int d=0;d<3;d++){
-	  pos[3*j+d]        = p[i].r.p[d];
+	  pos[3*j+d]        = p[i].pos()[d];
 	  pos[3*j+d]        -=rint(pos[3*j+d]/box_l[d])*box_l[d];
 	  force[3*j+d]      = p[i].f.f[d];
 	}
 #else
-        memmove(&pos[3*j], p[i].r.p, 3*sizeof(double));
+        memmove(&pos[3*j], p[i].pos(), 3*sizeof(double));
         memmove(&force[3*j], p[i].f.f, 3*sizeof(double));
 	for (int d=0;d<3;d++){
 	  pos[3*j+d]        -=rint(pos[3*j+d]/box_l[d])*box_l[d];
@@ -448,13 +448,13 @@ void propagate_pos_sd()
       // write back of position and velocity data
 #ifdef SD_USE_FLOAT
       for (int d=0;d<3;d++){
-	p[i].r.p[d] = pos[3*j+d]+box_l[d]*rint(p[i].r.p[d]/box_l[d]);
+	p[i].pos()[d] = pos[3*j+d]+box_l[d]*rint(p[i].pos()[d]/box_l[d]);
 	p[i].m.v[d] = velocity[3*j+d];
 	//p[i].f.f[d] *= (0.5*time_step*time_step)/(*part).p.mass;
       }
 #else
       for (int d=0;d<3;d++){
-	p[i].r.p[d] = pos[3*j+d]+box_l[d]*rint(p[i].r.p[d]/box_l[d]);
+	p[i].pos()[d] = pos[3*j+d]+box_l[d]*rint(p[i].pos()[d]/box_l[d]);
       }
       memmove(p[i].m.v, &velocity[DIM*j], 3*sizeof(double));
 #endif
@@ -467,7 +467,7 @@ void propagate_pos_sd()
       }
       j++;
       ONEPART_TRACE(if(p[i].id()==check_id) fprintf(stderr,"%d: OPT: PV_1 v_new = (%.3e,%.3e,%.3e)\n",this_node,p[i].m.v[0],p[i].m.v[1],p[i].m.v[2]));
-      ONEPART_TRACE(if(p[i].id()==check_id) fprintf(stderr,"%d: OPT: PPOS p = (%.3f,%.3f,%.3f)\n",this_node,p[i].r.p[0],p[i].r.p[1],p[i].r.p[2]));
+      ONEPART_TRACE(if(p[i].id()==check_id) fprintf(stderr,"%d: OPT: PPOS p = (%.3f,%.3f,%.3f)\n",this_node,p[i].pos()[0],p[i].pos()[1],p[i].pos()[2]));
    
 
 #ifdef ROTATION
@@ -475,7 +475,7 @@ void propagate_pos_sd()
 #endif
 
       /* Verlet criterion check */
-      if(distance2(p[i].r.p,p[i].l.p_old) > skin2 ) resort_particles = 1;
+      if(distance2(p[i].pos(),p[i].l.p_old) > skin2 ) resort_particles = 1;
     }
   }
   free(pos);
@@ -518,11 +518,11 @@ It could be difficult to set particles apart!\n",phi);
 	inner=false;
 	for (int i = 0; i < np; i++) { // only count nonVirtual Particles
 	  for (int j = i+1; j <np; j++){
-	    //position: p[i].r.p
+	    //position: p[i].pos()
 	    double dr2=0;
 	    double dr[3];
 	    for (int d=0; d<3;d++){
-	      dr[d]=p[i].r.p[d]-p[j].r.p[d];
+	      dr[d]=p[i].pos()[d]-p[j].pos()[d];
 	      dr[d]-=box_l[d]*rint(dr[d]/box_l[d]);
 	      dr2+=SQR(dr[d]);
 	    }
@@ -538,12 +538,12 @@ It could be difficult to set particles apart!\n",phi);
 		}
 		assert(!isnan(dr[d]));
 		assert(!isnan(dr[d]*fac));
-		p[i].r.p[d]+=fac*dr[d];
-		p[j].r.p[d]-=fac*dr[d];
+		p[i].pos()[d]+=fac*dr[d];
+		p[j].pos()[d]-=fac*dr[d];
 	      }
 	      dr2=0;
 	      for (int d=0; d<3;d++){
-		dr[d]=p[i].r.p[d]-p[j].r.p[d];
+		dr[d]=p[i].pos()[d]-p[j].pos()[d];
 		dr[d]-=box_l[d]*rint(dr[d]/box_l[d]);
 		dr2+=SQR(dr[d]);
 	      }
@@ -561,11 +561,11 @@ It could be difficult to set particles apart!\n",phi);
 	int npj       = cellJ->n;
 	for (int i = 0; i < np; i++) {
 	  for (int j = (c==cj?i+1:0); j <npj; j++){
-	    //position: p[i].r.p
+	    //position: p[i].pos()
 	    double dr2=0;
 	    double dr[3];
 	    for (int d=0; d<3;d++){
-	      dr[d]=p[i].r.p[d]-pj[j].r.p[d];
+	      dr[d]=p[i].pos()[d]-pj[j].pos()[d];
 	      dr[d]-=box_l[d]*rint(dr[d]/box_l[d]);
 	      dr2+=SQR(dr[d]);
 	    }
@@ -576,15 +576,15 @@ It could be difficult to set particles apart!\n",phi);
 	      assert(!isnan(fac));
 	      assert (fac > 0);
 	      for (int d=0; d<3;d++){
-		p[i].r.p[d] +=fac*dr[d];
-		pj[j].r.p[d]-=fac*dr[d];
+		p[i].pos()[d] +=fac*dr[d];
+		pj[j].pos()[d]-=fac*dr[d];
 	      }
 	      outer=true;
 	      moved=true;
 	    }
 	    for (int d=0;d<3;d++){
-	      assert(!isnan( pj[j].r.p[d]));
-	      assert(!isnan( p[i].r.p[d]));
+	      assert(!isnan( pj[j].pos()[d]));
+	      assert(!isnan( p[i].pos()[d]));
 	    }
 	  }
 	}
@@ -606,7 +606,7 @@ It could be difficult to set particles apart!\n",phi);
 	  double dr2=0;
 	  double dr[3];
 	  for (int d=0; d<3;d++){
-	    dr[d]=p[i].r.p[d]-pj[j].r.p[d];
+	    dr[d]=p[i].pos()[d]-pj[j].pos()[d];
 	    dr[d]-=box_l[d]*rint(dr[d]/box_l[d]);
 	    dr2+=SQR(dr[d]);
 	  }

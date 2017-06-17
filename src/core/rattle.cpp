@@ -78,7 +78,7 @@ void save_old_pos()
     np = cell->n;
     for(i = 0; i < np; i++) {
       for(j=0;j<3;j++)
-        p[i].r.p_old[j]=p[i].r.p[j];
+        p[i].pos()_old[j]=p[i].pos()[j];
     } //for i loop
   }// for c loop
 
@@ -89,7 +89,7 @@ void save_old_pos()
     np = cell->n;
     for(i = 0; i < np; i++) {
        for(j=0;j<3;j++)
-          p[i].r.p_old[j]=p[i].r.p[j];
+          p[i].pos()_old[j]=p[i].pos()[j];
     }
   }
 }
@@ -151,10 +151,10 @@ void compute_pos_corr_vec(int *repeat_)
 	    return;
 	  }
 
-	  get_mi_vector(r_ij  , p1->r.p    , p2->r.p    );
+	  get_mi_vector(r_ij  , p1->pos()    , p2->pos()    );
 	  r_ij2 = sqrlen(r_ij);
 	  if(fabs(1.0 - r_ij2/ia_params->p.rigid_bond.d2) > ia_params->p.rigid_bond.p_tol) {
-            get_mi_vector(r_ij_t, p1->r.p_old, p2->r.p_old);
+            get_mi_vector(r_ij_t, p1->pos()_old, p2->pos()_old);
 	    r_ij_dot = scalar(r_ij_t, r_ij);
 	    G = 0.50*(ia_params->p.rigid_bond.d2 - r_ij2 )/r_ij_dot;
 #ifdef MASS
@@ -196,7 +196,7 @@ void app_pos_correction()
       for(i = 0; i < np; i++) {
         p1 = &p[i];
 	for (j=0;j<3;j++) {
-	   p1->r.p[j] += p1->f.f[j];
+	   p1->pos()[j] += p1->f.f[j];
 	   p1->m.v[j] += p1->f.f[j];
 	}
 
@@ -252,7 +252,7 @@ void transfer_force_init_vel()
       for(i = 0; i < np; i++) {
 	for(j=0;j<3;j++)
 	  {
-	    p[i].r.p_old[j]=p[i].f.f[j];
+	    p[i].pos()_old[j]=p[i].f.f[j];
 	    p[i].f.f[j]=0.0;
 	  }
       } //for i loop
@@ -266,7 +266,7 @@ void transfer_force_init_vel()
       for(i = 0; i < np; i++) {
 	for(j=0;j<3;j++)
 	  {
-	    p[i].r.p_old[j]=p[i].f.f[j];
+	    p[i].pos()_old[j]=p[i].f.f[j];
 	    p[i].f.f[j]=0.0;
 	  }
       }
@@ -302,7 +302,7 @@ void compute_vel_corr_vec(int *repeat_)
 		}
 
 		vecsub(p1->m.v, p2->m.v, v_ij);
-                get_mi_vector(r_ij, p1->r.p, p2->r.p);
+                get_mi_vector(r_ij, p1->pos(), p2->pos());
 		if(fabs(scalar(v_ij, r_ij)) > ia_params->p.rigid_bond.v_tol)
 	        {
 		  K = scalar(v_ij, r_ij)/ia_params->p.rigid_bond.d2;
@@ -366,7 +366,7 @@ void revert_force()
     np = cell->n;
     for(i = 0; i < np; i++) {
       for(j=0;j<3;j++)
-      	p[i].f.f[j]=p[i].r.p_old[j];
+      	p[i].f.f[j]=p[i].pos()_old[j];
 
      } //for i loop
   }// for c loop
@@ -380,7 +380,7 @@ void revert_force()
     for(i = 0; i < np; i++)
     {
        for(j=0;j<3;j++)
-  	  p[i].f.f[j]=p[i].r.p_old[j];
+  	  p[i].f.f[j]=p[i].pos()_old[j];
     }
   }
 }
@@ -443,7 +443,7 @@ void print_bond_len()
 		 return;
 	       }
 
-	       get_mi_vector(r_ij, p[i].r.p , p2->r.p);
+	       get_mi_vector(r_ij, p[i].pos() , p2->pos());
 	       printf(" bl (%d %d): %f\t", p[i].id(), p2->id(),sqrlen(r_ij));
              }
 	     else

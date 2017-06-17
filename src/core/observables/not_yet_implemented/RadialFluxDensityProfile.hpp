@@ -31,7 +31,7 @@ int ObservableRadialFluxDensityProfile::actual_calculate() {
   double* old_positions=(double*) pdata->container;
   if (old_positions[0] == CONST_UNITITIALIZED) {
     for (int i = 0; i<ids->n; i++ ) {
-      memmove(unfolded_ppos, partCfg[ids->e[i]].r.p, 3*sizeof(double));
+      memmove(unfolded_ppos, partCfg[ids->e[i]].pos(), 3*sizeof(double));
       memmove(img, partCfg[ids->e[i]].l.i, 3*sizeof(int));
       unfold_position(unfolded_ppos, img);
       old_positions[3*i+0]=unfolded_ppos[0];
@@ -44,13 +44,13 @@ int ObservableRadialFluxDensityProfile::actual_calculate() {
     if (ids->e[i] >= n_part)
       return 1;
 /* We use folded coordinates here */
-    memmove(unfolded_ppos, partCfg[ids->e[i]].r.p, 3*sizeof(double));
+    memmove(unfolded_ppos, partCfg[ids->e[i]].pos(), 3*sizeof(double));
     memmove(img, partCfg[ids->e[i]].l.i, 3*sizeof(int));
     unfold_position(unfolded_ppos, img);
     v[0]=(unfolded_ppos[0] - old_positions[3*i+0]);
     v[1]=(unfolded_ppos[1] - old_positions[3*i+1]);
     v[2]=(unfolded_ppos[2] - old_positions[3*i+2]);
-    memmove(ppos, partCfg[ids->e[i]].r.p, 3*sizeof(double));
+    memmove(ppos, partCfg[ids->e[i]].pos(), 3*sizeof(double));
     memmove(img, partCfg[ids->e[i]].l.i, 3*sizeof(int));
     fold_position(ppos, img);
     // The position of the particle is by definition the middle of old and new position

@@ -2952,7 +2952,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
 
   /* determine elementary lattice cell surrounding the particle
      and the relative position of the particle in this cell */
-  lblattice.map_position_to_lattice(p->r.p,node_index,delta);
+  lblattice.map_position_to_lattice(p->pos(),node_index,delta);
   
   ONEPART_TRACE(
                 if(p->id() == check_id) 
@@ -2960,14 +2960,14 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
                     fprintf(stderr,
                             "%d: OPT: LB delta=(%.3f,%.3f,%.3f,%.3f,%.3f,%.3f) pos=(%.3f,%.3f,%.3f)\n",
                             this_node, delta[0], delta[1], delta[2], delta[3],
-                            delta[4], delta[5], p->r.p[0], p->r.p[1], p->r.p[2]);
+                            delta[4], delta[5], p->pos()[0], p->pos()[1], p->pos()[2]);
                   }
                 );
   
   /* calculate fluid velocity at particle's position
      this is done by linear interpolation
      (Eq. (11) Ahlrichs and Duenweg, JCP 111(17):8225 (1999)) */
-  lb_lbfluid_get_interpolated_velocity(p->r.p, interpolated_u);
+  lb_lbfluid_get_interpolated_velocity(p->pos(), interpolated_u);
   
   ONEPART_TRACE(
                 if (p->id()==check_id) 
@@ -3076,9 +3076,9 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
     // calculate source position
     double source_position[3];
     double direction = double(p->swim.push_pull) * p->swim.dipole_length;
-    source_position[0] = p->r.p[0] + direction * p->r.quatu[0];
-    source_position[1] = p->r.p[1] + direction * p->r.quatu[1];
-    source_position[2] = p->r.p[2] + direction * p->r.quatu[2];
+    source_position[0] = p->pos()[0] + direction * p->r.quatu[0];
+    source_position[1] = p->pos()[1] + direction * p->r.quatu[1];
+    source_position[2] = p->pos()[2] + direction * p->r.quatu[2];
 
     int corner[3] = {0,0,0};
     fold_position( source_position , corner );
@@ -3339,12 +3339,12 @@ void calc_particle_lattice_ia() {
       for (int i = 0; i < np; i++) {
         /* for ghost particles we have to check if they lie
          * in the range of the local lattice nodes */
-        if (p[i].r.p[0] >= my_left[0]-0.5*lblattice.agrid[0]
-            && p[i].r.p[0] < my_right[0]+0.5*lblattice.agrid[0]
-            && p[i].r.p[1] >= my_left[1]-0.5*lblattice.agrid[1]
-            && p[i].r.p[1] < my_right[1]+0.5*lblattice.agrid[1]
-            && p[i].r.p[2] >= my_left[2]-0.5*lblattice.agrid[2]
-            && p[i].r.p[2] < my_right[2]+0.5*lblattice.agrid[2]) 
+        if (p[i].pos()[0] >= my_left[0]-0.5*lblattice.agrid[0]
+            && p[i].pos()[0] < my_right[0]+0.5*lblattice.agrid[0]
+            && p[i].pos()[1] >= my_left[1]-0.5*lblattice.agrid[1]
+            && p[i].pos()[1] < my_right[1]+0.5*lblattice.agrid[1]
+            && p[i].pos()[2] >= my_left[2]-0.5*lblattice.agrid[2]
+            && p[i].pos()[2] < my_right[2]+0.5*lblattice.agrid[2]) 
           {
             ONEPART_TRACE(
                           if (p[i].id() == check_id)

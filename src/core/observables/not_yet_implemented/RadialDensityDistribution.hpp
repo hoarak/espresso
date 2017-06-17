@@ -29,10 +29,10 @@ int ObservableRadialDensityDistribution::actual_calculate() {
   int image_box[3];
   if ( r_data->id_flag ) {
 	  // Using particle_ids to specify the start and endpoints
-	  memmove(start_point, partCfg[r_data->start_point_id].r.p, 3*sizeof(double));
+	  memmove(start_point, partCfg[r_data->start_point_id].pos(), 3*sizeof(double));
 	  memmove(image_box, partCfg[r_data->start_point_id].l.i, 3*sizeof(int));
 	  unfold_position(start_point, image_box);
-	  memmove(end_point, partCfg[r_data->end_point_id].r.p, 3*sizeof(double));
+	  memmove(end_point, partCfg[r_data->end_point_id].pos(), 3*sizeof(double));
 	  memmove(image_box, partCfg[r_data->end_point_id].l.i, 3*sizeof(int));
 	  unfold_position(end_point, image_box);
   } else {
@@ -95,9 +95,9 @@ int ObservableRadialDensityDistribution::actual_calculate() {
 	  A[i] = 0.0;
 
   for (int i=0; i < ids->n; i++){
-	  part_pos[0]=partCfg[ids->e[i]].r.p[0];
-	  part_pos[1]=partCfg[ids->e[i]].r.p[1];
-	  part_pos[2]=partCfg[ids->e[i]].r.p[2];
+	  part_pos[0]=partCfg[ids->e[i]].pos()[0];
+	  part_pos[1]=partCfg[ids->e[i]].pos()[1];
+	  part_pos[2]=partCfg[ids->e[i]].pos()[2];
 	  // that might seem weird, but this ensures that the used particle position is the
 	  // closest image to one of the two points that define the axis
 	  get_mi_vector(tmp, part_pos, start_point);

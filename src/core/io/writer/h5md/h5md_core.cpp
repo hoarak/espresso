@@ -319,9 +319,9 @@ void File::fill_arrays_for_h5md_write_with_particle_property(
     mass[0][particle_index][0] = current_particle->p.mass;
   /* store folded particle positions. */
   if (write_pos) {
-    pos[0][particle_index][0] = current_particle->r.p[0];
-    pos[0][particle_index][1] = current_particle->r.p[1];
-    pos[0][particle_index][2] = current_particle->r.p[2];
+    pos[0][particle_index][0] = current_particle->pos()[0];
+    pos[0][particle_index][1] = current_particle->pos()[1];
+    pos[0][particle_index][2] = current_particle->pos()[2];
     image[0][particle_index][0] = current_particle->l.i[0];
     image[0][particle_index][1] = current_particle->l.i[1];
     image[0][particle_index][2] = current_particle->l.i[2];

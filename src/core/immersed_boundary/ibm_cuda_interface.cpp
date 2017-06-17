@@ -42,7 +42,7 @@ void pack_particles(ParticleRange particles,
 
   int i = 0;
   for (auto const &part : particles) {
-    memmove(pos, part.r.p, 3 * sizeof(double));
+    memmove(pos, part.pos(), 3 * sizeof(double));
     fold_position(pos, dummy);
 
     buffer[i].pos[0] = (float)pos[0];

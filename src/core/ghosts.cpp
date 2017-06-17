@@ -336,12 +336,12 @@ void put_recv_buffer(GhostCommunication *gc, int data_parts)
       if( gc->shift[1] != 0.0 ){
                /* LE transforms are wrapped
                   ---Using this method because its a shortcut to getting a neat-looking verlet list. */
-               if( pt->r.p[0]
+               if( pt->pos()[0]
                 - (my_left[0] + cur_list->myIndex[0]*dd.cell_size[0]) >  2*dd.cell_size[0] )
-                   pt->r.p[0]-=box_l[0];
-               if( pt->r.p[0]
+                   pt->pos()[0]-=box_l[0];
+               if( pt->pos()[0]
                 - (my_left[0] + cur_list->myIndex[0]*dd.cell_size[0]) < -2*dd.cell_size[0] )
-                   pt->r.p[0]+=box_l[0];
+                   pt->pos()[0]+=box_l[0];
       }
 #endif 
 	}
@@ -460,17 +460,17 @@ void cell_cell_transfer(GhostCommunication *gc, int data_parts)
 	  int i;
 	  memmove(&pt2->r, &pt1->r, sizeof(ParticlePosition));
 	  for (i = 0; i < 3; i++)
-	    pt2->r.p[i] += gc->shift[i];
+	    pt2->pos()[i] += gc->shift[i];
 #ifdef LEES_EDWARDS
       /* special wrapping conditions for x component of y LE shift */
       if( gc->shift[1] != 0.0 ){
         /* LE transforms are wrapped */
-         if(   pt2->r.p[0]
+         if(   pt2->pos()[0]
             - (my_left[0] + dst_list->myIndex[0]*dd.cell_size[0]) >  2*dd.cell_size[0] ) 
-               pt2->r.p[0]-=box_l[0];
-         if( pt2->r.p[0]
+               pt2->pos()[0]-=box_l[0];
+         if( pt2->pos()[0]
             - (my_left[0] + dst_list->myIndex[0]*dd.cell_size[0]) < -2*dd.cell_size[0] ) 
-               pt2->r.p[0]+=box_l[0];
+               pt2->pos()[0]+=box_l[0];
       }
 #endif
 	}

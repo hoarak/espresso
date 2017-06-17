@@ -80,12 +80,12 @@ void IBM_ForcesIntoFluid_CPU()
     {
       // for ghost particles we have to check if they lie
       // in the range of the local lattice nodes
-      if (p[i].r.p[0] >= my_left[0]-0.5*lblattice.agrid[0]
-          && p[i].r.p[0] < my_right[0]+0.5*lblattice.agrid[0]
-          && p[i].r.p[1] >= my_left[1]-0.5*lblattice.agrid[1]
-          && p[i].r.p[1] < my_right[1]+0.5*lblattice.agrid[1]
-          && p[i].r.p[2] >= my_left[2]-0.5*lblattice.agrid[2]
-          && p[i].r.p[2] < my_right[2]+0.5*lblattice.agrid[2])
+      if (p[i].pos()[0] >= my_left[0]-0.5*lblattice.agrid[0]
+          && p[i].pos()[0] < my_right[0]+0.5*lblattice.agrid[0]
+          && p[i].pos()[1] >= my_left[1]-0.5*lblattice.agrid[1]
+          && p[i].pos()[1] < my_right[1]+0.5*lblattice.agrid[1]
+          && p[i].pos()[2] >= my_left[2]-0.5*lblattice.agrid[2]
+          && p[i].pos()[2] < my_right[2]+0.5*lblattice.agrid[2])
       {
         
         if (p[i].p.isVirtual)
@@ -145,15 +145,15 @@ void IBM_UpdateParticlePositions(ParticleRange particles)
       if (p[j].p.isVirtual)
       {
         if ( !( p[j].p.ext_flag & 2 ) )
-          p[j].r.p[0] = p[j].r.p[0] + p[j].m.v[0]*time_step;
+          p[j].pos()[0] = p[j].pos()[0] + p[j].m.v[0]*time_step;
         if ( !( p[j].p.ext_flag & 4 ) )
-          p[j].r.p[1] = p[j].r.p[1] + p[j].m.v[1]*time_step;
+          p[j].pos()[1] = p[j].pos()[1] + p[j].m.v[1]*time_step;
         if ( !( p[j].p.ext_flag & 8 ) )
-          p[j].r.p[2] = p[j].r.p[2] + p[j].m.v[2]*time_step;
+          p[j].pos()[2] = p[j].pos()[2] + p[j].m.v[2]*time_step;
         
         // Check if the particle might have crossed a box border (criterion see e-mail Axel 28.8.2014)
         // if possible resort_particles = 1
-        const double dist2 = distance2( p[j].r.p, p[j].l.p_old);
+        const double dist2 = distance2( p[j].pos(), p[j].l.p_old);
         if ( dist2 > skin2 ) { resort_particles = 1; }
       }
   }
@@ -179,7 +179,7 @@ void CoupleIBMParticleToFluid(Particle *p)
   // Get indices and weights of affected nodes using discrete delta function
   index_t node_index[8];
   double delta[6];
-  lblattice.map_position_to_lattice(p->r.p,node_index,delta);
+  lblattice.map_position_to_lattice(p->pos(),node_index,delta);
   
   // Loop over all affected nodes
   for ( int z = 0; z < 2; z++)
@@ -392,7 +392,7 @@ void ParticleVelocitiesFromLB_CPU()
         double dummy[3];
         // Get interpolated velocity and store in the force (!) field
         // for later communication (see below)
-        GetIBMInterpolatedVelocity(p[j].r.p, p[j].f.f, dummy);
+        GetIBMInterpolatedVelocity(p[j].pos(), p[j].f.f, dummy);
       }
   }
   
@@ -405,18 +405,18 @@ void ParticleVelocitiesFromLB_CPU()
     for(int j = 0; j < cell->n; j++)
       // This criterion include the halo on the left, but excludes the halo on the right
       // Try if we have to use *1.5 on the right
-      if (p[j].r.p[0] >= my_left[0]-0.5*lblattice.agrid[0]
-          && p[j].r.p[0] < my_right[0]+0.5*lblattice.agrid[0]
-          && p[j].r.p[1] >= my_left[1]-0.5*lblattice.agrid[1]
-          && p[j].r.p[1] < my_right[1]+0.5*lblattice.agrid[1]
-          && p[j].r.p[2] >= my_left[2]-0.5*lblattice.agrid[2]
-          && p[j].r.p[2] < my_right[2]+0.5*lblattice.agrid[2])
+      if (p[j].pos()[0] >= my_left[0]-0.5*lblattice.agrid[0]
+          && p[j].pos()[0] < my_right[0]+0.5*lblattice.agrid[0]
+          && p[j].pos()[1] >= my_left[1]-0.5*lblattice.agrid[1]
+          && p[j].pos()[1] < my_right[1]+0.5*lblattice.agrid[1]
+          && p[j].pos()[2] >= my_left[2]-0.5*lblattice.agrid[2]
+          && p[j].pos()[2] < my_right[2]+0.5*lblattice.agrid[2])
       {
         if (p[j].p.isVirtual)
         {
           double dummy[3];
           double force[3]; // The force stemming from the ghost particle
-          GetIBMInterpolatedVelocity(p[j].r.p, dummy, force);
+          GetIBMInterpolatedVelocity(p[j].pos(), dummy, force);
           
           // Rescale and store in the force field of the particle (for communication, see below)
           p[j].f.f[0] = force[0] * lbpar.agrid/lbpar.tau;

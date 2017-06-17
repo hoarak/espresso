@@ -31,7 +31,7 @@ int ObservableFluxDensityProfile::actual_calculate() {
     v[0]=partCfg[ids->e[i]].m.v[0]/time_step;
     v[1]=partCfg[ids->e[i]].m.v[1]/time_step;
     v[2]=partCfg[ids->e[i]].m.v[2]/time_step;
-    memmove(ppos, partCfg[ids->e[i]].r.p, 3*sizeof(double));
+    memmove(ppos, partCfg[ids->e[i]].pos(), 3*sizeof(double));
     memmove(img, partCfg[ids->e[i]].l.i, 3*sizeof(int));
     fold_position(ppos, img);
     // The position of the particle is by definition the middle of old and new position

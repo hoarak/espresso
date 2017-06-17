@@ -339,7 +339,7 @@ inline void add_bonded_energy(Particle *p1) {
 #endif
     /* similar to the force, we prepare the center-center vector */
     if (n_partners == 1)
-      get_mi_vector(dx, p1->r.p, p2->r.p);
+      get_mi_vector(dx, p1->pos(), p2->pos());
 
     switch (type) {
     case BONDED_IA_FENE:

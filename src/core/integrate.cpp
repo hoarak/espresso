@@ -862,17 +862,17 @@ void propagate_press_box_pos_and_rescale_npt() {
               if (smaller_time_step > 0.) {
                 if (current_time_step_is_small == 1) {
                   if (mts_index == mts_max - 1) {
-                    p[i].r.p[j] =
-                        scal[1] * (p[i].r.p[j] + scal[2] * p[i].m.v[j]);
+                    p[i].pos()[j] =
+                        scal[1] * (p[i].pos()[j] + scal[2] * p[i].m.v[j]);
                     p[i].l.p_old[j] *= scal[1];
                     p[i].m.v[j] *= scal[0];
                   } else
-                    p[i].r.p[j] += p[i].m.v[j];
+                    p[i].pos()[j] += p[i].m.v[j];
                 }
               } else
 #endif
               {
-                p[i].r.p[j] = scal[1] * (p[i].r.p[j] + scal[2] * p[i].m.v[j]);
+                p[i].pos()[j] = scal[1] * (p[i].pos()[j] + scal[2] * p[i].m.v[j]);
                 p[i].l.p_old[j] *= scal[1];
                 p[i].m.v[j] *= scal[0];
               }
@@ -880,7 +880,7 @@ void propagate_press_box_pos_and_rescale_npt() {
 #ifdef MULTI_TIMESTEP
               if (smaller_time_step < 0. || current_time_step_is_small == 1)
 #endif
-                p[i].r.p[j] += p[i].m.v[j];
+                p[i].pos()[j] += p[i].m.v[j];
             }
 
 #ifdef EXTERNAL_FORCES
@@ -891,8 +891,8 @@ void propagate_press_box_pos_and_rescale_npt() {
             stderr, "%d: OPT:PV_1 v_new=(%.3e,%.3e,%.3e)\n", this_node,
             p[i].m.v[0], p[i].m.v[1], p[i].m.v[2]));
         ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
-            stderr, "%d: OPT:PPOS p=(%.3f,%.3f,%.3f)\n", this_node, p[i].r.p[0],
-            p[i].r.p[1], p[i].r.p[2]));
+            stderr, "%d: OPT:PPOS p=(%.3f,%.3f,%.3f)\n", this_node, p[i].pos()[0],
+            p[i].pos()[1], p[i].pos()[2]));
 #ifdef ADDITIONAL_CHECKS
         force_and_velocity_check(&p[i]);
 #endif
@@ -1027,11 +1027,11 @@ void propagate_pos() {
 #endif
             /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt *
              * v(t+0.5*dt) */
-            p[i].r.p[j] += p[i].m.v[j];
+            p[i].pos()[j] += p[i].m.v[j];
           }
         }
         /* Verlet criterion check */
-        if (distance2(p[i].r.p, p[i].l.p_old) > skin2)
+        if (distance2(p[i].pos(), p[i].l.p_old) > skin2)
           resort_particles = 1;
       }
     }
@@ -1079,7 +1079,7 @@ void propagate_vel_pos() {
 #endif
             /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt *
              * v(t+0.5*dt) */
-            p[i].r.p[j] += p[i].m.v[j];
+            p[i].pos()[j] += p[i].m.v[j];
         }
       }
 
@@ -1088,7 +1088,7 @@ void propagate_vel_pos() {
           p[i].m.v[0], p[i].m.v[1], p[i].m.v[2]));
       ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr, "%d: OPT: PPOS p = (%.3e,%.3e,%.3e)\n", this_node,
-          p[i].r.p[0], p[i].r.p[1], p[i].r.p[2]));
+          p[i].pos()[0], p[i].pos()[1], p[i].pos()[2]));
 
 #ifdef ADDITIONAL_CHECKS
       force_and_velocity_check(&p[i]);
@@ -1098,9 +1098,9 @@ void propagate_vel_pos() {
       /* test for crossing of a y-pbc: requires adjustment of velocity.*/
       {
         int b1, delta_box;
-        b1 = (int)floor(p[i].r.p[1] * box_l_i[1]);
+        b1 = (int)floor(p[i].pos()[1] * box_l_i[1]);
         if (b1 != 0) {
-          delta_box = b1 - (int)floor((p[i].r.p[1] - p[i].m.v[1]) * box_l_i[1]);
+          delta_box = b1 - (int)floor((p[i].pos()[1] - p[i].m.v[1]) * box_l_i[1]);
           if (abs(delta_box) > 1) {
             fprintf(
                 stderr,
@@ -1108,44 +1108,44 @@ void propagate_vel_pos() {
             errexit();
           }
           p[i].m.v[0] -= delta_box * lees_edwards_rate;
-          p[i].r.p[0] -= delta_box * lees_edwards_offset;
-          p[i].r.p[1] -= delta_box * box_l[1];
+          p[i].pos()[0] -= delta_box * lees_edwards_offset;
+          p[i].pos()[1] -= delta_box * box_l[1];
           p[i].l.i[1] += delta_box;
-          while (p[i].r.p[1] > box_l[1]) {
-            p[i].r.p[1] -= box_l[1];
+          while (p[i].pos()[1] > box_l[1]) {
+            p[i].pos()[1] -= box_l[1];
             p[i].l.i[1]++;
           }
-          while (p[i].r.p[1] < 0.0) {
-            p[i].r.p[1] += box_l[1];
+          while (p[i].pos()[1] < 0.0) {
+            p[i].pos()[1] += box_l[1];
             p[i].l.i[1]--;
           }
           resort_particles = 1;
         }
         /* Branch prediction on most systems should mean there is minimal cost
          * here */
-        while (p[i].r.p[0] > box_l[0]) {
-          p[i].r.p[0] -= box_l[0];
+        while (p[i].pos()[0] > box_l[0]) {
+          p[i].pos()[0] -= box_l[0];
           p[i].l.i[0]++;
         }
-        while (p[i].r.p[0] < 0.0) {
-          p[i].r.p[0] += box_l[0];
+        while (p[i].pos()[0] < 0.0) {
+          p[i].pos()[0] += box_l[0];
           p[i].l.i[0]--;
         }
-        while (p[i].r.p[2] > box_l[2]) {
-          p[i].r.p[2] -= box_l[2];
+        while (p[i].pos()[2] > box_l[2]) {
+          p[i].pos()[2] -= box_l[2];
           p[i].l.i[2]++;
         }
-        while (p[i].r.p[2] < 0.0) {
-          p[i].r.p[2] += box_l[2];
+        while (p[i].pos()[2] < 0.0) {
+          p[i].pos()[2] += box_l[2];
           p[i].l.i[2]--;
         }
       }
 #endif
 
       /* Verlet criterion check*/
-      if (SQR(p[i].r.p[0] - p[i].l.p_old[0]) +
-              SQR(p[i].r.p[1] - p[i].l.p_old[1]) +
-              SQR(p[i].r.p[2] - p[i].l.p_old[2]) >
+      if (SQR(p[i].pos()[0] - p[i].l.p_old[0]) +
+              SQR(p[i].pos()[1] - p[i].l.p_old[1]) +
+              SQR(p[i].pos()[2] - p[i].l.p_old[2]) >
           skin2)
         resort_particles = 1;
     }
@@ -1168,11 +1168,11 @@ void force_and_velocity_check(Particle *p) {
   double db_force, db_vel;
   /* distance_check */
   for (i = 0; i < 3; i++)
-    if (fabs(p->r.p[i] - p->l.p_old[i]) > local_box_l[i]) {
+    if (fabs(p->pos()[i] - p->l.p_old[i]) > local_box_l[i]) {
       fprintf(stderr, "%d: particle %d moved further than local box length by "
                       "%lf %lf %lf\n",
-              this_node, p->id(), p->r.p[0] - p->l.p_old[0],
-              p->r.p[1] - p->l.p_old[1], p->r.p[2] - p->l.p_old[2]);
+              this_node, p->id(), p->pos()[0] - p->l.p_old[0],
+              p->pos()[1] - p->l.p_old[1], p->pos()[2] - p->l.p_old[2]);
     }
 
   /* force check */

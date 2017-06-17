@@ -213,8 +213,8 @@ void print_local_particle_positions() {
     np = cell->n;
     for (i = 0; i < np; i++) {
       fprintf(stderr, "%d: local cell %d contains part id=%d pos=(%f,%f,%f)\n",
-              this_node, c, part[i].id(), part[i].r.p[0], part[i].r.p[1],
-              part[i].r.p[2]);
+              this_node, c, part[i].id(), part[i].pos()[0], part[i].pos()[1],
+              part[i].pos()[2]);
       cnt++;
     }
   }
@@ -327,7 +327,7 @@ void check_resort_particles() {
     np = cell->n;
     for (i = 0; i < np; i++) {
       /* Verlet criterion check */
-      if (distance2(p[i].r.p, p[i].l.p_old) > skin2)
+      if (distance2(p[i].pos(), p[i].l.p_old) > skin2)
         resort_particles = 1;
     }
   }
@@ -367,8 +367,8 @@ void print_ghost_positions() {
     np = cell->n;
     for (i = 0; i < np; i++) {
       fprintf(stderr, "%d: local cell %d contains ghost id=%d pos=(%f,%f,%f)\n",
-              this_node, c, part[i].id(), part[i].r.p[0], part[i].r.p[1],
-              part[i].r.p[2]);
+              this_node, c, part[i].id(), part[i].pos()[0], part[i].pos()[1],
+              part[i].pos()[2]);
       cnt++;
     }
   }

@@ -119,10 +119,10 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 			
 
 			
-      get_mi_vector(r31, p1->r.p, p3->r.p);
-      get_mi_vector(r41, p1->r.p, p4->r.p);
-      get_mi_vector(r52, p2->r.p, p5->r.p);
-      get_mi_vector(r62, p2->r.p, p6->r.p);
+      get_mi_vector(r31, p1->pos(), p3->pos());
+      get_mi_vector(r41, p1->pos(), p4->pos());
+      get_mi_vector(r52, p2->pos(), p5->pos());
+      get_mi_vector(r62, p2->pos(), p6->pos());
 	
 		  
       /* Bead i represents the central particle of monomer 1.
@@ -155,8 +155,8 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 	/* Optional 2nd environment */
 	if (localdz2 > 0.) {
 	  /* calculate center position of the interaction (calculate minimal distance) */
-	  z1  = p1->r.p[2];
-	  z2  = p2->r.p[2];
+	  z1  = p1->pos()[2];
+	  z2  = p2->pos()[2];
 	  z_middle  = z1 + z2;
 	  z_middle /= 2.;
 	  if (PERIODIC(2))
@@ -306,10 +306,10 @@ inline double ljangle_pair_energy(Particle *p1, Particle *p2, IA_parameters *ia_
       p5 = local_particles[part2p];
       p6 = local_particles[part2n];
 	    
-      get_mi_vector(r31, p1->r.p, p3->r.p);
-      get_mi_vector(r41, p1->r.p, p4->r.p);
-      get_mi_vector(r52, p2->r.p, p5->r.p);
-      get_mi_vector(r62, p2->r.p, p6->r.p);
+      get_mi_vector(r31, p1->pos(), p3->pos());
+      get_mi_vector(r41, p1->pos(), p4->pos());
+      get_mi_vector(r52, p2->pos(), p5->pos());
+      get_mi_vector(r62, p2->pos(), p6->pos());
 	    
       for(j=0;j<3;++j){
 	rij[j] = r31[j] + r41[j];
@@ -331,8 +331,8 @@ inline double ljangle_pair_energy(Particle *p1, Particle *p2, IA_parameters *ia_
 	/* Optional 2nd environment */
 	if (localdz2 > 0.) {
 	  /* calculate center position of the interaction (calculate minimal distance) */
-	  z1  = p1->r.p[2];
-	  z2  = p2->r.p[2];
+	  z1  = p1->pos()[2];
+	  z2  = p2->pos()[2];
 	  z_middle  = z1 + z2;
 	  z_middle /= 2.;
 	  if (PERIODIC(2))

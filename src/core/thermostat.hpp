@@ -297,7 +297,7 @@ inline void friction_thermo_langevin(Particle *p)
     #endif
 
     // Local effective velocity for leeds-edwards boundary conditions
-    velocity[i]=le_frameV(i,velocity,p->r.p);
+    velocity[i]=le_frameV(i,velocity,p->pos());
   } // for
   
   // Determine prefactors for the friction and the noise term 

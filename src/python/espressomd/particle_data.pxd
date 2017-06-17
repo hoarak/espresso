@@ -54,6 +54,7 @@ cdef extern from "particle_data.hpp":
         int i[3]
 
     ctypedef struct particle "Particle":
+        double (&pos())[3]
         particle_properties p
         particle_position r
         particle_momentum m

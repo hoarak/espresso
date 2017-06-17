@@ -56,43 +56,43 @@ inline int calc_out_direction(Particle *p1, Particle *p2, Particle *p3, Particle
     // first find out which particle out of p1, p2 (possibly p3, p4) is not a ghost particle. In almost all cases it is p2, however, it might be other one. we call this particle reference particle.
     if (p2->l.ghost != 1) {
         //unfold non-ghost particle using image, because for physical particles, the structure p->l.i is correctly set
-        memmove(fp2, p2->r.p, 3*sizeof(double));
+        memmove(fp2, p2->pos(), 3*sizeof(double));
         memmove(img, p2->l.i, 3*sizeof(int));
         unfold_position(fp2,img);
         // other coordinates are obtained from its relative positions to the reference particle
-        get_mi_vector(AA, p1->r.p, fp2);
-        get_mi_vector(BB, p3->r.p, fp2);
-        get_mi_vector(CC, p4->r.p, fp2);
+        get_mi_vector(AA, p1->pos(), fp2);
+        get_mi_vector(BB, p3->pos(), fp2);
+        get_mi_vector(CC, p4->pos(), fp2);
         for (int i=0; i < 3; i++) { fp1[i] = fp2[i] + AA[i]; fp3[i] = fp2[i] + BB[i]; fp4[i] = fp2[i] + CC[i]; }
     } else {
         // in case  particle p2 is a ghost particle
         if (p1->l.ghost != 1) {
-            memmove(fp1, p1->r.p, 3*sizeof(double));
+            memmove(fp1, p1->pos(), 3*sizeof(double));
             memmove(img, p1->l.i, 3*sizeof(int));
             unfold_position(fp1,img);
-            get_mi_vector(AA, p2->r.p, fp1);
-            get_mi_vector(BB, p3->r.p, fp1);
-            get_mi_vector(CC, p4->r.p, fp1);
+            get_mi_vector(AA, p2->pos(), fp1);
+            get_mi_vector(BB, p3->pos(), fp1);
+            get_mi_vector(CC, p4->pos(), fp1);
             for (int i=0; i < 3; i++) { fp2[i] = fp1[i] + AA[i]; fp3[i] = fp1[i] + BB[i];  fp4[i] = fp1[i] + CC[i];}
         } else {
             // in case the first and the second particle are ghost particles
             if (p3->l.ghost != 1) {
-                memmove(fp3, p3->r.p, 3*sizeof(double));
+                memmove(fp3, p3->pos(), 3*sizeof(double));
                 memmove(img, p3->l.i, 3*sizeof(int));
                 unfold_position(fp3,img);
-                get_mi_vector(AA, p1->r.p, fp3);
-                get_mi_vector(BB, p2->r.p, fp3);
-                get_mi_vector(CC, p4->r.p, fp3);
+                get_mi_vector(AA, p1->pos(), fp3);
+                get_mi_vector(BB, p2->pos(), fp3);
+                get_mi_vector(CC, p4->pos(), fp3);
                 for (int i=0; i < 3; i++) { fp1[i] = fp3[i] + AA[i]; fp2[i] = fp3[i] + BB[i]; fp4[i] = fp3[i] + CC[i]; }
             } else {
                 // in case the first and the second particle are ghost particles
                 if (p4->l.ghost != 1) {
-                    memmove(fp4, p4->r.p, 3*sizeof(double));
+                    memmove(fp4, p4->pos(), 3*sizeof(double));
                     memmove(img, p4->l.i, 3*sizeof(int));
                     unfold_position(fp4,img);
-                    get_mi_vector(AA, p1->r.p, fp4);
-                    get_mi_vector(BB, p2->r.p, fp4);
-                    get_mi_vector(CC, p3->r.p, fp4);
+                    get_mi_vector(AA, p1->pos(), fp4);
+                    get_mi_vector(BB, p2->pos(), fp4);
+                    get_mi_vector(CC, p3->pos(), fp4);
                     for (int i=0; i < 3; i++) { fp1[i] = fp4[i] + AA[i]; fp2[i] = fp4[i] + BB[i]; fp3[i] = fp4[i] + CC[i]; }
                 } else {
                     printf("Something wrong in out_direction.hpp: All particles in a bond are ghost particles, impossible to unfold the positions...");
@@ -104,13 +104,13 @@ inline int calc_out_direction(Particle *p1, Particle *p2, Particle *p3, Particle
 #endif
 #ifndef GHOST_FLAG
     // if ghost flag was not defined we have no other option than to assume the first particle (p1) is a physical one.
-    memmove(fp1, p1->r.p, 3*sizeof(double));
+    memmove(fp1, p1->pos(), 3*sizeof(double));
     memmove(img, p1->l.i, 3*sizeof(int));
     unfold_position(fp1,img);
     // other coordinates are obtained from its relative positions to the reference particle
-    get_mi_vector(AA, p2->r.p, fp1);
-    get_mi_vector(BB, p3->r.p, fp1);
-    get_mi_vector(CC, p4->r.p, fp1);
+    get_mi_vector(AA, p2->pos(), fp1);
+    get_mi_vector(BB, p3->pos(), fp1);
+    get_mi_vector(CC, p4->pos(), fp1);
     for (int i=0; i < 3; i++) {
         fp2[i] = fp1[i] + AA[i];
         fp3[i] = fp1[i] + BB[i];

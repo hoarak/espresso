@@ -561,7 +561,7 @@ template <int cao> void p3m_do_charge_assign() {
 
   for (auto &p : local_cells.particles()) {
     if (p.p.q != 0.0) {
-      p3m_do_assign_charge<cao>(p.p.q, p.r.p, cp_cnt);
+      p3m_do_assign_charge<cao>(p.p.q, p.pos(), cp_cnt);
       cp_cnt++;
     }
   }
@@ -764,7 +764,7 @@ static void P3M_assign_forces(double force_prefac, int d_rs) {
         double cur_ca_frac_val;
         for (int d = 0; d < 3; d++) {
           /* particle position in mesh coordinates */
-          pos = ((p[i].r.p[d] - p3m.local_mesh.ld_pos[d]) * p3m.params.ai[d]) -
+          pos = ((p[i].pos()[d] - p3m.local_mesh.ld_pos[d]) * p3m.params.ai[d]) -
                 p3m.pos_shift;
           /* nearest mesh point */
           nmp = (int)pos;
@@ -979,7 +979,7 @@ double p3m_calc_dipole_term(int force_flag, int energy_flag) {
     for (i = 0; i < np; i++) {
       for (j = 0; j < 3; j++)
         /* dipole moment with unfolded coordinates */
-        lcl_dm[j] += part[i].p.q * (part[i].r.p[j] + part[i].l.i[j] * box_l[j]);
+        lcl_dm[j] += part[i].p.q * (part[i].pos()[j] + part[i].l.i[j] * box_l[j]);
     }
   }
 

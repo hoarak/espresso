@@ -309,11 +309,11 @@ void layered_calculate_ia_iccp3m()
             p1 = &pl[i];
 
             if (rebuild_verletlist)
-                memmove(p1->l.p_old, p1->r.p, 3*sizeof(double));
+                memmove(p1->l.p_old, p1->pos(), 3*sizeof(double));
 
             /* cell itself. No bonded / constraints considered in ICCP3M */
             for(j = i+1; j < npl; j++) {
-                layered_get_mi_vector(d, p1->r.p, pl[j].r.p);
+                layered_get_mi_vector(d, p1->pos(), pl[j].pos());
                 dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
                 if (do_nonbonded(p1, &pl[j])) {
@@ -327,7 +327,7 @@ void layered_calculate_ia_iccp3m()
 
             /* bottom neighbor */
             for(j = 0; j < npb; j++) {
-                layered_get_mi_vector(d, p1->r.p, pb[j].r.p);
+                layered_get_mi_vector(d, p1->pos(), pb[j].pos());
                 dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
                 if (do_nonbonded(p1, &pl[j])) {
@@ -386,7 +386,7 @@ void build_verlet_lists_and_calc_verlet_ia_iccp3m()
                     j_start = 0;
                     /* Tasks within cell: (no bonded forces) store old position, avoid double counting */
                     if(n == 0) {
-                        memmove(p1[i].l.p_old, p1[i].r.p, 3*sizeof(double));
+                        memmove(p1[i].l.p_old, p1[i].pos(), 3*sizeof(double));
                         j_start = i+1;
                     }
                     /* Loop neighbor cell particles */
@@ -395,7 +395,7 @@ void build_verlet_lists_and_calc_verlet_ia_iccp3m()
                         if(do_nonbonded(&p1[i], &p2[j]))
 #endif
                         {
-                            dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
+                            dist2 = distance2vec(p1[i].pos(), p2[j].pos(), vec21);
 
                             VERLET_TRACE(fprintf(stderr,"%d: pair %d %d has distance %f\n",this_node,p1[i].id(),p2[j].id(),sqrt(dist2)));
                             if(verlet_list_criterion(p1+i,p2+j, dist2)) {
@@ -441,7 +441,7 @@ void calculate_verlet_ia_iccp3m()
             for(i=0; i<2*np; i+=2) {
                 p1 = pairs[i];                    /* pointer to particle 1 */
                 p2 = pairs[i+1];                  /* pointer to particle 2 */
-                dist2 = distance2vec(p1->r.p, p2->r.p, vec21); 
+                dist2 = distance2vec(p1->pos(), p2->pos(), vec21); 
                 add_non_bonded_pair_force_iccp3m(p1, p2, vec21, sqrt(dist2), dist2);
             }
         }
@@ -473,13 +473,13 @@ void calc_link_cell_iccp3m()
                 /* Tasks within cell: bonded forces */
                 if(n == 0) {
                     if (rebuild_verletlist)
-                        memmove(p1[i].l.p_old, p1[i].r.p, 3*sizeof(double));
+                        memmove(p1[i].l.p_old, p1[i].pos(), 3*sizeof(double));
 
                     j_start = i+1;
                 }
                 /* Loop neighbor cell particles */
                 for(j = j_start; j < np2; j++) {
-                    dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
+                    dist2 = distance2vec(p1[i].pos(), p2[j].pos(), vec21);
                     if(dist2 <= SQR(get_ia_param(p1[i].p.type, p2[j].p.type)->max_cut + skin)) {
                         /* calc non bonded interactions */
                         add_non_bonded_pair_force_iccp3m(&(p1[i]), &(p2[j]), vec21, sqrt(dist2), dist2);
@@ -490,7 +490,7 @@ void calc_link_cell_iccp3m()
         /* Loop neighbor cell particles */
         for(j = j_start; j < np2; j++) {
             {
-                dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
+                dist2 = distance2vec(p1[i].pos(), p2[j].pos(), vec21);
                 if(verlet_list_criterion(p1+i,p2+j,dist2)) {
                     /* calc non bonded interactions */
                     add_non_bonded_pair_force_iccp3m(&(p1[i]), &(p2[j]), vec21, sqrt(dist2), dist2);
@@ -516,12 +516,12 @@ void nsq_calculate_ia_iccp3m()
         pt1 = &partl[p];
 
         if (rebuild_verletlist)
-            memmove(pt1->l.p_old, pt1->r.p, 3*sizeof(double));
+            memmove(pt1->l.p_old, pt1->pos(), 3*sizeof(double));
 
         /* other particles, same node */
         for (p2 = p + 1; p2 < npl; p2++) {
             pt2 = &partl[p2];
-            get_mi_vector(d, pt1->r.p, pt2->r.p);
+            get_mi_vector(d, pt1->pos(), pt2->pos());
             dist2 = sqrlen(d);
             dist = sqrt(dist2);
             add_non_bonded_pair_force_iccp3m(pt1, pt2, d, dist, dist2);
@@ -534,7 +534,7 @@ void nsq_calculate_ia_iccp3m()
 
             for (p2 = 0; p2 < npg; p2++) {
                 pt2 = &partg[p2];
-                get_mi_vector(d, pt1->r.p, pt2->r.p);
+                get_mi_vector(d, pt1->pos(), pt2->pos());
                 dist2 = sqrlen(d);
                 dist = sqrt(dist2);
                 add_non_bonded_pair_force_iccp3m(pt1, pt2, d, dist, dist2);

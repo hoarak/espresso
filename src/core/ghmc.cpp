@@ -89,7 +89,7 @@ void save_last_state()
 	Particle *part;
 	
 	//part = local_cells.cell[0]->part;
-	//fprintf(stderr,"%d: save part %d: px_ls before %f, px before %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].r.p[0]);
+	//fprintf(stderr,"%d: save part %d: px_ls before %f, px before %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].pos()[0]);
 	//fprintf(stderr,"%d: save part %d: mx_ls before %f, mx before %f\n",this_node,part[0].id(),part[0].l.m_ls.v[0],part[0].m.v[0]);
 	
   for (c = 0; c < local_cells.n; c++) {
@@ -102,7 +102,7 @@ void save_last_state()
 	}
 	
 		//part = local_cells.cell[0]->part;
-		//fprintf(stderr,"%d: save part %d: px_ls after %f, px after %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].r.p[0]);
+		//fprintf(stderr,"%d: save part %d: px_ls after %f, px after %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].pos()[0]);
 		//fprintf(stderr,"%d: save part %d: mx_ls after %f, mx after %f\n",this_node,part[0].id(),part[0].l.m_ls.v[0],part[0].m.v[0]);
 		
 }
@@ -114,7 +114,7 @@ void load_last_state()
 	Particle *part;
 	
 	//part = local_cells.cell[0]->part;
-	//fprintf(stderr,"%d: load part %d: px_ls before %f, px before %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].r.p[0]);
+	//fprintf(stderr,"%d: load part %d: px_ls before %f, px before %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].pos()[0]);
 	//fprintf(stderr,"%d: load part %d: mx_ls before %f, mx before %f\n",this_node,part[0].id(),part[0].l.m_ls.v[0],part[0].m.v[0]);
 	
   for (c = 0; c < local_cells.n; c++) {
@@ -126,7 +126,7 @@ void load_last_state()
 		}
 	}
   //part = local_cells.cell[0]->part;
-  //fprintf(stderr,"%d: load part %d: px_ls after %f, px after %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].r.p[0]);
+  //fprintf(stderr,"%d: load part %d: px_ls after %f, px after %f\n",this_node,part[0].id(),part[0].l.r_ls.p[0],part[0].pos()[0]);
   //fprintf(stderr,"%d: load part %d: mx_ls after %f, mx after %f\n",this_node,part[0].id(),part[0].l.m_ls.v[0],part[0].m.v[0]);
   
 }

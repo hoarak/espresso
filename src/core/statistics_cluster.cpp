@@ -105,7 +105,7 @@ int clusters_connected(Particle *part, Cluster cluster1, Cluster cluster2)
     while ( element2 != NULL ) {
       id2 = element2->id;
       if ( abs( id1 - id2 ) > backbone_distance && 
-	   distance2(part[id1].r.p,part[id2].r.p) < space_distance2 ) return 1;
+	   distance2(part[id1].pos(),part[id2].pos()) < space_distance2 ) return 1;
       element2 = element2->next;
     }
     element1 = element1->next;
@@ -256,7 +256,7 @@ int test_mesh_elements(double pos[3], int probe_part_type)
 
   for (i=0; i<n_part; i++) {
     IA_parameters *ia_params = get_ia_param(partCfg[i].p.type,probe_part_type);
-    get_mi_vector(vec, pos, partCfg[i].r.p);
+    get_mi_vector(vec, pos, partCfg[i].pos());
     dist = sqrt(sqrlen(vec));
 
     if ( dist < (ia_params->LJ_cut+ia_params->LJ_offset) ) return -2;

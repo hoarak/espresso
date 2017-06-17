@@ -139,7 +139,7 @@ void build_verlet_lists()
         j_start = 0;
         /* Tasks within cell: store old position, avoid double counting */
         if(n == 0) {
-           memcpy(p1[i].l.p_old, p1[i].r.p, 3*sizeof(double));
+           memcpy(p1[i].l.p_old, p1[i].pos(), 3*sizeof(double));
            j_start = i+1;
         }
         /* Loop neighbor cell particles */
@@ -148,7 +148,7 @@ void build_verlet_lists()
           if(do_nonbonded(&p1[i], &p2[j]))
 #endif
           {
-            dist2 = distance2(p1[i].r.p, p2[j].r.p);
+            dist2 = distance2(p1[i].pos(), p2[j].pos());
             if(verlet_list_criterion(p1+i, p2+j,dist2))
               add_pair(pl, &p1[i], &p2[j]);
           }
@@ -201,7 +201,7 @@ void calculate_verlet_ia()
             || (!(p1->p.smaller_timestep==0 && p2->p.smaller_timestep==0) && current_time_step_is_small==1))
 #endif 
         {
-          dist2 = distance2vec(p1->r.p, p2->r.p, vec21);
+          dist2 = distance2vec(p1->pos(), p2->pos(), vec21);
           add_non_bonded_pair_force(p1, p2, vec21, sqrt(dist2), dist2);
         }
       }
@@ -256,7 +256,7 @@ void build_verlet_lists_and_calc_verlet_ia()
 #endif
           {
             add_single_particle_force(&p1[i]);
-            memcpy(p1[i].l.p_old, p1[i].r.p, 3*sizeof(double));
+            memcpy(p1[i].l.p_old, p1[i].pos(), 3*sizeof(double));
             j_start = i+1;
           }
         }
@@ -271,7 +271,7 @@ void build_verlet_lists_and_calc_verlet_ia()
           if(do_nonbonded(&p1[i], &p2[j]))
 #endif
           {
-          dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
+          dist2 = distance2vec(p1[i].pos(), p2[j].pos(), vec21);
 
           VERLET_TRACE(fprintf(stderr,"%d: pair %d %d has distance %f\n",this_node,p1[i].id(),p2[j].id(),sqrt(dist2)));
 
@@ -339,7 +339,7 @@ void calculate_verlet_energies()
       for(i=0; i<2*np; i+=2) {
         p1 = pairs[i];                    /* pointer to particle 1 */
         p2 = pairs[i+1];                  /* pointer to particle 2 */
-        dist2 = distance2vec(p1->r.p, p2->r.p, vec21);
+        dist2 = distance2vec(p1->pos(), p2->pos(), vec21);
         VERLET_TRACE(fprintf(stderr, "%d: %d <-> %d: dist2 dist2\n",this_node,p1->id(),p2->id()));
         add_non_bonded_pair_energy(p1, p2, vec21, sqrt(dist2), dist2);
       }
@@ -390,7 +390,7 @@ void calculate_verlet_virials(int v_comp)
       for(i=0; i<2*np; i+=2) {
         p1 = pairs[i];                    /* pointer to particle 1 */
         p2 = pairs[i+1];                  /* pointer to particle 2 */
-        dist2 = distance2vec(p1->r.p, p2->r.p, vec21);
+        dist2 = distance2vec(p1->pos(), p2->pos(), vec21);
         add_non_bonded_pair_virials(p1, p2, vec21, sqrt(dist2), dist2);
       }
     }

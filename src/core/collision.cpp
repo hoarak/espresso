@@ -197,7 +197,7 @@ void detect_collision(Particle* p1, Particle* p2)
 
   double vec21[3];
   // Obtain distance between particles
-  double dist_betw_part = sqrt(distance2vec(p1->r.p, p2->r.p, vec21));
+  double dist_betw_part = sqrt(distance2vec(p1->pos(), p2->pos(), vec21));
   //TRACE(printf("%d: Distance between particles %lf %lf %lf, Scalar: %f\n",this_node,vec21[0],vec21[1],vec21[2], dist_betw_part));
   if (dist_betw_part > collision_params.distance)
     return;
@@ -293,7 +293,7 @@ void detect_collision(Particle* p1, Particle* p2)
        }
      }
      for (int i=0;i<3;i++) {
-       new_position[i] = p1->r.p[i] - vec21[i] * c;
+       new_position[i] = p1->pos()[i] - vec21[i] * c;
     }
 
 
@@ -311,11 +311,11 @@ void coldet_do_three_particle_bond(Particle* p, Particle* p1, Particle* p2)
   double vec21[3];
   // If p1 and p2 are not closer or equal to the cutoff distance, skip
   // p1:
-  get_mi_vector(vec21,p->r.p,p1->r.p);
+  get_mi_vector(vec21,p->pos(),p1->pos());
   if (sqrt(sqrlen(vec21)) > collision_params.distance)
     return;
   // p2:
-  get_mi_vector(vec21,p->r.p,p2->r.p);
+  get_mi_vector(vec21,p->pos(),p2->pos());
   if (sqrt(sqrlen(vec21)) > collision_params.distance)
     return;
 
@@ -361,14 +361,14 @@ void coldet_do_three_particle_bond(Particle* p, Particle* p1, Particle* p2)
   
   double vec1[3],vec2[3];
   /* vector from p to p1 */
-  get_mi_vector(vec1, p->r.p, p1->r.p);
+  get_mi_vector(vec1, p->pos(), p1->pos());
   // Normalize
   double dist2 = sqrlen(vec1);
   double d1i = 1.0 / sqrt(dist2);
   for(int j=0;j<3;j++) vec1[j] *= d1i;
   
   /* vector from p to p2 */
-  get_mi_vector(vec2, p->r.p, p2->r.p);
+  get_mi_vector(vec2, p->pos(), p2->pos());
   // normalize
   dist2 = sqrlen(vec2);
   double d2i = 1.0 / sqrt(dist2);
@@ -574,8 +574,8 @@ void three_particle_binding_domain_decomposition()
 
         Particle* p1=local_particles[gathered_queue[id].pp1];
         Particle* p2=local_particles[gathered_queue[id].pp2];
-        dd_position_to_cell_indices(p1->r.p,cellIdx[0]);
-        dd_position_to_cell_indices(p2->r.p,cellIdx[1]);
+        dd_position_to_cell_indices(p1->pos(),cellIdx[0]);
+        dd_position_to_cell_indices(p2->pos(),cellIdx[1]);
 
         // Iterate over the cells + their neighbors
         // if p1 and p2 are in the same cell, we don't need to consider it 2x

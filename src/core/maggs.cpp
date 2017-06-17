@@ -490,7 +490,7 @@ maggs.pref2      = maggs.bjerrum * temperature;
         np = cell->n;
         for(i=0; i<np; i++)
             for (dim=0;dim<3;dim++)
-                 local_dipole_moment[dim] += p[i].r.p[dim] * p[i].p.q;
+                 local_dipole_moment[dim] += p[i].pos()[dim] * p[i].p.q;
     }
 
     MPI_Allreduce(local_dipole_moment, dipole_moment, 3, MPI_DOUBLE, MPI_SUM, comm_cart);
@@ -1095,17 +1095,17 @@ void maggs_accumulate_charge_from_ghosts()
       if( (q=p[i].p.q) != 0.0 ) {
 	flag_inner=1;
 	FOR3D(d) {
-	  if(p[i].r.p[d]<lparams.left_down_position[d]||p[i].r.p[d]>=lparams.upper_right_position[d])
+	  if(p[i].pos()[d]<lparams.left_down_position[d]||p[i].pos()[d]>=lparams.upper_right_position[d])
 	    {flag_inner=0; break;}
 	}
       }
       if(flag_inner) {
 	FOR3D(d) {
-	  pos[d]        = (p[i].r.p[d] - lparams.left_down_position[d])* maggs.inva;
+	  pos[d]        = (p[i].pos()[d] - lparams.left_down_position[d])* maggs.inva;
 	  first[d]      = (int) pos[d];
 	  rel[d]        = pos[d] - first[d];
 	}
-	//      	fprintf(stderr,"pos: %f %f %f\n", p[i].r.p[0], p[i].r.p[1], p[i].r.p[2]);
+	//      	fprintf(stderr,"pos: %f %f %f\n", p[i].pos()[0], p[i].pos()[1], p[i].pos()[2]);
 	maggs_interpolate_charge(first, rel, q);
       }
     }      
@@ -1136,7 +1136,7 @@ void maggs_distribute_particle_charges()
     for(i = 0; i < np; i++) {
       if( (q=p[i].p.q) != 0.0 ) {
 	FOR3D(d) {
-	  pos[d]        = (p[i].r.p[d] - lparams.left_down_position[d])* maggs.inva;
+	  pos[d]        = (p[i].pos()[d] - lparams.left_down_position[d])* maggs.inva;
 	  first[d]      = (int) pos[d];
 	  rel[d]        = pos[d] - first[d];
 	}
@@ -1203,7 +1203,7 @@ void maggs_update_charge_gradients(double *grad)
     for(i = 0; i < np; i++) {
       if( (q=p[i].p.q) != 0.0 ) {
 	FOR3D(d) {
-	  pos[d]        = (p[i].r.p[d] - lparams.left_down_position[d])* maggs.inva;
+	  pos[d]        = (p[i].pos()[d] - lparams.left_down_position[d])* maggs.inva;
 	  first[d]      = (int) pos[d];
 	  rel[d]        = pos[d] - first[d];
 	}
@@ -1874,7 +1874,7 @@ void maggs_add_current_on_segment(Particle *p, int ghost_cell)
   double t_step;
 	
   FOR3D(d) {
-    pos[d]   = (p->r.p[d] - lparams.left_down_position[d])* maggs.inva;
+    pos[d]   = (p->pos()[d] - lparams.left_down_position[d])* maggs.inva;
     first[d] = (int) floor(pos[d]);
     r_temp[d]   = pos[d] - first[d]; /* it is the updated coord (we have to go back) */
     help[d]     = 1. - r_temp[d];
@@ -1981,7 +1981,7 @@ void maggs_couple_current_to_Dfield()
       if((q=p[i].p.q) != 0.) {
 	flag_inner = 1;
 	FOR3D(d) {
-	  r2 = p[i].r.p[d];
+	  r2 = p[i].pos()[d];
 	  r1 = r2 - p[i].m.v[d];
 	  if(((r2 < lparams.left_down_position[d])&&(r1 < lparams.left_down_position[d]))
 	     ||((r2 >= lparams.upper_right_position[d] && r1 >= lparams.upper_right_position[d])))
@@ -2144,7 +2144,7 @@ void maggs_calc_interpolated_self_force(Particle *p)
 
   // calculate position in cell, normalized to lattice size:
   FOR3D(k) {
-    position[k]           = (p->r.p[k] - lparams.left_down_position[k]) * maggs.inva;
+    position[k]           = (p->pos()[k] - lparams.left_down_position[k]) * maggs.inva;
     left_down_position[k] = floor(position[k]);
     relative_position[k]  = position[k] - left_down_position[k];
     self_force[k] = 0.0;
@@ -2196,7 +2196,7 @@ void maggs_calc_self_influence(Particle* P)
 	
   /* calculate position in cell, normalized to lattice size: */
   FOR3D(k) {
-    position[k]           = (P->r.p[k] - lparams.left_down_position[k]) * maggs.inva;
+    position[k]           = (P->pos()[k] - lparams.left_down_position[k]) * maggs.inva;
     left_down_position[k] = floor(position[k]);
     relative_position[k]  = position[k] - left_down_position[k];
     local_force[k] = 0.0;
@@ -2340,7 +2340,7 @@ void maggs_calc_forces()
       q = p[i].p.q;
       if( fabs(q) > 1.0e-5 ) {
 	FOR3D(d) {
-	  pos[d]   = (p[i].r.p[d] - lparams.left_down_position[d])* maggs.inva;
+	  pos[d]   = (p[i].pos()[d] - lparams.left_down_position[d])* maggs.inva;
 	  first[d] = (int) pos[d];
 	}
 				

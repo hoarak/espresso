@@ -256,12 +256,12 @@ void nsq_calculate_ia()
     add_single_particle_force(pt1);
     
     if (rebuild_verletlist)
-      memcpy(pt1->l.p_old, pt1->r.p, 3*sizeof(double));
+      memcpy(pt1->l.p_old, pt1->pos(), 3*sizeof(double));
 
     /* other particles, same node */
     for (p2 = p + 1; p2 < npl; p2++) {
       pt2 = &partl[p2];
-      get_mi_vector(d, pt1->r.p, pt2->r.p);
+      get_mi_vector(d, pt1->pos(), pt2->pos());
       dist2 = sqrlen(d);
       dist = sqrt(dist2);
 #ifdef EXCLUSIONS
@@ -277,7 +277,7 @@ void nsq_calculate_ia()
 
       for (p2 = 0; p2 < npg; p2++) {
 	pt2 = &partg[p2];
-	get_mi_vector(d, pt1->r.p, pt2->r.p);
+	get_mi_vector(d, pt1->pos(), pt2->pos());
 	dist2 = sqrlen(d);
 	dist = sqrt(dist2);
 #ifdef EXCLUSIONS
@@ -307,12 +307,12 @@ void nsq_calculate_energies()
     add_single_particle_energy(pt1);
     
     if (rebuild_verletlist)
-      memcpy(pt1->l.p_old, pt1->r.p, 3*sizeof(double));
+      memcpy(pt1->l.p_old, pt1->pos(), 3*sizeof(double));
 
     /* other particles, same node */
     for (p2 = p + 1; p2 < npl; p2++) {
       pt2 = &partl[p2];
-      get_mi_vector(d, pt1->r.p, pt2->r.p);
+      get_mi_vector(d, pt1->pos(), pt2->pos());
       dist2 = sqrlen(d);
       dist = sqrt(dist2);
 #ifdef EXCLUSIONS
@@ -328,7 +328,7 @@ void nsq_calculate_energies()
 
       for (p2 = 0; p2 < npg; p2++) {
 	pt2 = &partg[p2];
-	get_mi_vector(d, pt1->r.p, pt2->r.p);
+	get_mi_vector(d, pt1->pos(), pt2->pos());
 	dist2 = sqrlen(d);
 	dist = sqrt(dist2);
 #ifdef EXCLUSIONS
@@ -364,12 +364,12 @@ void nsq_calculate_virials(int v_comp)
 #endif
 
     if (rebuild_verletlist)
-      memcpy(pt1->l.p_old, pt1->r.p, 3*sizeof(double));
+      memcpy(pt1->l.p_old, pt1->pos(), 3*sizeof(double));
 
     /* other particles, same node */
     for (p2 = p + 1; p2 < npl; p2++) {
       pt2 = &partl[p2];
-      get_mi_vector(d, pt1->r.p, pt2->r.p);
+      get_mi_vector(d, pt1->pos(), pt2->pos());
       dist2 = sqrlen(d);
       dist = sqrt(dist2);
 #ifdef EXCLUSIONS
@@ -385,7 +385,7 @@ void nsq_calculate_virials(int v_comp)
 
       for (p2 = 0; p2 < npg; p2++) {
 	pt2 = &partg[p2];
-	get_mi_vector(d, pt1->r.p, pt2->r.p);
+	get_mi_vector(d, pt1->pos(), pt2->pos());
 	dist2 = sqrlen(d);
 	dist = sqrt(dist2);
 #ifdef EXCLUSIONS

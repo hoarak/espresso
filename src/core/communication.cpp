@@ -1694,15 +1694,15 @@ void mpi_get_particles(Particle *result, IntList *bi) {
   COMM_TRACE(for (i = 0; i < tot_size; i++) {
     printf("%d: %d -> %d %d %f (%f, %f, %f)\n", this_node, i,
            result[i].id(), result[i].p.type, result[i].p.q,
-           result[i].r.p[0], result[i].r.p[1], result[i].r.p[2]);
+           result[i].pos()[0], result[i].pos()[1], result[i].pos()[2]);
   });
 #endif
 
 #ifdef DIPOLES
   COMM_TRACE(for (i = 0; i < tot_size; i++) {
     printf("%d: %d -> %d %d  (%f, %f, %f) (%f, %f, %f)\n", this_node, i,
-           result[i].id(), result[i].p.type, result[i].r.p[0],
-           result[i].r.p[1], result[i].r.p[2], result[i].r.dip[0],
+           result[i].id(), result[i].p.type, result[i].pos()[0],
+           result[i].pos()[1], result[i].pos()[2], result[i].r.dip[0],
            result[i].r.dip[1], result[i].r.dip[2]);
   });
 #endif

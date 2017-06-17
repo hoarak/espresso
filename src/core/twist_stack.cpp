@@ -104,18 +104,18 @@ int calc_twist_stack_energy(Particle *si1, Particle *bi1, Particle *bi2, Particl
   double ani[3], anj[3];
   double ani_l, anj_l;
    
-  get_mi_vector(vec1, sj1->r.p, si1->r.p);
-  get_mi_vector(vec2, bj1->r.p, si1->r.p);
-  get_mi_vector(vec3, sj2->r.p, si2->r.p);
-  get_mi_vector(vec4, bj2->r.p, si2->r.p);
+  get_mi_vector(vec1, sj1->pos(), si1->pos());
+  get_mi_vector(vec2, bj1->pos(), si1->pos());
+  get_mi_vector(vec3, sj2->pos(), si2->pos());
+  get_mi_vector(vec4, bj2->pos(), si2->pos());
 
-  get_mi_vector(rcci, si2->r.p, si1->r.p);
-  get_mi_vector(rcb1, bi1->r.p, si1->r.p);
-  get_mi_vector(rcb2, bi2->r.p, si2->r.p);
+  get_mi_vector(rcci, si2->pos(), si1->pos());
+  get_mi_vector(rcb1, bi1->pos(), si1->pos());
+  get_mi_vector(rcb2, bi2->pos(), si2->pos());
   
-  get_mi_vector(rccj, sj2->r.p, sj1->r.p);
-  get_mi_vector(rcb1j, bj1->r.p, sj1->r.p);
-  get_mi_vector(rcb2j, bj2->r.p, sj2->r.p);
+  get_mi_vector(rccj, sj2->pos(), sj1->pos());
+  get_mi_vector(rcb1j, bj1->pos(), sj1->pos());
+  get_mi_vector(rcb2j, bj2->pos(), sj2->pos());
 
   cross(rcci, rcb1, n1);
   cross(rcci, rcb2, n2);
@@ -271,18 +271,18 @@ int calc_twist_stack_force(Particle *si1, Particle *bi1, Particle *bi2, Particle
   double ani[3], anj[3];
   double ani_l, anj_l;
    
-  get_mi_vector(vec1, sj1->r.p, si1->r.p);
-  get_mi_vector(vec2, bj1->r.p, si1->r.p);
-  get_mi_vector(vec3, sj2->r.p, si2->r.p);
-  get_mi_vector(vec4, bj2->r.p, si2->r.p);
+  get_mi_vector(vec1, sj1->pos(), si1->pos());
+  get_mi_vector(vec2, bj1->pos(), si1->pos());
+  get_mi_vector(vec3, sj2->pos(), si2->pos());
+  get_mi_vector(vec4, bj2->pos(), si2->pos());
 
-  get_mi_vector(rcci, si2->r.p, si1->r.p);
-  get_mi_vector(rcb1, bi1->r.p, si1->r.p);
-  get_mi_vector(rcb2, bi2->r.p, si2->r.p);
+  get_mi_vector(rcci, si2->pos(), si1->pos());
+  get_mi_vector(rcb1, bi1->pos(), si1->pos());
+  get_mi_vector(rcb2, bi2->pos(), si2->pos());
   
-  get_mi_vector(rccj, sj2->r.p, sj1->r.p);
-  get_mi_vector(rcb1j, bj1->r.p, sj1->r.p);
-  get_mi_vector(rcb2j, bj2->r.p, sj2->r.p);
+  get_mi_vector(rccj, sj2->pos(), sj1->pos());
+  get_mi_vector(rcb1j, bj1->pos(), sj1->pos());
+  get_mi_vector(rcb2j, bj2->pos(), sj2->pos());
 
   cross(rcci, rcb1, n1);
   cross(rcci, rcb2, n2);
@@ -483,8 +483,8 @@ int calc_twist_stack_force(Particle *si1, Particle *bi1, Particle *bi2, Particle
     tau_tilt = cos1*cos1;
     f_tilt = -2.*pot_twist_ref*cos1;
 
-    get_mi_vector(veci, bi1->r.p, si2->r.p);
-    get_mi_vector(vecj, bj1->r.p, sj2->r.p);
+    get_mi_vector(veci, bi1->pos(), si2->pos());
+    get_mi_vector(vecj, bj1->pos(), sj2->pos());
 
     for(int i = 0; i < 3; i++) {
       ui[i] = f_tilt*(anj[i] - cos1*ani[i])/ani_l;
@@ -552,15 +552,15 @@ int calc_twist_stack_force(Particle *si1, Particle *bi1, Particle *bi2, Particle
     PS(time_step);
     PS(sim_time/time_step);
 
-    PV(si1->r.p);
-    PV(si2->r.p);
-    PV(bi1->r.p);
-    PV(bi2->r.p);
+    PV(si1->pos());
+    PV(si2->pos());
+    PV(bi1->pos());
+    PV(bi2->pos());
 
-    PV(sj1->r.p);
-    PV(sj2->r.p);
-    PV(bj1->r.p);
-    PV(bj2->r.p);
+    PV(sj1->pos());
+    PV(sj2->pos());
+    PV(bj1->pos());
+    PV(bj2->pos());
 
     PS(rcci_l);
     PS(rccj_l);

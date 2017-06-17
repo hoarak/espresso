@@ -181,9 +181,9 @@ void mpi_mpiio_common_write(const char *filename, unsigned fields)
     for (int j = 0; j < cell->n; ++j) {
       id[i1] = cell->part[j].id();
       if (fields & MPIIO_OUT_POS) {
-        pos[i3] = cell->part[j].r.p[0];
-        pos[i3 + 1] = cell->part[j].r.p[1];
-        pos[i3 + 2] = cell->part[j].r.p[2];
+        pos[i3] = cell->part[j].pos()[0];
+        pos[i3 + 1] = cell->part[j].pos()[1];
+        pos[i3 + 2] = cell->part[j].pos()[2];
       }
       if (fields & MPIIO_OUT_VEL) {
         vel[i3] = cell->part[j].m.v[0] / time_step;

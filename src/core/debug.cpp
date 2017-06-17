@@ -65,11 +65,11 @@ void check_particle_consistency() {
       }
       for (dir = 0; dir < 3; dir++) {
         if (PERIODIC(dir) &&
-            (part[n].r.p[dir] < -ROUND_ERROR_PREC * box_l[dir] ||
-             part[n].r.p[dir] - box_l[dir] > ROUND_ERROR_PREC * box_l[dir])) {
+            (part[n].pos()[dir] < -ROUND_ERROR_PREC * box_l[dir] ||
+             part[n].pos()[dir] - box_l[dir] > ROUND_ERROR_PREC * box_l[dir])) {
           fprintf(stderr, "%d: check_particle_consistency: ERROR: illegal "
                           "pos[%d]=%f of part %d id=%d in cell %d\n",
-                  this_node, dir, part[n].r.p[dir], n, part[n].id(), c);
+                  this_node, dir, part[n].pos()[dir], n, part[n].id(), c);
           errexit();
         }
       }
@@ -184,11 +184,11 @@ void check_particles() {
       is_here[part[n].id()] = 1;
 
       for (dir = 0; dir < 3; dir++) {
-        if (PERIODIC(dir) && (part[n].r.p[dir] < -skin2 ||
-                              part[n].r.p[dir] > box_l[dir] + skin2)) {
+        if (PERIODIC(dir) && (part[n].pos()[dir] < -skin2 ||
+                              part[n].pos()[dir] > box_l[dir] + skin2)) {
           fprintf(stderr, "%d: check_particles: ERROR: illegal pos[%d]=%f of "
                           "part %d id=%d in cell %d\n",
-                  this_node, dir, part[n].r.p[dir], n, part[n].id(), c);
+                  this_node, dir, part[n].pos()[dir], n, part[n].id(), c);
           errexit();
         }
       }

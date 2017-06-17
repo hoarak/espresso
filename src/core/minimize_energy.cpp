@@ -95,7 +95,7 @@ bool steepest_descent_step(void) {
 	    dp2 += SQR(dp);
             
 	    // Move particle
-	    p[i].r.p[j] += dp;
+	    p[i].pos()[j] += dp;
 	    MINIMIZE_ENERGY_TRACE(printf("part %d dim %d dp %e gamma*f %e\n", i, j, dp, params->gamma * p[i].f.f[j]));
           }
 	}

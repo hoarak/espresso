@@ -60,12 +60,12 @@ inline int calc_angle_cosine_force(Particle *p_mid, Particle *p_left, Particle *
 
   cosine=0.0;
   /* vector from p_left to p_mid */
-  get_mi_vector(vec1, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec1, p_mid->pos(), p_left->pos());
   dist2 = sqrlen(vec1);
   d1i = 1.0 / sqrt(dist2);
   for(j=0;j<3;j++) vec1[j] *= d1i;
   /* vector from p_mid to p_right */
-  get_mi_vector(vec2, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec2, p_right->pos(), p_mid->pos());
   dist2 = sqrlen(vec2);
   d2i = 1.0 / sqrt(dist2);
   for(j=0;j<3;j++) vec2[j] *= d2i;
@@ -108,11 +108,11 @@ inline void calc_angle_cosine_3body_forces(Particle *p_mid, Particle *p_left,
   double fk[3];
   double fac;
 
-  get_mi_vector(vec12, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec12, p_mid->pos(), p_left->pos());
   for(j = 0; j < 3; j++)
     vec21[j] = -vec12[j];
 
-  get_mi_vector(vec31, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec31, p_right->pos(), p_mid->pos());
   vec21_sqr = sqrlen(vec21);
   vec21_magn = sqrt(vec21_sqr);
   vec31_sqr = sqrlen(vec31);
@@ -169,12 +169,12 @@ inline int angle_cosine_energy(Particle *p_mid, Particle *p_left, Particle *p_ri
 
   cosine=0.0;
   /* vector from p_mid to p_left */
-  get_mi_vector(vec1, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec1, p_mid->pos(), p_left->pos());
   dist2 = sqrlen(vec1);
   d1i = 1.0 / sqrt(dist2);
   for(j=0;j<3;j++) vec1[j] *= d1i;
   /* vector from p_right to p_mid */
-  get_mi_vector(vec2, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec2, p_right->pos(), p_mid->pos());
   dist2 = sqrlen(vec2);
   d2i = 1.0 / sqrt(dist2);
   for(j=0;j<3;j++) vec2[j] *= d2i;

@@ -86,7 +86,7 @@ void EspressoSystemInterface::gatherParticles() {
 
       for (i = 0; i < np; i++) {
         if (needsR())
-          R.push_back(Vector3(p[i].r.p));
+          R.push_back(Vector3(p[i].pos()));
 
 #ifdef ELECTROSTATICS
         if (needsQ())

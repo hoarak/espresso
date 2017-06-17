@@ -566,7 +566,7 @@ inline void add_bonded_force(Particle *p1) {
          1->2 distance vector here. For many body interactions this vector is
          not needed,
          and the pressure calculation not yet clear. */
-      get_mi_vector(dx, p1->r.p, p2->r.p);
+      get_mi_vector(dx, p1->pos(), p2->pos());
     }
 
     switch (type) {

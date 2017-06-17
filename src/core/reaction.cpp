@@ -129,7 +129,7 @@ void integrate_reaction_noswap() {
                  p2->p.type == reaction.catalyzer_type) ||
                 (p2->p.type == reaction.reactant_type &&
                  p1->p.type == reaction.catalyzer_type)) {
-              get_mi_vector(vec21, p1->r.p, p2->r.p);
+              get_mi_vector(vec21, p1->pos(), p2->pos());
               dist2 = sqrlen(vec21);
 
               /* Count the number of times a reactant particle is
@@ -225,7 +225,7 @@ bool in_lower_half_space(Particle p1, Particle p2) {
   // This function determines whether the particle p2 is in the lower
   // half space of particle p1
   double distvec[3];
-  get_mi_vector(distvec, p1.r.p, p2.r.p);
+  get_mi_vector(distvec, p1.pos(), p2.pos());
   double dot = utils::dot_product(p1.r.quatu, distvec);
   int sgn = utils::sign(dot);
   return (sgn + 1) / 2;
@@ -302,7 +302,7 @@ void integrate_reaction_swap() {
           // Particle list loop
           for (int i = 0; i < np; i++) {
             // Get the distance between a catalyst and another particle
-            get_mi_vector(vec21, p_local[*id].r.p, p_neigh[i].r.p);
+            get_mi_vector(vec21, p_local[*id].pos(), p_neigh[i].pos());
             dist2 = sqrlen(vec21);
 
             // Check if the distance is within the reaction range and

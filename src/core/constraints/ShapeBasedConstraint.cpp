@@ -25,9 +25,9 @@ void ShapeBasedConstraint::reflect_particle(Particle *p, const double *distance_
   memcpy(vec, distance_vector, 3 * sizeof(double));
 
   norm = sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
-  p->r.p[0] = p->r.p[0] - 2 * vec[0];
-  p->r.p[1] = p->r.p[1] - 2 * vec[1];
-  p->r.p[2] = p->r.p[2] - 2 * vec[2];
+  p->pos()[0] = p->pos()[0] - 2 * vec[0];
+  p->pos()[1] = p->pos()[1] - 2 * vec[1];
+  p->pos()[2] = p->pos()[2] - 2 * vec[2];
 
   /* vec seems to be the vector that points from the wall to the particle*/
   /* now normalize it */

@@ -46,7 +46,7 @@ void wall_sort_particles()
   // 2. for each particle, find the box and put its
   // identity there
   for(int i=0; i<n_part; i++) {
-    double x = partCfg[i].r.p[0];
+    double x = partCfg[i].pos()[0];
     // ignore particles outside the wallstuff_boundaries
     if (x < wallstuff_boundaries.e[0] || x > wallstuff_boundaries.e[wallstuff_boundaries.n-1])
       continue;
@@ -113,7 +113,7 @@ void calc_wallbondyz(double *g, int bin, double rclocal, double rmax, int rbins)
       //printf("%d   %d\n",p,q);
       // minimum image vector between the two particles
       double diff[3];
-      get_mi_vector(diff, partCfg[p].r.p, partCfg[q].r.p);
+      get_mi_vector(diff, partCfg[p].pos(), partCfg[q].pos());
 
       double dist = SQR(diff[1]) + SQR(diff[2]);
       if (dist <rclocal2) {
@@ -174,7 +174,7 @@ void calc_wallbondyz(double *g, int bin, double rclocal, double rmax, int rbins)
 
       // minimum image vector between the two particles
       double diff[3];
-      get_mi_vector(diff, partCfg[p].r.p, partCfg[q].r.p);
+      get_mi_vector(diff, partCfg[p].pos(), partCfg[q].pos());
       double dist = sqrt(SQR(diff[1]) + SQR(diff[2]));
 
       // binning
@@ -237,7 +237,7 @@ void calc_scaling(double *g, int bin, int boxes, double rclocal)
       //printf("%d   %d\n",p,q);
       // minimum image vector between the two particles
       double diff[3];
-      get_mi_vector(diff, partCfg[p].r.p, partCfg[q].r.p);
+      get_mi_vector(diff, partCfg[p].pos(), partCfg[q].pos());
       
       double dist = SQR(diff[1]) + SQR(diff[2]);
       if (dist <rclocal2) {
@@ -266,10 +266,10 @@ void calc_scaling(double *g, int bin, int boxes, double rclocal)
       sai_r = sai_m = 0.0;
     }
     //printf("bin %d   nb %d  i %d  sin %e cos %e\n", bin,nb, i, sinus, cosinus);
-    fold_position(partCfg[p].r.p,partCfg[p].m.v,partCfg[p].l.i);
+    fold_position(partCfg[p].pos(),partCfg[p].m.v,partCfg[p].l.i);
 
-    double y=partCfg[p].r.p[1];
-    double z=partCfg[p].r.p[2];
+    double y=partCfg[p].pos()[1];
+    double z=partCfg[p].pos()[2];
     int line=(int)(y/ystep);
     int col=(int)(z/zstep);
     //if (line!=0||col!=0){
@@ -340,7 +340,7 @@ void calc_scaling2 (double *g, int bin, int boxes, double rclocal)
       //printf("%d   %d\n",p,q);
       // minimum image vector between the two particles
       double diff[3];
-      get_mi_vector(diff, partCfg[p].r.p, partCfg[q].r.p);
+      get_mi_vector(diff, partCfg[p].pos(), partCfg[q].pos());
       
       double dist = SQR(diff[1]) + SQR(diff[2]);
       if (dist <rclocal2) {
@@ -370,10 +370,10 @@ void calc_scaling2 (double *g, int bin, int boxes, double rclocal)
     }
     //printf("bin %d   nb %d  i %d  sin %e cos %e\n", bin,nb, i, sinus, cosinus);
     
-    fold_position(partCfg[p].r.p,partCfg[p].m.v,partCfg[p].l.i);
+    fold_position(partCfg[p].pos(),partCfg[p].m.v,partCfg[p].l.i);
 
-    double y=partCfg[p].r.p[1];
-    double z=partCfg[p].r.p[2];
+    double y=partCfg[p].pos()[1];
+    double z=partCfg[p].pos()[2];
     int line=(int)(y/ystep);
     int col=(int)(z/zstep);
     //if (line!=0||col!=0){
@@ -427,7 +427,7 @@ void calc_wallrdfyz(double *g, int bin, double rmin, double rmax, int rbins)
 
       // minimum image vector between the two particles
       double diff[3];
-      get_mi_vector(diff, partCfg[p].r.p, partCfg[q].r.p);
+      get_mi_vector(diff, partCfg[p].pos(), partCfg[q].pos());
       double dist = sqrt(SQR(diff[1]) + SQR(diff[2]));
 
       // binning

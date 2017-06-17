@@ -644,7 +644,7 @@ void dp3m_dipole_assign(void)
     np = cell->n;
     for(i = 0; i < np; i++) {
       if( p[i].p.dipm != 0.0) {
-	dp3m_assign_dipole( p[i].r.p,p[i].p.dipm, p[i].r.dip,cp_cnt);
+	dp3m_assign_dipole( p[i].pos(),p[i].p.dipm, p[i].r.dip,cp_cnt);
 	cp_cnt++;
       }
     }

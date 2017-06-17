@@ -162,7 +162,7 @@ cdef class mayaviLive(object):
             if not particle_exists(i):
                 continue
             get_particle_data(i,&p)
-            coords[j,:] = p.r.p
+            coords[j,:] = p.pos()
             t = p.p.type
             types[j] = t +1
             radii[j] = self._determine_radius(t)
@@ -194,8 +194,8 @@ cdef class mayaviLive(object):
             t = bonds[3*n+2]
             get_particle_data(i,&p1)
             get_particle_data(j,&p2)
-            bond_coords[n,:3] = p1.r.p 
-            get_mi_vector(bond_vec,p2.r.p,p1.r.p)
+            bond_coords[n,:3] = p1.pos() 
+            get_mi_vector(bond_vec,p2.pos(),p1.pos())
             bond_coords[n,3:6] = bond_vec
             bond_coords[n,6] = t
 

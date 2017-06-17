@@ -24,7 +24,7 @@ int ObservablePolymerKDistribution::actual_calculate() {
 	int number_of_pairs =(int) ( floor(poly_len / (k +1 ) ) + ( (poly_len - 1)%(k+1) == 0 ? 1 : 0 ) - 1);
 	for (int i = 0; i < npoly; i++) 
 		for (int j = 0; j < poly_len - k; j+= k) {
-			get_mi_vector(dist_vec, partCfg[ids->e[i*poly_len + j]].r.p, partCfg[ids->e[i*poly_len + j + k]].r.p);
+			get_mi_vector(dist_vec, partCfg[ids->e[i*poly_len + j]].pos(), partCfg[ids->e[i*poly_len + j + k]].pos());
 			dist = normr(dist_vec);
 			bin_id = (int) floor( (dist - r_min)/bin_size );
 			if (bin_id < n_bins && bin_id >= 0) {

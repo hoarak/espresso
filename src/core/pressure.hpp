@@ -326,7 +326,7 @@ inline void add_bonded_virials(Particle *p1)
       return;
     }
 
-    get_mi_vector(dx, p1->r.p, p2->r.p);
+    get_mi_vector(dx, p1->pos(), p2->pos());
     calc_bonded_force(p1,p2,iaparams,&i,dx,force);
     *obsstat_bonded(&virials, type_num) += dx[0]*force[0] + dx[1]*force[1] + dx[2]*force[2];
 
@@ -371,11 +371,11 @@ inline void add_three_body_bonded_stress(Particle *p1) {
       p2 = local_particles[p1->bl.e[++i]];
       p3 = local_particles[p1->bl.e[++i]];
 
-      get_mi_vector(dx12, p1->r.p, p2->r.p);
+      get_mi_vector(dx12, p1->pos(), p2->pos());
       for(j = 0; j < 3; j++)
         dx21[j] = -dx12[j];
 
-      get_mi_vector(dx31, p3->r.p, p1->r.p);
+      get_mi_vector(dx31, p3->pos(), p1->pos());
 
       for(j = 0; j < 3; j++) {
         force1[j] = 0.0;
@@ -432,11 +432,11 @@ inline void add_three_body_bonded_stress(Particle *p1) {
         p2 = local_particles[p1->bl.e[++i]];
         p3 = local_particles[p1->bl.e[++i]];
 
-        get_mi_vector(dx12, p1->r.p, p2->r.p);
+        get_mi_vector(dx12, p1->pos(), p2->pos());
         for(j = 0; j < 3; j++)
           dx21[j] = -dx12[j];
 
-        get_mi_vector(dx31, p3->r.p, p1->r.p);
+        get_mi_vector(dx31, p3->pos(), p1->pos());
 
         for(j = 0; j < 3; j++) {
           force1[j] = 0.0;

@@ -51,7 +51,7 @@ void update_mol_pos_particle(Particle *p){
    if (ifParticleIsVirtual(p)) {
       calc_mol_pos(p,r_com);
       for (j=0;j<3;j++){
-         p->r.p[j] = r_com[j];
+         p->pos()[j] = r_com[j];
       }
    }
 }
@@ -138,7 +138,7 @@ void calc_mol_pos(Particle *p_com,double r_com[3]){
       }
       #endif
       if (ifParticleIsVirtual(p)) continue;
-      get_mi_vector(vec12,p->r.p, p_com->r.p);
+      get_mi_vector(vec12,p->pos(), p_com->pos());
       for (j=0;j<3;j++){
           r_com[j] += (*p).p.mass*vec12[j];
       }
@@ -149,7 +149,7 @@ void calc_mol_pos(Particle *p_com,double r_com[3]){
    }
    for (j=0;j<3;j++){
       r_com[j] /= M;
-      r_com[j] += p_com->r.p[j];
+      r_com[j] += p_com->pos()[j];
    }
 #ifdef VIRTUAL_SITES_DEBUG
    if (count!=topology[mol_id].part.n-1){
@@ -175,7 +175,7 @@ int calc_mol_pos_cfg(Particle *p_com,double r_com[3]){
       p=&partCfg[topology[mol_id].part.e[i]];
       if (ifParticleIsVirtual(p)) continue;
       for (j=0;j<3;j++){
-            r_com[j] += (*p).p.mass*p->r.p[j];
+            r_com[j] += (*p).p.mass*p->pos()[j];
       }
       M+=(*p).p.mass;
 #ifdef VIRTUAL_SITES_DEBUG
@@ -292,7 +292,7 @@ double get_mol_dist(Particle *p1,Particle *p2){
       dist[0]=dist[1]=dist[2]=0.0;
    }
    #endif
-   get_mi_vector(dist,p1_com->r.p, p2_com->r.p);
+   get_mi_vector(dist,p1_com->pos(), p2_com->pos());
    dist2=SQR(dist[0])+SQR(dist[1])+SQR(dist[2]);
    return sqrt(dist2);
 }
@@ -346,7 +346,7 @@ void calc_force_between_mol(int mol_id1,int mol_id2,double force[3]){
     for (j=0;j<topology[mol_id2].part.n;j++){
       p2=&partCfg[topology[mol_id2].part.e[j]];
       
-      get_mi_vector(vec12,p1->r.p, p2->r.p);
+      get_mi_vector(vec12,p1->pos(), p2->pos());
       dist2=sqrlen(vec12);
       dist=sqrt(dist2);
 #ifdef EXCLUSIONS
@@ -428,7 +428,7 @@ void calc_dipole_of_molecule(int mol_id,double dipole[4]){
       }
       else
       {
-         get_mi_vector(vec12,p->r.p, p_first->r.p);
+         get_mi_vector(vec12,p->pos(), p_first->pos());
          for (k=0;k<3;k++){
             dipole[k] += p->p.q*vec12[k];
          }
@@ -479,7 +479,7 @@ void get_mol_dist_vector_from_molid_cfg(int mol_id1,int mol_id2,double dist[3]){
       return;
    }
    #endif
-   get_mi_vector(dist,p1_com->r.p, p2_com->r.p);
+   get_mi_vector(dist,p1_com->pos(), p2_com->pos());
 }
 
 #endif

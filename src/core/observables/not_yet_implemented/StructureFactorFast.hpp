@@ -19,7 +19,7 @@ int ObservableStructureFactorFast::actual_calculate() {
   float partCache[n_part*3];
   for(int p=0; p<n_part; p++) {
     for (int i=0;i<3;i++){
-      partCache[3*p+i]=partCfg[p].r.p[i];
+      partCache[3*p+i]=partCfg[p].pos()[i];
     }
   }
   int k_density = params->k_density;

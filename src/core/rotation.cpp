@@ -237,7 +237,7 @@ void propagate_omega_quat_particle(Particle* p)
 #endif
   
   
-  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: PPOS p = (%.3f,%.3f,%.3f)\n",this_node,p->r.p[0],p->r.p[1],p->r.p[2]));
+  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: PPOS p = (%.3f,%.3f,%.3f)\n",this_node,p->pos()[0],p->pos()[1],p->pos()[2]));
 }
 
 /** convert the torques to the body-fixed frames and propagate angular velocities */

@@ -72,11 +72,11 @@ int mindist3(int part_id, double r_catch, int *ids) {
   }
   for (i = 0; i < n_part; i++) {
     if (i != me) {
-      dx = partCfgMD[me].r.p[0] - partCfgMD[i].r.p[0];
+      dx = partCfgMD[me].pos()[0] - partCfgMD[i].pos()[0];
       dx -= dround(dx / box_l[0]) * box_l[0];
-      dy = partCfgMD[me].r.p[1] - partCfgMD[i].r.p[1];
+      dy = partCfgMD[me].pos()[1] - partCfgMD[i].pos()[1];
       dy -= dround(dy / box_l[1]) * box_l[1];
-      dz = partCfgMD[me].r.p[2] - partCfgMD[i].r.p[2];
+      dz = partCfgMD[me].pos()[2] - partCfgMD[i].pos()[2];
       dz -= dround(dz / box_l[2]) * box_l[2];
       if (sqrt(SQR(dx) + SQR(dy) + SQR(dz)) < r_catch)
         ids[caught++] = partCfgMD[i].id();
@@ -96,11 +96,11 @@ double mindist4(double pos[3]) {
   partCfgMD = (Particle *)Utils::malloc(n_part * sizeof(Particle));
   mpi_get_particles(partCfgMD, NULL);
   for (i = 0; i < n_part; i++) {
-    dx = pos[0] - partCfgMD[i].r.p[0];
+    dx = pos[0] - partCfgMD[i].pos()[0];
     dx -= dround(dx / box_l[0]) * box_l[0];
-    dy = pos[1] - partCfgMD[i].r.p[1];
+    dy = pos[1] - partCfgMD[i].pos()[1];
     dy -= dround(dy / box_l[1]) * box_l[1];
-    dz = pos[2] - partCfgMD[i].r.p[2];
+    dz = pos[2] - partCfgMD[i].pos()[2];
     dz -= dround(dz / box_l[2]) * box_l[2];
     mindist = std::min(mindist, SQR(dx) + SQR(dy) + SQR(dz));
   }

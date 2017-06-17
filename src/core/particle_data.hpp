@@ -210,7 +210,18 @@ struct ParticleProperties {
 
 /** Positional information on a particle. Information that is
     communicated to calculate interactions with ghost particles. */
-typedef struct {
+struct ParticlePosition {
+  /* Position, folded up to skin */
+  double(&pos())[3] { return p; }
+
+#ifdef ROTATION
+  /* Position, folded up to skin */
+  double(&quat_())[4] { return quat; }
+
+  /* Position, folded up to skin */
+  double(&quatu_())[3] { return quatu; }
+#endif
+
   /** periodically folded position. */
   double p[3];
 #ifdef ROTATION
@@ -233,8 +244,7 @@ typedef struct {
 #ifdef SHANCHEN
   double composition[LB_COMPONENTS];
 #endif
-
-} ParticlePosition;
+};
 
 /** Force information on a particle. Forces of ghost particles are
     collected and added up to the force of the original particle. */
@@ -309,16 +319,13 @@ typedef struct {
 } ParticleParametersSwimming;
 
 /** Struct holding all information for one particle. */
-typedef struct {
+struct Particle : public ParticlePosition {
   int id() const { return p.identity; }
-
-  /* Position, folded up to skin */
-  double(&pos())[3] { return r.p; }
 
   ///
   ParticleProperties p;
   ///
-  ParticlePosition r;
+  //  ParticlePosition r;
   ///
   ParticleMomentum m;
   ///
@@ -346,7 +353,7 @@ typedef struct {
 #ifdef ENGINE
   ParticleParametersSwimming swim;
 #endif
-} Particle;
+};
 
 /** List of particles. The particle array is resized using a sophisticated
     (we hope) algorithm to avoid unnecessary resizes.

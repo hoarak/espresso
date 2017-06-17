@@ -21,7 +21,7 @@ int ObservableForceDensityProfile::actual_calculate() {
     if (ids->e[i] >= n_part)
       return 1;
 /* We use folded coordinates here */
-    memmove(ppos, partCfg[ids->e[i]].r.p, 3*sizeof(double));
+    memmove(ppos, partCfg[ids->e[i]].pos(), 3*sizeof(double));
     memmove(img, partCfg[ids->e[i]].l.i, 3*sizeof(int));
     fold_position(ppos, img);
     binx= (int) floor( pdata->xbins*  (ppos[0]-pdata->minx)/(pdata->maxx-pdata->minx));

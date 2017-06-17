@@ -23,9 +23,9 @@ public:
     if (ids[i] >= n_part)
       return 1;
     double mass = partCfg[ids[i]].p.mass;
-    last_value[0] += mass*partCfg[ids[i]].r.p[0];
-    last_value[1] += mass*partCfg[ids[i]].r.p[1];
-    last_value[2] += mass*partCfg[ids[i]].r.p[2];
+    last_value[0] += mass*partCfg[ids[i]].pos()[0];
+    last_value[1] += mass*partCfg[ids[i]].pos()[1];
+    last_value[2] += mass*partCfg[ids[i]].pos()[2];
     total_mass+=mass;
   }
   last_value[0]/=total_mass;

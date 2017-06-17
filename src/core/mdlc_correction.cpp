@@ -198,8 +198,8 @@ double get_DLC_dipolar(int kcut,double *fx, double *fy, double *fz, double *tx, 
 	
 	      a=gx*p1[j].r.dip[0]+gy*p1[j].r.dip[1];
 	      b=gr*p1[j].r.dip[2];
-	      er=gx*p1[j].r.p[0] +gy*p1[j].r.p[1] ;
-	      ez=gr*p1[j].r.p[2];
+	      er=gx*p1[j].pos()[0] +gy*p1[j].pos()[1] ;
+	      ez=gr*p1[j].pos()[2];
 	      c=cos(er);
 	      d=sin(er);
 	      f=exp(ez);
@@ -408,8 +408,8 @@ double get_DLC_energy_dipolar(int kcut){
 	    
 	      a=gx*p1[j].r.dip[0]+gy*p1[j].r.dip[1];{
 		b=gr*p1[j].r.dip[2];
-		er=gx*p1[j].r.p[0] +gy*p1[j].r.p[1] ;
-		ez=gr*p1[j].r.p[2];
+		er=gx*p1[j].pos()[0] +gy*p1[j].pos()[1] ;
+		ez=gr*p1[j].pos()[2];
 		c=cos(er);
 		d=sin(er);
 		f=exp(ez);

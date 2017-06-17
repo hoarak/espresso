@@ -70,7 +70,7 @@ static double calc_pwdist(Particle *p1, Bonded_ia_parameters *iaparams,
 //  /*fprintf(stdout,"  Entering calc_pwdist:\n");*/
 //
 //  /* folds coordinates of p_left into original box */
-//  memmove(folded_pos_p1, p1->r.p, 3 * sizeof(double));
+//  memmove(folded_pos_p1, p1->pos(), 3 * sizeof(double));
 //  memmove(img, p1->l.i, 3 * sizeof(int));
 //  fold_position(folded_pos_p1, img);
 //
@@ -106,7 +106,7 @@ static double calc_pwangle(Particle *p1, Particle *p2,
 //  double vec[3];
 //
 //  /* vector from p1 to p2 */
-//  get_mi_vector(vec, p2->r.p, p1->r.p);
+//  get_mi_vector(vec, p2->pos(), p1->pos());
 //  dist = sqrlen(vec);
 //  di = 1.0 / sqrt(dist);
 //  for (j = 0; j < 3; j++)
@@ -114,7 +114,7 @@ static double calc_pwangle(Particle *p1, Particle *p2,
 //  /*
 //  fprintf(stdout,"Normalised: p1= %9.6f %9.6f %9.6f   p1= %9.6f %9.6f %9.6f
 //  vec= %9.6f %9.6f
-//  %9.6f\n",p1->r.p[0],p1->r.p[1],p1->r.p[2],p2->r.p[0],p2->r.p[1],p2->r.p[2],vec[0],vec[1],vec[2]);
+//  %9.6f\n",p1->pos()[0],p1->pos()[1],p1->pos()[2],p2->pos()[0],p2->pos()[1],p2->pos()[2],vec[0],vec[1],vec[2]);
 //  */
 //  /* vectors are normalised so cosine is just cos(angle_between_vec1_and_vec2)
 //   * Wall is closest wall to particle
@@ -169,7 +169,7 @@ int calc_endangledist_pair_force(Particle *p1, Particle *p2,
 //      }
 //    }
 //    /* Get vector from particle 1 to particle 2 */
-//    get_mi_vector(vec, p2->r.p, p1->r.p);
+//    get_mi_vector(vec, p2->pos(), p1->pos());
 //    dist = sqrlen(vec);
 //    di = 1.0 / sqrt(dist);
 //    /*
@@ -188,7 +188,7 @@ int calc_endangledist_pair_force(Particle *p1, Particle *p2,
 //\n",p1->id(),clconstr,distwallmin);
 //fprintf(stdout,"    vector=(%f %f %f)\n",vec[0],vec[1],vec[2]);
 //fprintf(stdout,"pos1=(%f %f %f)  pos2=(%f %f %f)  distwallmin=%9.6f
-//angle=%9.6f\n",p1->r.p[0],p1->r.p[1],p1->r.p[2],p2->r.p[0],p2->r.p[1],p2->r.p[2],distwallmin,phi*180.0/PI);
+//angle=%9.6f\n",p1->pos()[0],p1->pos()[1],p1->pos()[2],p2->pos()[0],p2->pos()[1],p2->pos()[2],distwallmin,phi*180.0/PI);
 //*/
 //
 //#ifdef BOND_ENDANGLEDIST_HARMONIC

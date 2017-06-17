@@ -115,10 +115,10 @@ int calc_hydrogen_bond_force(Particle *s1, Particle *b1, Particle *b2, Particle 
 
   /* Calculate geometry variables */
 
-  get_mi_vector(rcc, s2->r.p, s1->r.p);
-  get_mi_vector(rhb, b2->r.p, b1->r.p);
-  get_mi_vector(rcb1, b1->r.p, s1->r.p);
-  get_mi_vector(rcb2, b2->r.p, s2->r.p);
+  get_mi_vector(rcc, s2->pos(), s1->pos());
+  get_mi_vector(rhb, b2->pos(), b1->pos());
+  get_mi_vector(rcb1, b1->pos(), s1->pos());
+  get_mi_vector(rcb2, b2->pos(), s2->pos());
 
   rcb1_l = norm(rcb1);
   rcb2_l = norm(rcb2);
@@ -275,10 +275,10 @@ int calc_hydrogen_bond_force(Particle *s1, Particle *b1, Particle *b2, Particle 
     PS(b1->id());
     PS(b2->id());
     PS(s2->id());
-    PV(s1->r.p);
-    PV(b1->r.p);
-    PV(b2->r.p);
-    PV(s2->r.p);
+    PV(s1->pos());
+    PV(b1->pos());
+    PV(b2->pos());
+    PV(s2->pos());
 
     PV(rhb);
     PV(rcc);
@@ -371,10 +371,10 @@ int calc_hydrogen_bond_energy(Particle *s1, Particle *b1, Particle *b2, Particle
 
   /* Calculate geometry variables */
 
-  get_mi_vector(rcc, s2->r.p, s1->r.p);
-  get_mi_vector(rhb, b2->r.p, b1->r.p);
-  get_mi_vector(rcb1, b1->r.p, s1->r.p);
-  get_mi_vector(rcb2, b2->r.p, s2->r.p);
+  get_mi_vector(rcc, s2->pos(), s1->pos());
+  get_mi_vector(rhb, b2->pos(), b1->pos());
+  get_mi_vector(rcb1, b1->pos(), s1->pos());
+  get_mi_vector(rcb2, b2->pos(), s2->pos());
 
   rcb1_l = norm(rcb1);
   rcb2_l = norm(rcb2);

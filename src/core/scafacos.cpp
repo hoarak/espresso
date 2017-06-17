@@ -83,9 +83,9 @@ int ScafacosData::update_particle_data() {
     const int np = cell->n;
     
     for(int i = 0; i < np; i++) {
-      positions.push_back(p[i].r.p[0]);
-      positions.push_back(p[i].r.p[1]);
-      positions.push_back(p[i].r.p[2]);
+      positions.push_back(p[i].pos()[0]);
+      positions.push_back(p[i].pos()[1]);
+      positions.push_back(p[i].pos()[2]);
       if (!dipolar()) {
         charges.push_back(p[i].p.q);
       }

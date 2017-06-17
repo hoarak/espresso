@@ -112,7 +112,7 @@ void local_system_CMS( double *sdata ) {
       M = part[i].p.mass;
       mass += M;
 
-      memmove(ppos, part[i].r.p, 3*sizeof(double));
+      memmove(ppos, part[i].pos(), 3*sizeof(double));
       memmove(img, part[i].l.i, 3*sizeof(int));
       unfold_position(ppos, img);
 
@@ -139,7 +139,7 @@ void local_system_CMS( double *sdata ) {
     for(i = 0; i < np; i++) {
       npart++;
 
-      memmove(ppos, part[i].r.p, 3*sizeof(double));
+      memmove(ppos, part[i].pos(), 3*sizeof(double));
       memmove(img, part[i].l.i, 3*sizeof(int));
       unfold_position(ppos, img);
 

@@ -51,10 +51,10 @@ static bool le_chatterjee_test_pair(Particle *p1, Particle *p2){
      * but can assume (for LE) that non-ghost
      * particle y-coords are always imaged inside the box */
 
-    if( p1->r.p[1] < 0 )        return true;
-    if( p1->r.p[1] > box_l[1] ) return true;
-    if( p2->r.p[1] < 0 )        return true;
-    if( p2->r.p[1] > box_l[1] ) return true;
+    if( p1->pos()[1] < 0 )        return true;
+    if( p1->pos()[1] > box_l[1] ) return true;
+    if( p2->pos()[1] < 0 )        return true;
+    if( p2->pos()[1] > box_l[1] ) return true;
 #endif
     return false;
 }

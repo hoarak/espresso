@@ -77,9 +77,9 @@ double mindist(IntList *set1, IntList *set2)
 
   updatePartCfg(WITHOUT_BONDS);
   for (j=0; j<n_part-1; j++) {
-    pt[0] = partCfg[j].r.p[0];
-    pt[1] = partCfg[j].r.p[1];
-    pt[2] = partCfg[j].r.p[2];
+    pt[0] = partCfg[j].pos()[0];
+    pt[1] = partCfg[j].pos()[1];
+    pt[2] = partCfg[j].pos()[2];
     /* check which sets particle j belongs to
        bit 0: set1, bit1: set2
     */
@@ -95,7 +95,7 @@ double mindist(IntList *set1, IntList *set2)
       /* accept a pair if particle j is in set1 and particle i in set2 or vice versa. */
       if (((in_set & 1) && (!set2 || intlist_contains(set2, partCfg[i].p.type))) ||
           ((in_set & 2) && (!set1 || intlist_contains(set1, partCfg[i].p.type))))
-        mindist = std::min(mindist, min_distance2(pt, partCfg[i].r.p));
+        mindist = std::min(mindist, min_distance2(pt, partCfg[i].pos()));
   }
   mindist = std::sqrt(mindist);
 
@@ -161,7 +161,7 @@ int aggregation(double dist_criteria2, int min_contact, int s_mol_id, int f_mol_
 	p2molid = p2->p.mol_id;
 	if (((p1molid <= f_mol_id) && (p1molid >= s_mol_id)) && ((p2molid <= f_mol_id) && (p2molid >= s_mol_id))) {
 	  if (agg_id_list[p1molid] != agg_id_list[p2molid]) {
-	    dist2 = min_distance2(p1->r.p, p2->r.p);
+	    dist2 = min_distance2(p1->pos(), p2->pos());
 
 #ifdef ELECTROSTATICS
 	    if (charge && (p1->p.q * p2->p.q >= 0)) {continue;}
@@ -288,7 +288,7 @@ std::vector<double> centerofmass(int type)
     for (int i=0; i<n_part; i++) {
         if ((partCfg[i].p.type == type) || (type == -1)) {
             for (int j=0; j<3; j++) {
-                com[j] += partCfg[i].r.p[j]*(partCfg[i]).p.mass;
+                com[j] += partCfg[i].pos()[j]*(partCfg[i]).p.mass;
             }
             mass += (partCfg[i]).p.mass;
         }
@@ -333,7 +333,7 @@ void angularmomentum(int type, double *com)
   {
     if (type == partCfg[j].p.type) 
     {
-      vector_product(partCfg[j].r.p,partCfg[j].m.v,tmp);
+      vector_product(partCfg[j].pos(),partCfg[j].m.v,tmp);
       pre_factor=(partCfg[j]).p.mass;
       for (i=0; i<3; i++) {
         com[i] += tmp[i]*pre_factor;
@@ -356,7 +356,7 @@ void momentofinertiamatrix(int type, double* MofImatrix)
     if (type == partCfg[j].p.type) {
       count ++;
       for (i=0; i<3; i++) {
-      	p1[i] = partCfg[j].r.p[i] - com[i];
+      	p1[i] = partCfg[j].pos()[i] - com[i];
       }
       massi= (partCfg[j]).p.mass;
       MofImatrix[0] += massi * (p1[1] * p1[1] + p1[2] * p1[2]) ; 
@@ -396,7 +396,7 @@ void calc_gyration_tensor(int type, std::vector<double>& gt)
   for (i=0;i<n_part;i++) {
     if ((partCfg[i].p.type == type) || (type == -1)) {
       for ( j=0; j<3 ; j++ ) { 
-        p1[j] = partCfg[i].r.p[j] - com[j];
+        p1[j] = partCfg[i].pos()[j] - com[j];
       }
       count ++;
       Smatrix[0] += p1[0]*p1[0];
@@ -454,11 +454,11 @@ void nbhood(double pt[3], double r, IntList *il, int planedims[3] )
 
   for (i = 0; i<n_part; i++) {
     if ( (planedims[0] + planedims[1] + planedims[2]) == 3 ) {
-      get_mi_vector(d, pt, partCfg[i].r.p);
+      get_mi_vector(d, pt, partCfg[i].pos());
     } else {
       /* Calculate the in plane distance */
       for ( j= 0 ; j < 3 ; j++ ) {
-	d[j] = planedims[j]*(partCfg[i].r.p[j]-pt[j]);
+	d[j] = planedims[j]*(partCfg[i].pos()[j]-pt[j]);
       }
     }
 
@@ -482,7 +482,7 @@ double distto(double p[3], int pid)
   mindist=SQR(box_l[0] + box_l[1] + box_l[2]);
   for (i=0; i<n_part; i++) {
     if (pid != partCfg[i].id()) {
-      get_mi_vector(d, p, partCfg[i].r.p);
+      get_mi_vector(d, p, partCfg[i].pos());
       mindist = std::min(mindist, sqrlen(d));
     }
   }
@@ -613,7 +613,7 @@ void calc_part_distribution(int *p1_types, int n_p1, int *p2_types, int n_p2,
 	  if(j != i) {
 	    for(t2=0; t2<n_p2; t2++) {
 	      if(partCfg[j].p.type == p2_types[t2]) {
-		act_dist2 =  min_distance2(partCfg[i].r.p, partCfg[j].r.p);
+		act_dist2 =  min_distance2(partCfg[i].pos(), partCfg[j].pos());
 		if(act_dist2 < min_dist2) { min_dist2 = act_dist2; }
 	      }
 	    }
@@ -679,7 +679,7 @@ void calc_rdf(int *p1_types, int n_p1, int *p2_types, int n_p2,
 	for(j=start; j<n_part; j++) {
 	  for(t2=0; t2<n_p2; t2++) {
 	    if(partCfg[j].p.type == p2_types[t2]) {
-	      dist = min_distance(partCfg[i].r.p, partCfg[j].r.p);
+	      dist = min_distance(partCfg[i].pos(), partCfg[j].pos());
 	      if(dist > r_min && dist < r_max) {
 		ind = (int) ( (dist - r_min)*inv_bin_width );
 		rdf[ind]++;
@@ -878,7 +878,7 @@ void calc_structurefactor(int *p_types, int n_types, int order, double **_ff) {
 	    for(p=0; p<n_part; p++) {
 	      for(t=0; t<n_types; t++) {
 		if (partCfg[p].p.type == p_types[t]) {
-		  qr = twoPI_L * ( i*partCfg[p].r.p[0] + j*partCfg[p].r.p[1] + k*partCfg[p].r.p[2] );
+		  qr = twoPI_L * ( i*partCfg[p].pos()[0] + j*partCfg[p].pos()[1] + k*partCfg[p].pos()[2] );
 		  C_sum+= cos(qr);
 		  S_sum+= sin(qr);
 		}
@@ -1081,9 +1081,9 @@ int calc_cylindrical_average(std::vector<double> center, std::vector<double> dir
 
   // Make sure particles are folded
   for (int i = 0 ; i < n_part ; i++) {
-    fold_coordinate(partCfg[i].r.p,partCfg[i].m.v,partCfg[i].l.i,0);
-    fold_coordinate(partCfg[i].r.p,partCfg[i].m.v,partCfg[i].l.i,1);
-    fold_coordinate(partCfg[i].r.p,partCfg[i].m.v,partCfg[i].l.i,2);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].m.v,partCfg[i].l.i,0);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].m.v,partCfg[i].l.i,1);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].m.v,partCfg[i].l.i,2);
   }
 
   // Declare variables for the density calculation
@@ -1094,9 +1094,9 @@ int calc_cylindrical_average(std::vector<double> center, std::vector<double> dir
   for (int part_id = 0; part_id < n_part; part_id++) {
     for (unsigned int type_id = 0; type_id < types.size(); type_id++) {
       if ( types[type_id] == partCfg[part_id].p.type || all_types) {
-        pos[0] = partCfg[part_id].r.p[0];
-        pos[1] = partCfg[part_id].r.p[1];
-        pos[2] = partCfg[part_id].r.p[2];
+        pos[0] = partCfg[part_id].pos()[0];
+        pos[1] = partCfg[part_id].pos()[1];
+        pos[2] = partCfg[part_id].pos()[2];
         vel[0] = partCfg[part_id].m.v[0];
         vel[1] = partCfg[part_id].m.v[1];
         vel[2] = partCfg[part_id].m.v[2];
@@ -1179,9 +1179,9 @@ int calc_radial_density_map (int xbins,int ybins,int thetabins,double xrange,dou
 
   /* Make sure particles are folded */
   for (i = 0 ; i < n_part ; i++) {
-    fold_coordinate(partCfg[i].r.p,partCfg[i].m.v,partCfg[i].l.i,0);
-    fold_coordinate(partCfg[i].r.p,partCfg[i].m.v,partCfg[i].l.i,1);
-    fold_coordinate(partCfg[i].r.p,partCfg[i].m.v,partCfg[i].l.i,2);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].m.v,partCfg[i].l.i,0);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].m.v,partCfg[i].l.i,1);
+    fold_coordinate(partCfg[i].pos(),partCfg[i].m.v,partCfg[i].l.i,2);
   }
 
   beadcount = 0;
@@ -1191,7 +1191,7 @@ int calc_radial_density_map (int xbins,int ybins,int thetabins,double xrange,dou
     for ( bi = 0 ; bi < nbeadtypes ; bi++ ) {
       if ( beadids->e[bi] == partCfg[pi].p.type ) {
 	/* Find the vector from the point to the center */
-	vecsub(center,partCfg[pi].r.p,pvector);
+	vecsub(center,partCfg[pi].pos(),pvector);
 
 	/* Work out x and y coordinates with respect to rotation axis */
 	
@@ -1208,7 +1208,7 @@ int calc_radial_density_map (int xbins,int ybins,int thetabins,double xrange,dou
 	yindex = (int)(floor((ydist+yrange*0.5)/ybinwidth));
 	/*
           printf("x %d y %d \n",xindex,yindex);
-          printf("p %f %f %f \n",partCfg[pi].r.p[0],partCfg[pi].r.p[1],partCfg[pi].r.p[2]);
+          printf("p %f %f %f \n",partCfg[pi].pos()[0],partCfg[pi].pos()[1],partCfg[pi].pos()[2]);
           printf("pvec %f %f %f \n",pvector[0],pvector[1],pvector[2]);
           printf("axis %f %f %f \n",axis[0],axis[1],axis[2]);
           printf("dists %f %f \n",xdist,ydist);
@@ -1257,7 +1257,7 @@ int calc_radial_density_map (int xbins,int ybins,int thetabins,double xrange,dou
     for ( pi = 0 ; pi < n_part ; pi++ ) {
       for ( bi = 0 ; bi < nbeadtypes ; bi++ ) {
         if ( beadids->e[bi] == partCfg[pi].p.type ) {
-          vecsub(center,partCfg[pi].r.p,pvector);
+          vecsub(center,partCfg[pi].pos(),pvector);
           vector_product(axis,pvector,vectprod);
           xdist = sqrt(sqrlen(vectprod)/sqrlen(axis));
           ydist = scalar(axis,pvector)/sqrt(sqrlen(axis));
@@ -1353,9 +1353,9 @@ void analyze_append() {
   configs = (double**)Utils::realloc(configs,(n_configs+1)*sizeof(double *));
   configs[n_configs] = (double *) Utils::malloc(3*n_part_conf*sizeof(double));
   for(i=0; i<n_part_conf; i++) {
-    configs[n_configs][3*i]   = partCfg[i].r.p[0];
-    configs[n_configs][3*i+1] = partCfg[i].r.p[1];
-    configs[n_configs][3*i+2] = partCfg[i].r.p[2];
+    configs[n_configs][3*i]   = partCfg[i].pos()[0];
+    configs[n_configs][3*i+1] = partCfg[i].pos()[1];
+    configs[n_configs][3*i+2] = partCfg[i].pos()[2];
   }
   n_configs++;
 }
@@ -1369,9 +1369,9 @@ void analyze_push() {
   }
   configs[n_configs-1] = (double *) Utils::malloc(3*n_part_conf*sizeof(double));
   for(i=0; i<n_part_conf; i++) {
-    configs[n_configs-1][3*i]   = partCfg[i].r.p[0];
-    configs[n_configs-1][3*i+1] = partCfg[i].r.p[1];
-    configs[n_configs-1][3*i+2] = partCfg[i].r.p[2];
+    configs[n_configs-1][3*i]   = partCfg[i].pos()[0];
+    configs[n_configs-1][3*i+1] = partCfg[i].pos()[1];
+    configs[n_configs-1][3*i+2] = partCfg[i].pos()[2];
   }
 }
 
@@ -1379,9 +1379,9 @@ void analyze_replace(int ind) {
   int i;
   n_part_conf = n_part;
   for(i=0; i<n_part_conf; i++) {
-    configs[ind][3*i]   = partCfg[i].r.p[0];
-    configs[ind][3*i+1] = partCfg[i].r.p[1];
-    configs[ind][3*i+2] = partCfg[i].r.p[2];
+    configs[ind][3*i]   = partCfg[i].pos()[0];
+    configs[ind][3*i+1] = partCfg[i].pos()[1];
+    configs[ind][3*i+2] = partCfg[i].pos()[2];
   }
 }
 
@@ -1485,7 +1485,7 @@ void mark_neighbours(int type,int pa_nr,double dist,int *list){
   int k;
   for (k=0;k<n_part;k++){
      //only unmarked and particles with right distance
-     if ( (partCfg[k].p.type == type) && (list[k] == 0) && (min_distance(partCfg[pa_nr].r.p,partCfg[k].r.p) < dist) ){
+     if ( (partCfg[k].p.type == type) && (list[k] == 0) && (min_distance(partCfg[pa_nr].pos(),partCfg[k].pos()) < dist) ){
         //mark particle with same number as calling particle
         list[k]=list[pa_nr];
         mark_neighbours(type,k,dist,list);

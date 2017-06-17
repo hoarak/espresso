@@ -68,13 +68,13 @@ static double calc_angledist_param(Particle *p_mid, Particle *p_left,
   int img[3];
 
   /* vector from p_left to p_mid */
-  get_mi_vector(vec1, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec1, p_mid->pos(), p_left->pos());
   const double dist1 = sqrlen(vec1);
   const double d1i = 1.0 / sqrt(dist1);
   for (int j = 0; j < 3; j++)
     vec1[j] *= d1i;
   /* vector from p_mid to p_right */
-  get_mi_vector(vec2, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec2, p_right->pos(), p_mid->pos());
   dist2 = sqrlen(vec2);
   d2i = 1.0 / sqrt(dist2);
   for (int j = 0; j < 3; j++)
@@ -86,7 +86,7 @@ static double calc_angledist_param(Particle *p_mid, Particle *p_left,
   const double distmx = iaparams->p.angledist.distmax;
 
   /* folds coordinates of p_mid into original box */
-  memmove(folded_pos, p_mid->r.p, 3 * sizeof(double));
+  memmove(folded_pos, p_mid->pos(), 3 * sizeof(double));
   memmove(img, p_mid->l.i, 3 * sizeof(int));
   fold_position(folded_pos, img);
 
@@ -129,14 +129,14 @@ int calc_angledist_force(Particle *p_mid, Particle *p_left, Particle *p_right,
   double cosine = 0.0, vec1[3], vec2[3], fac = 0.0, f1 = 0.0, f2 = 0.0;
 
   /* vector from p_left to p_mid */
-  get_mi_vector(vec1, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec1, p_mid->pos(), p_left->pos());
   const double dist12 = sqrlen(vec1);
   const double d1i = 1.0 / sqrt(dist12);
   for (int j = 0; j < 3; j++)
     vec1[j] *= d1i;
 
   /* vector from p_mid to p_right */
-  get_mi_vector(vec2, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec2, p_right->pos(), p_mid->pos());
   const double dist22 = sqrlen(vec2);
   const double d2i = 1.0 / sqrt(dist22);
   for (int j = 0; j < 3; j++)
@@ -179,13 +179,13 @@ int angledist_energy(Particle *p_mid, Particle *p_left, Particle *p_right,
   double vec1[3], vec2[3];
 
   /* vector from p_mid to p_left */
-  get_mi_vector(vec1, p_mid->r.p, p_left->r.p);
+  get_mi_vector(vec1, p_mid->pos(), p_left->pos());
   dist1 = sqrlen(vec1);
   d1i = 1.0 / sqrt(dist1);
   for (j = 0; j < 3; j++)
     vec1[j] *= d1i;
   /* vector from p_right to p_mid */
-  get_mi_vector(vec2, p_right->r.p, p_mid->r.p);
+  get_mi_vector(vec2, p_right->pos(), p_mid->pos());
   dist2 = sqrlen(vec2);
   d2i = 1.0 / sqrt(dist2);
   for (j = 0; j < 3; j++)

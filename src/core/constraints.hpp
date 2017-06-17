@@ -22,7 +22,7 @@ inline void add_constraints_forces(Particle *p) {
   // position
   int image[3];
   double pos[3];
-  memcpy(pos, p->r.p, 3 * sizeof(double));
+  memcpy(pos, p->pos(), 3 * sizeof(double));
   memcpy(image, p->l.i, 3 * sizeof(int));
 
   fold_position(pos, image);
@@ -41,11 +41,11 @@ inline void add_constraints_energy(Particle *p) {
 
   int image[3];
   double pos[3];
-  memcpy(pos, p->r.p, 3 * sizeof(double));
+  memcpy(pos, p->pos(), 3 * sizeof(double));
   memcpy(image, p->l.i, 3 * sizeof(int));
   fold_position(pos, image);
   for (auto const &c : Constraints::constraints) {
-    c->add_energy(p, p->r.p, energy);
+    c->add_energy(p, p->pos(), energy);
   }
 }
 

@@ -25,7 +25,7 @@ void local_rotate_system(double phi, double theta, double alpha)
         
     for(i = 0; i < np; i++) {
       for (int j=0;j<3;j++){
-        com[j]+=part[i].r.p[j];
+        com[j]+=part[i].pos()[j];
       }
       N++;
     }
@@ -48,14 +48,14 @@ void local_rotate_system(double phi, double theta, double alpha)
     for(i = 0; i < np; i++) {
       // Move the center of mass of the system to the origin
       for (int j=0;j<3;j++){
-        part[i].r.p[j]-=com[j];
+        part[i].pos()[j]-=com[j];
       }
       // Rotate
       double res[3];
-      vec_rotate(axis,alpha,part[i].r.p,res);
+      vec_rotate(axis,alpha,part[i].pos(),res);
       // Write back result and shift back the center of mass
       for (int j=0;j<3;j++){
-        part[i].r.p[j]=com[j]+res[j];
+        part[i].pos()[j]=com[j]+res[j];
       }
       #ifdef ROTATION
         rotate_particle(part+i,axis,alpha);

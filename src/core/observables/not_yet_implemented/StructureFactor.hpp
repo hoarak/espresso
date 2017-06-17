@@ -23,7 +23,7 @@ int ObservableStructureFactor::actual_calculate() {
   float partCache[n_part*3];
   for(int p=0; p<n_part; p++) {
     for (int i=0;i<3;i++){
-      partCache[3*p+i]=partCfg[p].r.p[i];
+      partCache[3*p+i]=partCfg[p].pos()[i];
     }
   }
   //printf("n: %d, dim_sf: %d\n",n_A, params.dim_sf); fflush(stdout);
@@ -35,7 +35,7 @@ int ObservableStructureFactor::actual_calculate() {
 	  C_sum = S_sum = 0.0;
 	  //printf("l: %d, n: %d %d %d\n",l,i,j,k); fflush(stdout);
 	  for(int p=0; p<n_part; p++) {
-	    //qr = twoPI_L * ( i*partCfg[p].r.p[0] + j*partCfg[p].r.p[1] + k*partCfg[p].r.p[2] );
+	    //qr = twoPI_L * ( i*partCfg[p].pos()[0] + j*partCfg[p].pos()[1] + k*partCfg[p].pos()[2] );
 	    qr = twoPI_L * ( i*partCache[3*p+0] + j*partCache[3*p+1] + k*partCache[3*p+2] );
 	    C_sum+= scattering_length * cos(qr);
 	    S_sum-= scattering_length * sin(qr);

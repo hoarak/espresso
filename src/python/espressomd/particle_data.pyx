@@ -158,7 +158,7 @@ cdef class ParticleHandle(object):
             cdef int img[3]
             for i in range(3):
                 img[i]=self.particle_data.l.i[i]
-                ppos[i]=self.particle_data.r.p[i]
+                ppos[i]=self.particle_data.pos()[i]
 
             unfold_position(ppos,img)
             return np.array([ppos[0],ppos[1],ppos[2]])

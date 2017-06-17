@@ -157,14 +157,14 @@ void init_particle(Particle *part)
 #endif
 
   /* ParticlePosition */
-  part->r.p[0]     = 0.0;
-  part->r.p[1]     = 0.0;
-  part->r.p[2]     = 0.0;
+  part->pos()[0]     = 0.0;
+  part->pos()[1]     = 0.0;
+  part->pos()[2]     = 0.0;
 
 #ifdef BOND_CONSTRAINT
-  part->r.p_old[0] = 0.0;
-  part->r.p_old[1] = 0.0;
-  part->r.p_old[2] = 0.0;
+  part->pos()_old[0] = 0.0;
+  part->pos()_old[1] = 0.0;
+  part->pos()_old[2] = 0.0;
 #endif
 
 #ifdef ROTATION
@@ -353,7 +353,7 @@ int updatePartCfg(int bonds_flag)
   else
     mpi_get_particles(partCfg,&partCfg_bl);
   for(j=0; j<n_part; j++)
-    unfold_position(partCfg[j].r.p, partCfg[j].m.v, partCfg[j].l.i);
+    unfold_position(partCfg[j].pos(), partCfg[j].m.v, partCfg[j].l.i);
   partCfgSorted = 0;
 #ifdef VIRTUAL_SITES
 
@@ -1375,10 +1375,10 @@ void local_place_particle(int part, double p[3], int _new)
   pt->m.v[2] += vv[2];  
 #endif
 
-  memmove(pt->r.p, pp, 3*sizeof(double));
+  memmove(pt->pos(), pp, 3*sizeof(double));
   memmove(pt->l.i, i, 3*sizeof(int));
 #ifdef BOND_CONSTRAINT
-  memmove(pt->r.p_old, pp, 3*sizeof(double));
+  memmove(pt->pos()_old, pp, 3*sizeof(double));
 #endif
 }
 
@@ -1411,11 +1411,11 @@ void local_rescale_particles(int dir, double scale) {
     for(j = 0; j < cell->n; j++) {
       p1 = &p[j];
       if(dir < 3)
-	p1->r.p[dir] *= scale;
+	p1->pos()[dir] *= scale;
       else {
-	p1->r.p[0] *= scale;
-	p1->r.p[1] *= scale;
-	p1->r.p[2] *= scale;
+	p1->pos()[0] *= scale;
+	p1->pos()[1] *= scale;
+	p1->pos()[2] *= scale;
       }
     }
   }

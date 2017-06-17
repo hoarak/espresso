@@ -393,7 +393,7 @@ void layered_topology_init(CellPList *old) {
     part = old->cell[c]->part;
     np = old->cell[c]->n;
     for (p = 0; p < np; p++) {
-      Cell *nc = layered_position_to_cell(part[p].r.p);
+      Cell *nc = layered_position_to_cell(part[p].pos());
       /* particle does not belong to this node. Just stow away
          somewhere for the moment */
       if (nc == NULL)
@@ -413,18 +413,18 @@ static void layered_append_particles(ParticleList *pl, ParticleList *up,
 
   CELL_TRACE(fprintf(stderr, "%d: sorting in %d\n", this_node, pl->n));
   for (p = 0; p < pl->n; p++) {
-    fold_position(pl->part[p].r.p, pl->part[p].m.v, pl->part[p].l.i);
+    fold_position(pl->part[p].pos(), pl->part[p].m.v, pl->part[p].l.i);
 
-    if (LAYERED_BTM_NEIGHBOR && pl->part[p].r.p[2] < my_left[2]) {
+    if (LAYERED_BTM_NEIGHBOR && pl->part[p].pos()[2] < my_left[2]) {
       CELL_TRACE(fprintf(stderr, "%d: leaving part %d for node below\n",
                          this_node, pl->part[p].id()));
       move_indexed_particle(dn, pl, p);
-    } else if (LAYERED_TOP_NEIGHBOR && pl->part[p].r.p[2] >= my_right[2]) {
+    } else if (LAYERED_TOP_NEIGHBOR && pl->part[p].pos()[2] >= my_right[2]) {
       CELL_TRACE(fprintf(stderr, "%d: leaving part %d for node above\n",
                          this_node, pl->part[p].id()));
       move_indexed_particle(up, pl, p);
     } else
-      move_indexed_particle(layered_position_to_cell(pl->part[p].r.p), pl, p);
+      move_indexed_particle(layered_position_to_cell(pl->part[p].pos()), pl, p);
     /* same particle again, as this is now a new one */
     if (p < pl->n)
       p--;
@@ -454,14 +454,14 @@ void layered_exchange_and_sort_particles(int global_flag) {
     for (p = 0; p < oc->n; p++) {
       part = &oc->part[p];
 
-      if (n_nodes != 1 && LAYERED_BTM_NEIGHBOR && part->r.p[2] < my_left[2]) {
+      if (n_nodes != 1 && LAYERED_BTM_NEIGHBOR && part->pos()[2] < my_left[2]) {
         CELL_TRACE(fprintf(stderr, "%d: send part %d down\n", this_node,
                            part->id()));
         move_indexed_particle(&send_buf_dn, oc, p);
         if (p < oc->n)
           p--;
       } else if (n_nodes != 1 && LAYERED_TOP_NEIGHBOR &&
-                 part->r.p[2] >= my_right[2]) {
+                 part->pos()[2] >= my_right[2]) {
         CELL_TRACE(fprintf(stderr, "%d: send part %d up\n", this_node,
                            part->id()));
         move_indexed_particle(&send_buf_up, oc, p);
@@ -469,9 +469,9 @@ void layered_exchange_and_sort_particles(int global_flag) {
           p--;
       } else {
         /* particle stays here. Fold anyways to get x,y correct */
-        fold_position(part->r.p, part->m.v, part->l.i);
+        fold_position(part->pos(), part->m.v, part->l.i);
 
-        nc = layered_position_to_cell(part->r.p);
+        nc = layered_position_to_cell(part->pos());
         if (nc != oc) {
           move_indexed_particle(nc, oc, p);
           if (p < oc->n)
@@ -585,13 +585,13 @@ void layered_calculate_ia() {
       p1 = &pl[i];
 
       if (rebuild_verletlist)
-        memcpy(p1->l.p_old, p1->r.p, 3 * sizeof(double));
+        memcpy(p1->l.p_old, p1->pos(), 3 * sizeof(double));
 
       add_single_particle_force(p1);
 
       /* cell itself and bonded / constraints */
       for (j = i + 1; j < npl; j++) {
-        layered_get_mi_vector(d, p1->r.p, pl[j].r.p);
+        layered_get_mi_vector(d, p1->pos(), pl[j].pos());
         dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
         if (do_nonbonded(p1, &pl[j]))
@@ -601,7 +601,7 @@ void layered_calculate_ia() {
 
       /* bottom neighbor */
       for (j = 0; j < npb; j++) {
-        layered_get_mi_vector(d, p1->r.p, pb[j].r.p);
+        layered_get_mi_vector(d, p1->pos(), pb[j].pos());
         dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
         if (do_nonbonded(p1, &pb[j]))
@@ -636,13 +636,13 @@ void layered_calculate_energies() {
       p1 = &pl[i];
 
       if (rebuild_verletlist)
-        memcpy(p1->l.p_old, p1->r.p, 3 * sizeof(double));
+        memcpy(p1->l.p_old, p1->pos(), 3 * sizeof(double));
 
       add_single_particle_energy(p1);
 
       /* cell itself and bonded / constraints */
       for (j = i + 1; j < npl; j++) {
-        layered_get_mi_vector(d, p1->r.p, pl[j].r.p);
+        layered_get_mi_vector(d, p1->pos(), pl[j].pos());
         dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
         if (do_nonbonded(p1, &pl[j]))
@@ -652,7 +652,7 @@ void layered_calculate_energies() {
 
       /* bottom neighbor */
       for (j = 0; j < npb; j++) {
-        layered_get_mi_vector(d, p1->r.p, pb[j].r.p);
+        layered_get_mi_vector(d, p1->pos(), pb[j].pos());
         dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
         if (do_nonbonded(p1, &pb[j]))
@@ -684,7 +684,7 @@ void layered_calculate_virials(int v_comp) {
       p1 = &pl[i];
 
       if (rebuild_verletlist)
-        memcpy(p1->l.p_old, p1->r.p, 3 * sizeof(double));
+        memcpy(p1->l.p_old, p1->pos(), 3 * sizeof(double));
 
       add_kinetic_virials(p1, v_comp);
 
@@ -698,7 +698,7 @@ void layered_calculate_virials(int v_comp) {
 
       /* cell itself and bonded / constraints */
       for (j = i + 1; j < npl; j++) {
-        layered_get_mi_vector(d, p1->r.p, pl[j].r.p);
+        layered_get_mi_vector(d, p1->pos(), pl[j].pos());
         dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
         if (do_nonbonded(p1, &pl[j]))
@@ -708,7 +708,7 @@ void layered_calculate_virials(int v_comp) {
 
       /* bottom neighbor */
       for (j = 0; j < npb; j++) {
-        layered_get_mi_vector(d, p1->r.p, pb[j].r.p);
+        layered_get_mi_vector(d, p1->pos(), pb[j].pos());
         dist2 = sqrlen(d);
 #ifdef EXCLUSIONS
         if (do_nonbonded(p1, &pb[j]))

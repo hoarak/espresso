@@ -12,9 +12,9 @@ int ObservableDipoleMoment::actual_calculate() {
     if (ids->e[i] > n_part)
       return 1;
     charge = partCfg[ids->e[i]].p.q;
-    j[0] += charge * partCfg[ids->e[i]].r.p[0];
-    j[1] += charge * partCfg[ids->e[i]].r.p[1];
-    j[2] += charge * partCfg[ids->e[i]].r.p[2];
+    j[0] += charge * partCfg[ids->e[i]].pos()[0];
+    j[1] += charge * partCfg[ids->e[i]].pos()[1];
+    j[2] += charge * partCfg[ids->e[i]].pos()[2];
   }
   A[0]=j[0];
   A[1]=j[1];

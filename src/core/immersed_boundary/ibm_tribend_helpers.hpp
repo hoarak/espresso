@@ -37,7 +37,7 @@ inline void Subtr(Vector3D &res, const Vector3D &a, const Vector3D &b)
 
 inline void Subtr(Vector3D &res, const Particle *const a, const Particle *const b)
 {
-  get_mi_vector_const(res.el, a->r.p, b->r.p);
+  get_mi_vector_const(res.el, a->pos(), b->pos());
 }
 
 // LengthSqr

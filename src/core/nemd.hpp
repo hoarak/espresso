@@ -144,11 +144,11 @@ inline void nemd_get_velocity(Particle part) {
     return;
 
   /* calculate slab_num */
-  slab_num = part.r.p[2] * nemddata.invthickness;
+  slab_num = part.pos()[2] * nemddata.invthickness;
   /* THIS IS A SINGLE NODE CORRECTION !!! */
   if (slab_num == nemddata.n_slabs)
     slab_num = 0;
-  if (part.r.p[2] < 0.0)
+  if (part.pos()[2] < 0.0)
     slab_num = nemddata.n_slabs - 1;
   slab = &nemddata.slab[slab_num];
 
@@ -218,7 +218,7 @@ inline void nemd_add_velocity(Particle *part) {
     int slab_num;
     Slab *slab;
 
-    slab_num = part->r.p[2] * nemddata.invthickness;
+    slab_num = part->pos()[2] * nemddata.invthickness;
     slab = &nemddata.slab[slab_num];
 
     if (slab_num == nemddata.top_slab || slab_num == nemddata.mid_slab) {

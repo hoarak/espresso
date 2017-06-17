@@ -665,18 +665,18 @@ int dd_append_particles(ParticleList *pl, int fold_dir)
 
   for(p=0; p<pl->n; p++) {
     if(boundary[fold_dir] != 0){
-      fold_coordinate(pl->part[p].r.p, pl->part[p].m.v, pl->part[p].l.i, fold_coord);
+      fold_coordinate(pl->part[p].pos(), pl->part[p].m.v, pl->part[p].l.i, fold_coord);
     }    
 
     for(dir=0;dir<3;dir++) {
-      cpos[dir] = (int)((pl->part[p].r.p[dir]-my_left[dir])*dd.inv_cell_size[dir])+1;
+      cpos[dir] = (int)((pl->part[p].pos()[dir]-my_left[dir])*dd.inv_cell_size[dir])+1;
 
       if (cpos[dir] < 1) { 
         cpos[dir] = 1;
         if( PERIODIC(dir) )
           {
             flag=1;
-            CELL_TRACE(if(fold_coord==2){fprintf(stderr, "%d: dd_append_particles: particle %d (%f,%f,%f) not inside node domain.\n", this_node,pl->part[p].id(),pl->part[p].r.p[0],pl->part[p].r.p[1],pl->part[p].r.p[2]);});
+            CELL_TRACE(if(fold_coord==2){fprintf(stderr, "%d: dd_append_particles: particle %d (%f,%f,%f) not inside node domain.\n", this_node,pl->part[p].id(),pl->part[p].pos()[0],pl->part[p].pos()[1],pl->part[p].pos()[2]);});
           }
       }
       else if (cpos[dir] > dd.cell_grid[dir]) {
@@ -684,7 +684,7 @@ int dd_append_particles(ParticleList *pl, int fold_dir)
         if( PERIODIC(dir) )
           {
             flag=1;
-            CELL_TRACE(if(fold_coord==2){fprintf(stderr, "%d: dd_append_particles: particle %d (%f,%f,%f) not inside node domain.\n", this_node,pl->part[p].id(),pl->part[p].r.p[0],pl->part[p].r.p[1],pl->part[p].r.p[2]);});
+            CELL_TRACE(if(fold_coord==2){fprintf(stderr, "%d: dd_append_particles: particle %d (%f,%f,%f) not inside node domain.\n", this_node,pl->part[p].id(),pl->part[p].pos()[0],pl->part[p].pos()[1],pl->part[p].pos()[2]);});
           }
       }
     }
@@ -876,7 +876,7 @@ void dd_topology_init(CellPList *old)
     part = old->cell[c]->part;
     np   = old->cell[c]->n;
     for (p = 0; p < np; p++) {
-      Cell *nc = dd_save_position_to_cell(part[p].r.p);
+      Cell *nc = dd_save_position_to_cell(part[p].pos());
       /* particle does not belong to this node. Just stow away
          somewhere for the moment */
       if (nc == NULL)
@@ -949,7 +949,7 @@ void  dd_exchange_and_sort_particles(int global_flag)
 	    /* Move particles to the left side */
 	    // Without the factor 0.5 in front of ROUND_ERROR_PREC, particles sitting exactly on the boundary 
 	    // may be accepted (i.e. not sent) here and rejected later on by dd_save_position_to_cell
-	    if(part->r.p[dir] - my_left[dir] < -0.5*ROUND_ERROR_PREC*box_l[dir]) {
+	    if(part->pos()[dir] - my_left[dir] < -0.5*ROUND_ERROR_PREC*box_l[dir]) {
 	      if( PERIODIC(dir) || (boundary[2*dir]==0) ) 
 		{
 		  CELL_TRACE(fprintf(stderr,"%d: dd_ex_and_sort_p: send part left %d\n",this_node,part->id()));
@@ -960,7 +960,7 @@ void  dd_exchange_and_sort_particles(int global_flag)
 	    }
 	    /* Move particles to the right side */
 	    // Factor 0.5 see above
-	    else if(part->r.p[dir] - my_right[dir] >= 0.5*ROUND_ERROR_PREC*box_l[dir]) {
+	    else if(part->pos()[dir] - my_right[dir] >= 0.5*ROUND_ERROR_PREC*box_l[dir]) {
 	      if( PERIODIC(dir) || (boundary[2*dir+1]==0) ) 
 		{
 		  CELL_TRACE(fprintf(stderr,"%d: dd_ex_and_sort_p: send part right %d\n",this_node,part->id()));
@@ -971,12 +971,12 @@ void  dd_exchange_and_sort_particles(int global_flag)
 	    }
 	    /* Sort particles in cells of this node during last direction */
 	    else if(dir==2) {
-	      sort_cell = dd_save_position_to_cell(part->r.p);
+	      sort_cell = dd_save_position_to_cell(part->pos());
 	      if(sort_cell != cell) {
 		if(sort_cell==NULL) {
 		  CELL_TRACE(fprintf(stderr,"%d: dd_exchange_and_sort_particles: Take another loop",this_node));
 		  CELL_TRACE(fprintf(stderr, "%d: dd_exchange_and_sort_particles: CP1 Particle %d (%f,%f,%f) not inside node domain.\n",
-				     this_node,part->id(),part->r.p[0],part->r.p[1],part->r.p[2]));		 
+				     this_node,part->id(),part->pos()[0],part->pos()[1],part->pos()[2]));		 
 		  finished=0;
 		  sort_cell = local_cells.cell[0];
 		  if(sort_cell != cell) {
@@ -1054,14 +1054,14 @@ void  dd_exchange_and_sort_particles(int global_flag)
 	  for (p = 0; p < cell->n; p++) {
 	    part = &cell->part[p];
 	    if( PERIODIC(dir) ) {
-              fold_coordinate(part->r.p, part->m.v, part->l.i, dir);
+              fold_coordinate(part->pos(), part->m.v, part->l.i, dir);
             }
 	    if (dir==2) {
-	      sort_cell = dd_save_position_to_cell(part->r.p);
+	      sort_cell = dd_save_position_to_cell(part->pos());
 	      if(sort_cell != cell) {
 		if(sort_cell==NULL) {
 		  CELL_TRACE(fprintf(stderr, "%d: dd_exchange_and_sort_particles: CP2 Particle %d (%f,%f,%f) not inside node domain.\n",
-				     this_node,part->id(),part->r.p[0],part->r.p[1],part->r.p[2]));
+				     this_node,part->id(),part->pos()[0],part->pos()[1],part->pos()[2]));
 		  finished=0;
 		  sort_cell = local_cells.cell[0];
 		  if(sort_cell != cell) {
@@ -1101,9 +1101,9 @@ void  dd_exchange_and_sort_particles(int global_flag)
 	cell = local_cells.cell[0];
 	for (p = 0; p < cell->n; p++) {
 	  part = &cell->part[p];
-	  if(dir < 3 && (part->r.p[dir] < my_left[dir] || part->r.p[dir] > my_right[dir]))
+	  if(dir < 3 && (part->pos()[dir] < my_left[dir] || part->pos()[dir] > my_right[dir]))
 	    for (i = 0; i < 3; i++)
-	      part->r.p[i] = 0;
+	      part->pos()[i] = 0;
 	}
       }
     }
@@ -1163,7 +1163,7 @@ void calc_link_cell()
 	if(n == 0) {
           add_single_particle_force(&p1[i]);
 	  if (rebuild_verletlist)
-	    memcpy(p1[i].l.p_old, p1[i].r.p, 3*sizeof(double));
+	    memcpy(p1[i].l.p_old, p1[i].pos(), 3*sizeof(double));
 
 	  j_start = i+1;
 	}
@@ -1173,7 +1173,7 @@ void calc_link_cell()
           if(do_nonbonded(&p1[i], &p2[j]))
 #endif
 	    {
-	      dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
+	      dist2 = distance2vec(p1[i].pos(), p2[j].pos(), vec21);
 	      add_non_bonded_pair_force(&(p1[i]), &(p2[j]), vec21, sqrt(dist2), dist2);
 	    }
 	}
@@ -1205,7 +1205,7 @@ void calculate_link_cell_energies()
       add_single_particle_energy(&p1[i]);
       
       if (rebuild_verletlist)
-        memcpy(p1[i].l.p_old, p1[i].r.p, 3*sizeof(double));
+        memcpy(p1[i].l.p_old, p1[i].pos(), 3*sizeof(double));
     }
 
     CELL_TRACE(fprintf(stderr,"%d: cell %d with %d neighbors\n",this_node,c, dd.cell_inter[c].n_neighbors));
@@ -1224,7 +1224,7 @@ void calculate_link_cell_energies()
           if(do_nonbonded(&p1[i], &p2[j]))
 #endif
 	    {
-	      dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
+	      dist2 = distance2vec(p1[i].pos(), p2[j].pos(), vec21);
 	      add_non_bonded_pair_energy(&(p1[i]), &(p2[j]), vec21, sqrt(dist2), dist2);
 	    }
 	}
@@ -1262,7 +1262,7 @@ void calculate_link_cell_virials(int v_comp)
       add_three_body_bonded_stress(&p1[i]);
 #endif
       if (rebuild_verletlist)
-        memcpy(p1[i].l.p_old, p1[i].r.p, 3*sizeof(double));
+        memcpy(p1[i].l.p_old, p1[i].pos(), 3*sizeof(double));
     }
 
     CELL_TRACE(fprintf(stderr,"%d: cell %d with %d neighbors\n",this_node,c, dd.cell_inter[c].n_neighbors));
@@ -1281,7 +1281,7 @@ void calculate_link_cell_virials(int v_comp)
           if(do_nonbonded(&p1[i], &p2[j]))
 #endif
 	    {
-	      dist2 = distance2vec(p1[i].r.p, p2[j].r.p, vec21);
+	      dist2 = distance2vec(p1[i].pos(), p2[j].pos(), vec21);
 	      add_non_bonded_pair_virials(&(p1[i]), &(p2[j]), vec21, sqrt(dist2), dist2);
 	    }
 	}

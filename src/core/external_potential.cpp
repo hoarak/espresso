@@ -243,11 +243,11 @@ void add_external_potential_tabulated_forces(ExternalPotential* e, Particle* p) 
   double field[3];
   double ppos[3];
   int    img[3];
-  memmove(ppos, p->r.p, 3*sizeof(double));
-  memmove(img, p->r.p, 3*sizeof(int));
+  memmove(ppos, p->pos(), 3*sizeof(double));
+  memmove(img, p->pos(), 3*sizeof(int));
   fold_position(ppos, img);
  
-  e->tabulated.potential.interpolate_gradient(p->r.p, field);
+  e->tabulated.potential.interpolate_gradient(p->pos(), field);
   p->f.f[0]-=e->scale[p->p.type]*field[0];
   p->f.f[1]-=e->scale[p->p.type]*field[1];
   p->f.f[2]-=e->scale[p->p.type]*field[2];
@@ -273,11 +273,11 @@ void add_external_potential_tabulated_energy(ExternalPotential* e, Particle* p) 
   double potential;
   double ppos[3];
   int img[3];
-  memmove(ppos, p->r.p, 3*sizeof(double));
-  memmove(img, p->r.p, 3*sizeof(int));
+  memmove(ppos, p->pos(), 3*sizeof(double));
+  memmove(img, p->pos(), 3*sizeof(int));
   fold_position(ppos, img);
  
-  e->tabulated.potential.interpolate(p->r.p, &potential);
+  e->tabulated.potential.interpolate(p->pos(), &potential);
   e->energy += e->scale[p->p.type] * potential;
 }
 

@@ -89,7 +89,7 @@ double calc_mol_hydro_radius(Molecule mol)
     id1 = mol.part.e[i];
     for(j=i+1; j<mol.part.n; j++) {
       id2 = mol.part.e[i];
-      vecsub(partCfg[id1].r.p, partCfg[id2].r.p, diff_vec);
+      vecsub(partCfg[id1].pos(), partCfg[id2].pos(), diff_vec);
       rh += 1.0/sqrt(sqrlen(diff_vec));
     }
   }
@@ -106,7 +106,7 @@ void calc_mol_center_of_mass(Molecule mol, double com[3])
 
   for(i=0; i<mol.part.n; i++) {
     id = mol.part.e[i];
-    for(j=0; j<3; j++) com[j]+= partCfg[id].r.p[j]*(partCfg[id]).p.mass;
+    for(j=0; j<3; j++) com[j]+= partCfg[id].pos()[j]*(partCfg[id]).p.mass;
     M += (partCfg[id]).p.mass;
   }
     for(j=0; j<3; j++) com[j] /= M;
@@ -123,7 +123,7 @@ double calc_mol_gyr_radius2(Molecule mol)
 
   for(i=0; i<mol.part.n; i++) {
     id = mol.part.e[i];
-    vecsub(partCfg[id].r.p, com, diff_vec);
+    vecsub(partCfg[id].pos(), com, diff_vec);
     rg += sqrlen(diff_vec);
     M += (partCfg[id]).p.mass;
   }
