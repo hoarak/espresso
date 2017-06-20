@@ -10,15 +10,16 @@
 namespace Constraints {
 
 Vector3d ShapeBasedConstraint::total_force() const {
-    Vector3d total_force;
-    boost::mpi::all_reduce(comm_cart, m_local_force, total_force,
-            std::plus<Vector3d>());                                                                         
+  Vector3d total_force;
+  boost::mpi::all_reduce(comm_cart, m_local_force, total_force,
+                         std::plus<Vector3d>());
 
-    return total_force;
+  return total_force;
 }
 
-void ShapeBasedConstraint::reflect_particle(Particle *p, const double *distance_vector,
-                                  const double *folded_pos) const {
+void ShapeBasedConstraint::reflect_particle(Particle *p,
+                                            const double *distance_vector,
+                                            const double *folded_pos) const {
   double vec[3];
   double norm;
 
@@ -57,7 +58,7 @@ void ShapeBasedConstraint::reflect_particle(Particle *p, const double *distance_
 
 void ShapeBasedConstraint::add_force(Particle *p, double *folded_pos) {
   double dist, vec[3], force[3], torque1[3], torque2[3];
-  Particle part_rep;
+  Particle part_rep{-1};
   part_rep.p.type = m_type;
 
   IA_parameters *ia_params = get_ia_param(p->p.type, part_rep.p.type);
@@ -92,8 +93,8 @@ void ShapeBasedConstraint::add_force(Particle *p, double *folded_pos) {
         reflect_particle(p, vec, folded_pos);
       } else {
         runtimeErrorMsg() << "Constraint"
-                          << " violated by particle " << p->id()
-                          << " dist " << dist;
+                          << " violated by particle " << p->id() << " dist "
+                          << dist;
       }
     }
   }
@@ -108,11 +109,11 @@ void ShapeBasedConstraint::add_force(Particle *p, double *folded_pos) {
 }
 
 void ShapeBasedConstraint::add_energy(Particle *p, double *folded_pos,
-                            Observable_stat &energy) const {
+                                      Observable_stat &energy) const {
   double dist, vec[3];
   IA_parameters *ia_params;
   double nonbonded_en = 0.0;
-  Particle part_rep;
+  Particle part_rep{-1};
   part_rep.p.type = m_type;
 
   ia_params = get_ia_param(p->p.type, part_rep.p.type);

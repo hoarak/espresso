@@ -25,9 +25,9 @@
     see \ref particle_data.cpp "particle_data.c"
 */
 
+#include "Vector.hpp"
 #include "config.hpp"
 #include "utils.hpp"
-#include "Vector.hpp"
 
 /************************************************
  * defines
@@ -78,8 +78,9 @@
     needed in the interaction calculation, but are just copies of
     particles stored on different nodes.
 */
-typedef struct ParticleProperties ParticleProperties;
 struct ParticleProperties {
+  ParticleProperties() : identity{-1} {}
+  ParticleProperties(int id) : identity{id} {}
   /** unique identifier for the particle. */
   int identity;
   /** Molecule identifier. */
@@ -212,28 +213,32 @@ struct ParticleProperties {
     communicated to calculate interactions with ghost particles. */
 struct ParticlePosition {
   /* Position, folded up to skin */
-  double(&pos())[3] { return p; }
+  double (&pos())[3] { return p; }
+  double const (&pos() const)[3] { return p; }
 
 #ifdef ROTATION
-  /* Position, folded up to skin */
-  double(&quat_())[4] { return quat; }
+  double (&quat())[4] { return m_quat; }
+  double const (&quat() const)[4] { return m_quat; }
 
-  /* Position, folded up to skin */
-  double(&quatu_())[3] { return quatu; }
+  double (&quatu())[3] { return m_quatu; }
+  double const (&quatu() const)[3] { return m_quatu; }
 #endif
 
   /** periodically folded position. */
   double p[3];
 #ifdef ROTATION
   /** quaternions to define particle orientation */
-  double quat[4];
+  double m_quat[4];
   /** unit director calculated from the quaternions */
-  double quatu[3];
+  double m_quatu[3];
 #endif
 
 #ifdef DIPOLES
+  double (&dip())[3] { return m_dip; }
+  double const (&dip() const)[3] { return m_dip; }
+
   /** dipol moment. This is synchronized with quatu and quat. */
-  double dip[3];
+  double m_dip[3];
 #endif
 
 #ifdef BOND_CONSTRAINT
@@ -320,7 +325,14 @@ typedef struct {
 
 /** Struct holding all information for one particle. */
 struct Particle : public ParticlePosition {
+  Particle() = default;
+  Particle(int id) : p{id} {}
   int id() const { return p.identity; }
+
+  Particle &operator=(ParticlePosition const &rhs) {
+     ParticlePosition::operator=(rhs);
+     return *this;
+  }
 
   ///
   ParticleProperties p;

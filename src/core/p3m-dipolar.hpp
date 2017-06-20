@@ -180,9 +180,9 @@ inline double dp3m_add_pair_force(Particle *p1, Particle *p2,
     #endif
 
   //Calculate scalar multiplications for vectors mi, mj, rij
-  mimj = p1->r.dip[0]*p2->r.dip[0] + p1->r.dip[1]*p2->r.dip[1] + p1->r.dip[2]*p2->r.dip[2];
-  mir = p1->r.dip[0]*d[0] + p1->r.dip[1]*d[1] + p1->r.dip[2]*d[2];
-  mjr = p2->r.dip[0]*d[0] + p2->r.dip[1]*d[1] + p2->r.dip[2]*d[2];
+  mimj = p1->dip()[0]*p2->dip()[0] + p1->dip()[1]*p2->dip()[1] + p1->dip()[2]*p2->dip()[2];
+  mir = p1->dip()[0]*d[0] + p1->dip()[1]*d[1] + p1->dip()[2]*d[2];
+  mjr = p2->dip()[0]*d[0] + p2->dip()[1]*d[1] + p2->dip()[2]*d[2];
 
   coeff = 2.0*dp3m.params.alpha*wupii;
   dist2i = 1 / dist2;
@@ -198,21 +198,21 @@ inline double dp3m_add_pair_force(Particle *p1, Particle *p2,
 
   // Calculate real-space forces
   for(j=0;j<3;j++)
-    force[j] += coulomb.Dprefactor *((mimj*d[j] + p1->r.dip[j]*mjr + p2->r.dip[j]*mir) * C_r - mir*mjr*D_r*d[j]) ;
+    force[j] += coulomb.Dprefactor *((mimj*d[j] + p1->dip()[j]*mjr + p2->dip()[j]*mir) * C_r - mir*mjr*D_r*d[j]) ;
 
   //Calculate vector multiplications for vectors mi, mj, rij
 #ifdef ROTATION
-  mixmj[0] = p1->r.dip[1]*p2->r.dip[2] - p1->r.dip[2]*p2->r.dip[1];
-  mixmj[1] = p1->r.dip[2]*p2->r.dip[0] - p1->r.dip[0]*p2->r.dip[2];
-  mixmj[2] = p1->r.dip[0]*p2->r.dip[1] - p1->r.dip[1]*p2->r.dip[0];
+  mixmj[0] = p1->dip()[1]*p2->dip()[2] - p1->dip()[2]*p2->dip()[1];
+  mixmj[1] = p1->dip()[2]*p2->dip()[0] - p1->dip()[0]*p2->dip()[2];
+  mixmj[2] = p1->dip()[0]*p2->dip()[1] - p1->dip()[1]*p2->dip()[0];
 
-  mixr[0] = p1->r.dip[1]*d[2] - p1->r.dip[2]*d[1];
-  mixr[1] = p1->r.dip[2]*d[0] - p1->r.dip[0]*d[2];
-  mixr[2] = p1->r.dip[0]*d[1] - p1->r.dip[1]*d[0];
+  mixr[0] = p1->dip()[1]*d[2] - p1->dip()[2]*d[1];
+  mixr[1] = p1->dip()[2]*d[0] - p1->dip()[0]*d[2];
+  mixr[2] = p1->dip()[0]*d[1] - p1->dip()[1]*d[0];
 
-  mjxr[0] = p2->r.dip[1]*d[2] - p2->r.dip[2]*d[1];
-  mjxr[1] = p2->r.dip[2]*d[0] - p2->r.dip[0]*d[2];
-  mjxr[2] = p2->r.dip[0]*d[1] - p2->r.dip[1]*d[0];
+  mjxr[0] = p2->dip()[1]*d[2] - p2->dip()[2]*d[1];
+  mjxr[1] = p2->dip()[2]*d[0] - p2->dip()[0]*d[2];
+  mjxr[2] = p2->dip()[0]*d[1] - p2->dip()[1]*d[0];
 
   // Calculate real-space torques
   for(j=0;j<3;j++){
@@ -254,9 +254,9 @@ inline double dp3m_pair_energy(Particle *p1, Particle *p2,
 #endif
 
     //Calculate scalar multiplications for vectors mi, mj, rij
-    mimj = p1->r.dip[0]*p2->r.dip[0] + p1->r.dip[1]*p2->r.dip[1] + p1->r.dip[2]*p2->r.dip[2];
-    mir = p1->r.dip[0]*d[0] + p1->r.dip[1]*d[1] + p1->r.dip[2]*d[2];
-    mjr = p2->r.dip[0]*d[0] + p2->r.dip[1]*d[1] + p2->r.dip[2]*d[2];
+    mimj = p1->dip()[0]*p2->dip()[0] + p1->dip()[1]*p2->dip()[1] + p1->dip()[2]*p2->dip()[2];
+    mir = p1->dip()[0]*d[0] + p1->dip()[1]*d[1] + p1->dip()[2]*d[2];
+    mjr = p2->dip()[0]*d[0] + p2->dip()[1]*d[1] + p2->dip()[2]*d[2];
 
     coeff = 2.0*dp3m.params.alpha*wupii;
     dist2i = 1 / dist2;

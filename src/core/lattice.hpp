@@ -74,11 +74,6 @@ public:
 
     void *_data;/** pointer to the actual lattice data. This can be a contiguous field of arbitrary data. */
 
-    /** particle representation of this lattice. This is needed to
-     *  specify interactions between particles and the lattice.
-     *  Actually used are only the identity and the type. */
-    Particle part_rep;
-
     /* Constructor */
     Lattice() {}
 

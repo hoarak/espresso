@@ -96,8 +96,8 @@ void save_last_state()
     np   = local_cells.cell[c]->n;
     part = local_cells.cell[c]->part;
     for (i = 0; i < np; i++) {
-			memmove(&part[i].l.r_ls, &part[i].r, sizeof(ParticlePosition));
-			memmove(&part[i].l.m_ls, &part[i].m, sizeof(ParticleMomentum));
+      part[i].l.r_ls = static_cast<ParticlePosition>(part[i]);
+      part[i].l.m_ls = part[i].m;
 		}
 	}
 	
@@ -121,8 +121,8 @@ void load_last_state()
     np   = local_cells.cell[c]->n;
     part = local_cells.cell[c]->part;
     for (i = 0; i < np; i++) {
-			memmove(&part[i].r, &part[i].l.r_ls, sizeof(ParticlePosition));
-			memmove(&part[i].m, &part[i].l.m_ls, sizeof(ParticleMomentum));
+      part[i] = part[i].l.r_ls;
+      part[i].m = part[i].l.m_ls;
 		}
 	}
   //part = local_cells.cell[0]->part;

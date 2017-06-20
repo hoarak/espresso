@@ -168,20 +168,20 @@ void init_particle(Particle *part)
 #endif
 
 #ifdef ROTATION
-  part->r.quat[0]  = 1.0;
-  part->r.quat[1]  = 0.0;
-  part->r.quat[2]  = 0.0;
-  part->r.quat[3]  = 0.0;
+  part->quat()[0]  = 1.0;
+  part->quat()[1]  = 0.0;
+  part->quat()[2]  = 0.0;
+  part->quat()[3]  = 0.0;
 
-  part->r.quatu[0]  = 0.0;
-  part->r.quatu[1]  = 0.0;
-  part->r.quatu[2]  = 1.0;
+  part->quatu()[0]  = 0.0;
+  part->quatu()[1]  = 0.0;
+  part->quatu()[2]  = 1.0;
 #endif
 
 #ifdef DIPOLES
-  part->r.dip[0]    = 0.0;
-  part->r.dip[1]    = 0.0;
-  part->r.dip[2]    = 0.0;
+  part->dip()[0]    = 0.0;
+  part->dip()[1]    = 0.0;
+  part->dip()[2]    = 0.0;
   part->p.dipm      = 0.0;
 #endif
 
@@ -240,20 +240,20 @@ void init_particle(Particle *part)
   #endif
 
   #ifdef ROTATION
-    part->l.r_ls.quat[0]  = 1.0;
-    part->l.r_ls.quat[1]  = 0.0;
-    part->l.r_ls.quat[2]  = 0.0;
-    part->l.r_ls.quat[3]  = 0.0;
+    part->l.r_ls.quat()[0]  = 1.0;
+    part->l.r_ls.quat()[1]  = 0.0;
+    part->l.r_ls.quat()[2]  = 0.0;
+    part->l.r_ls.quat()[3]  = 0.0;
 
-    part->l.r_ls.quatu[0]  = 0.0;
-    part->l.r_ls.quatu[1]  = 0.0;
-    part->l.r_ls.quatu[2]  = 1.0;
+    part->l.r_ls.quatu()[0]  = 0.0;
+    part->l.r_ls.quatu()[1]  = 0.0;
+    part->l.r_ls.quatu()[2]  = 1.0;
   #endif
 
   #ifdef DIPOLES
-    part->l.r_ls.dip[0]    = 0.0;
-    part->l.r_ls.dip[1]    = 0.0;
-    part->l.r_ls.dip[2]    = 0.0;
+    part->l.r_ls.dip()[0]    = 0.0;
+    part->l.r_ls.dip()[1]    = 0.0;
+    part->l.r_ls.dip()[2]    = 0.0;
     //part->l.p_ls.dipm      = 0.0;
   #endif
 
@@ -1020,7 +1020,7 @@ int set_particle_omega_lab(int part, double omega_lab[3])
 
   double A[9];
   double omega[3];
-  Particle particle;
+  Particle particle{part};
 
   get_particle_data(part, &particle);
   define_rotation_matrix(&particle, A);
@@ -1070,7 +1070,7 @@ int set_particle_torque_lab(int part, double torque_lab[3])
 
   double A[9];
   double torque[3];
-  Particle particle;
+  Particle particle{part};
 
   get_particle_data(part, &particle);
   define_rotation_matrix(&particle, A);
@@ -2171,12 +2171,12 @@ void pointer_to_torque_lab(Particle* p, double*& res)
 
 void pointer_to_quat(Particle* p, double*& res)
 {
-  res=p->r.quat;
+  res=p->quat();
 }
 
 void pointer_to_quatu(Particle* p, double*& res)
 {
-  res=p->r.quatu;
+  res=p->quatu();
 }
 #endif
 
@@ -2213,7 +2213,7 @@ void pointer_to_smaller_timestep(Particle* p, int*&  res)
 #ifdef DIPOLES
 void pointer_to_dip(Particle* p, double*& res)
 {
-res=p->r.dip;
+res=p->dip();
 }
 
 void pointer_to_dipm(Particle* p, double*& res)

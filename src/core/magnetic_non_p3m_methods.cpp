@@ -58,9 +58,9 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
   r7=r5*r2;
  
   // Dot products
-  pe1=p1->r.dip[0]*p2->r.dip[0]+p1->r.dip[1]*p2->r.dip[1]+p1->r.dip[2]*p2->r.dip[2];
-  pe2=p1->r.dip[0]*dr[0]+p1->r.dip[1]*dr[1]+p1->r.dip[2]*dr[2];
-  pe3=p2->r.dip[0]*dr[0]+p2->r.dip[1]*dr[1]+p2->r.dip[2]*dr[2];
+  pe1=p1->dip()[0]*p2->dip()[0]+p1->dip()[1]*p2->dip()[1]+p1->dip()[2]*p2->dip()[2];
+  pe2=p1->dip()[0]*dr[0]+p1->dip()[1]*dr[1]+p1->dip()[2]*dr[2];
+  pe3=p2->dip()[0]*dr[0]+p2->dip()[1]*dr[1]+p2->dip()[2]*dr[2];
   pe4=3.0/r5;
 
   // Energy, if requested
@@ -75,9 +75,9 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
     d=pe4*pe2;
     
     //  Result
-    ffx=ab*dr[0]+cc*p1->r.dip[0]+d*p2->r.dip[0];
-    ffy=ab*dr[1]+cc*p1->r.dip[1]+d*p2->r.dip[1];
-    ffz=ab*dr[2]+cc*p1->r.dip[2]+d*p2->r.dip[2];
+    ffx=ab*dr[0]+cc*p1->dip()[0]+d*p2->dip()[0];
+    ffy=ab*dr[1]+cc*p1->dip()[1]+d*p2->dip()[1];
+    ffz=ab*dr[2]+cc*p1->dip()[2]+d*p2->dip()[2];
     // Add the force to the particles
     p1->f.f[0] +=coulomb.Dprefactor*ffx;
     p1->f.f[1] +=coulomb.Dprefactor*ffy;
@@ -98,22 +98,22 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
 
       // Torques
 #ifdef ROTATION
-    ax=p1->r.dip[1]*p2->r.dip[2]-p2->r.dip[1]*p1->r.dip[2];
-    ay=p2->r.dip[0]*p1->r.dip[2]-p1->r.dip[0]*p2->r.dip[2];
-    az=p1->r.dip[0]*p2->r.dip[1]-p2->r.dip[0]*p1->r.dip[1];
+    ax=p1->dip()[1]*p2->dip()[2]-p2->dip()[1]*p1->dip()[2];
+    ay=p2->dip()[0]*p1->dip()[2]-p1->dip()[0]*p2->dip()[2];
+    az=p1->dip()[0]*p2->dip()[1]-p2->dip()[0]*p1->dip()[1];
     
-    bx=p1->r.dip[1]*dr[2]-dr[1]*p1->r.dip[2];
-    by=dr[0]*p1->r.dip[2]-p1->r.dip[0]*dr[2];
-    bz=p1->r.dip[0]*dr[1]-dr[0]*p1->r.dip[1];
+    bx=p1->dip()[1]*dr[2]-dr[1]*p1->dip()[2];
+    by=dr[0]*p1->dip()[2]-p1->dip()[0]*dr[2];
+    bz=p1->dip()[0]*dr[1]-dr[0]*p1->dip()[1];
     
     p1->f.torque[0]+=coulomb.Dprefactor*(-ax/r3+bx*cc);
     p1->f.torque[1]+=coulomb.Dprefactor *(-ay/r3+by*cc);
     p1->f.torque[2]+=coulomb.Dprefactor*(-az/r3+bz*cc);
     
     // 2nd particle     
-    bx=p2->r.dip[1]*dr[2]-dr[1]*p2->r.dip[2];
-    by=dr[0]*p2->r.dip[2]-p2->r.dip[0]*dr[2];
-    bz=p2->r.dip[0]*dr[1]-dr[0]*p2->r.dip[1];
+    bx=p2->dip()[1]*dr[2]-dr[1]*p2->dip()[2];
+    by=dr[0]*p2->dip()[2]-p2->dip()[0]*dr[2];
+    bz=p2->dip()[0]*dr[1]-dr[0]*p2->dip()[1];
 	     
     p2->f.torque[0]+=coulomb.Dprefactor* (ax/r3+bx*d);
     p2->f.torque[1]+=coulomb.Dprefactor*(ay/r3+by*d);
@@ -256,9 +256,9 @@ double  magnetic_dipolar_direct_sum_calculations(int force_flag, int energy_flag
     for(i=0;i<np;i++) {
       if( part[i].p.dipm != 0.0 ) {
        
-	mx[dip_particles]=part[i].r.dip[0];
-	my[dip_particles]=part[i].r.dip[1];
-	mz[dip_particles]=part[i].r.dip[2];
+	mx[dip_particles]=part[i].dip()[0];
+	my[dip_particles]=part[i].dip()[1];
+	mz[dip_particles]=part[i].dip()[2];
 
 	/* here we wish the coordinates to be folded into the primary box */
                   

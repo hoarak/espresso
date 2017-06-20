@@ -95,12 +95,12 @@ void EspressoSystemInterface::gatherParticles() {
 #ifdef DIPOLES
         if (needsDip())
           Dip.emplace_back(
-              Vector3{p[i].r.dip[0], p[i].r.dip[1], p[i].r.dip[2]});
+              Vector3{p[i].dip()[0], p[i].dip()[1], p[i].dip()[2]});
 #endif
 #ifdef ROTATION
         if (needsQuatu())
           Quatu.emplace_back(
-              Vector3{p[i].r.quatu[0], p[i].r.quatu[1], p[i].r.quatu[2]});
+              Vector3{p[i].quatu()[0], p[i].quatu()[1], p[i].quatu()[2]});
 #endif
       }
     }

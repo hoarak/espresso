@@ -2990,9 +2990,9 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
 #ifdef ENGINE
   if ( p->swim.swimming )
   {
-    velocity[0] -= (p->swim.v_swim*time_step)*p->r.quatu[0];
-    velocity[1] -= (p->swim.v_swim*time_step)*p->r.quatu[1];
-    velocity[2] -= (p->swim.v_swim*time_step)*p->r.quatu[2];
+    velocity[0] -= (p->swim.v_swim*time_step)*p->quatu()[0];
+    velocity[1] -= (p->swim.v_swim*time_step)*p->quatu()[1];
+    velocity[2] -= (p->swim.v_swim*time_step)*p->quatu()[2];
     p->swim.v_center[0] = interpolated_u[0];
     p->swim.v_center[1] = interpolated_u[1];
     p->swim.v_center[2] = interpolated_u[2];
@@ -3076,9 +3076,9 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
     // calculate source position
     double source_position[3];
     double direction = double(p->swim.push_pull) * p->swim.dipole_length;
-    source_position[0] = p->pos()[0] + direction * p->r.quatu[0];
-    source_position[1] = p->pos()[1] + direction * p->r.quatu[1];
-    source_position[2] = p->pos()[2] + direction * p->r.quatu[2];
+    source_position[0] = p->pos()[0] + direction * p->quatu()[0];
+    source_position[1] = p->pos()[1] + direction * p->quatu()[1];
+    source_position[2] = p->pos()[2] + direction * p->quatu()[2];
 
     int corner[3] = {0,0,0};
     fold_position( source_position , corner );
@@ -3088,9 +3088,9 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
     lb_lbfluid_get_interpolated_velocity(source_position, p->swim.v_source);
 
     // calculate and set force at source position
-    delta_j[0] = - p->swim.f_swim*p->r.quatu[0]*time_step*lbpar.tau/lbpar.agrid;
-    delta_j[1] = - p->swim.f_swim*p->r.quatu[1]*time_step*lbpar.tau/lbpar.agrid;
-    delta_j[2] = - p->swim.f_swim*p->r.quatu[2]*time_step*lbpar.tau/lbpar.agrid;
+    delta_j[0] = - p->swim.f_swim*p->quatu()[0]*time_step*lbpar.tau/lbpar.agrid;
+    delta_j[1] = - p->swim.f_swim*p->quatu()[1]*time_step*lbpar.tau/lbpar.agrid;
+    delta_j[2] = - p->swim.f_swim*p->quatu()[2]*time_step*lbpar.tau/lbpar.agrid;
 
     for (z=0;z<2;z++) {
       for (y=0;y<2;y++) {

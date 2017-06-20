@@ -11,9 +11,9 @@ int ObservableComDipoleMoment::actual_calculate() {
   for (int i = 0; i<ids->n; i++ ) {
     if (ids->e[i] > n_part)
       return 1;
-    d[0] += partCfg[ids->e[i]].r.dip[0];
-    d[1] += partCfg[ids->e[i]].r.dip[1];
-    d[2] += partCfg[ids->e[i]].r.dip[2];
+    d[0] += partCfg[ids->e[i]].dip()[0];
+    d[1] += partCfg[ids->e[i]].dip()[1];
+    d[2] += partCfg[ids->e[i]].dip()[2];
   }
   A[0]=d[0];
   A[1]=d[1];

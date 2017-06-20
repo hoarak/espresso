@@ -72,9 +72,9 @@ static void pack_particles(ParticleRange particles,
 #endif
 
 #ifdef DIPOLES
-    buffer[i].dip[0] = static_cast<float>(part.r.dip[0]);
-    buffer[i].dip[1] = static_cast<float>(part.r.dip[1]);
-    buffer[i].dip[2] = static_cast<float>(part.r.dip[2]);
+    buffer[i].dip[0] = static_cast<float>(part.dip()[0]);
+    buffer[i].dip[1] = static_cast<float>(part.dip()[1]);
+    buffer[i].dip[2] = static_cast<float>(part.dip()[2]);
 #endif
 
 #ifdef SHANCHEN
@@ -99,17 +99,17 @@ static void pack_particles(ParticleRange particles,
 #endif
 
 #ifdef ROTATION
-    buffer[i].quatu[0] = static_cast<float>(part.r.quatu[0]);
-    buffer[i].quatu[1] = static_cast<float>(part.r.quatu[1]);
-    buffer[i].quatu[2] = static_cast<float>(part.r.quatu[2]);
+    buffer[i].quatu[0] = static_cast<float>(part.quatu()[0]);
+    buffer[i].quatu[1] = static_cast<float>(part.quatu()[1]);
+    buffer[i].quatu[2] = static_cast<float>(part.quatu()[2]);
 #endif
 
 #ifdef ENGINE
     buffer[i].swim.v_swim = static_cast<float>(part.swim.v_swim);
     buffer[i].swim.f_swim = static_cast<float>(part.swim.f_swim);
-    buffer[i].swim.quatu[0] = static_cast<float>(part.r.quatu[0]);
-    buffer[i].swim.quatu[1] = static_cast<float>(part.r.quatu[1]);
-    buffer[i].swim.quatu[2] = static_cast<float>(part.r.quatu[2]);
+    buffer[i].swim.quatu[0] = static_cast<float>(part.quatu()[0]);
+    buffer[i].swim.quatu[1] = static_cast<float>(part.quatu()[1]);
+    buffer[i].swim.quatu[2] = static_cast<float>(part.quatu()[2]);
 #if defined(LB) || defined(LB_GPU)
     buffer[i].swim.push_pull = part.swim.push_pull;
     buffer[i].swim.dipole_length = static_cast<float>(part.swim.dipole_length);

@@ -644,7 +644,7 @@ void dp3m_dipole_assign(void)
     np = cell->n;
     for(i = 0; i < np; i++) {
       if( p[i].p.dipm != 0.0) {
-	dp3m_assign_dipole( p[i].pos(),p[i].p.dipm, p[i].r.dip,cp_cnt);
+	dp3m_assign_dipole( p[i].pos(),p[i].p.dipm, p[i].dip(),cp_cnt);
 	cp_cnt++;
       }
     }
@@ -812,16 +812,16 @@ Since the torque is the dipole moment cross-product with E, we have:
 */
               switch (d_rs) {
 		case 0:	//E_x
-		  p[i].f.torque[1] -= p[i].r.dip[2]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];     
-		  p[i].f.torque[2] += p[i].r.dip[1]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind]; 
+		  p[i].f.torque[1] -= p[i].dip()[2]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];     
+		  p[i].f.torque[2] += p[i].dip()[1]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind]; 
 		  break;
 		case 1:	//E_y
-		  p[i].f.torque[0] += p[i].r.dip[2]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
-		  p[i].f.torque[2] -= p[i].r.dip[0]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
+		  p[i].f.torque[0] += p[i].dip()[2]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
+		  p[i].f.torque[2] -= p[i].dip()[0]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
 		  break;
 		case 2:	//E_z
-		  p[i].f.torque[0] -= p[i].r.dip[1]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
-		  p[i].f.torque[1] += p[i].r.dip[0]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
+		  p[i].f.torque[0] -= p[i].dip()[1]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
+		  p[i].f.torque[1] += p[i].dip()[0]*prefac*dp3m.ca_frac[cf_cnt]*dp3m.rs_mesh[q_ind];  
 	      }
 	      q_ind++; 
 	      cf_cnt++;
@@ -869,9 +869,9 @@ static void dp3m_assign_forces_dip(double prefac, int d_rs)
 	  for(i1=0; i1<dp3m.params.cao; i1++) {
 	    for(i2=0; i2<dp3m.params.cao; i2++) {
 	      p[i].f.f[d_rs] += prefac*dp3m.ca_frac[cf_cnt]*
-	                          ( dp3m.rs_mesh_dip[0][q_ind]*p[i].r.dip[0]
-		                  +dp3m.rs_mesh_dip[1][q_ind]*p[i].r.dip[1]
-				  +dp3m.rs_mesh_dip[2][q_ind]*p[i].r.dip[2]);
+	                          ( dp3m.rs_mesh_dip[0][q_ind]*p[i].dip()[0]
+		                  +dp3m.rs_mesh_dip[1][q_ind]*p[i].dip()[1]
+				  +dp3m.rs_mesh_dip[2][q_ind]*p[i].dip()[2]);
 	      q_ind++;
 	      cf_cnt++;
 	    }
@@ -1140,9 +1140,9 @@ double calc_surface_term(int force_flag, int energy_flag)
        np   = local_cells.cell[c]->n;
        part = local_cells.cell[c]->part;
        for (i = 0; i < np; i++){
-	 mx[ip]=part[i].r.dip[0];
-	 my[ip]=part[i].r.dip[1];
-	 mz[ip]=part[i].r.dip[2];	 
+	 mx[ip]=part[i].dip()[0];
+	 my[ip]=part[i].dip()[1];
+	 mz[ip]=part[i].dip()[2];	 
 	 ip++;
       }  
      } 
@@ -2023,9 +2023,9 @@ void dp3m_count_magnetic_particles()
     np   = cell->n;
     for(i=0;i<np;i++) {
      if( part[i].p.dipm != 0.0 ) {
-	node_sums[0] += SQR(part[i].r.dip[0])
-	               +SQR(part[i].r.dip[1])
-		       +SQR(part[i].r.dip[2]);
+	node_sums[0] += SQR(part[i].dip()[0])
+	               +SQR(part[i].dip()[1])
+		       +SQR(part[i].dip()[2]);
 	node_sums[1] += 1.0;	       
       }
     }

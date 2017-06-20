@@ -108,9 +108,9 @@ double slab_dip_count_mu(double *mt, double *mx, double *my)
     np   = cell->n;
     for(i=0;i<np;i++) {
       if( part[i].p.dipm != 0.0 ) {
-	node_sums[0] +=part[i].r.dip[0];	 	 
-	node_sums[1] +=part[i].r.dip[1];	 	 
-	node_sums[2] +=part[i].r.dip[2];	 	 
+	node_sums[0] +=part[i].dip()[0];	 	 
+	node_sums[1] +=part[i].dip()[1];	 	 
+	node_sums[2] +=part[i].dip()[2];	 	 
       }
     }
   }
@@ -196,8 +196,8 @@ double get_DLC_dipolar(int kcut,double *fx, double *fy, double *fz, double *tx, 
 	  for(j = 0; j < np; j++)  {
 	    if(p1[j].p.dipm>0){
 	
-	      a=gx*p1[j].r.dip[0]+gy*p1[j].r.dip[1];
-	      b=gr*p1[j].r.dip[2];
+	      a=gx*p1[j].dip()[0]+gy*p1[j].dip()[1];
+	      b=gr*p1[j].dip()[2];
 	      er=gx*p1[j].pos()[0] +gy*p1[j].pos()[1] ;
 	      ez=gr*p1[j].pos()[2];
 	      c=cos(er);
@@ -298,9 +298,9 @@ double get_DLC_dipolar(int kcut,double *fx, double *fy, double *fz, double *tx, 
 
     for(j = 0; j < np; j++)  {
       if(p1[j].p.dipm>0){
-	a=p1[j].r.dip[1]*tz[ip]-p1[j].r.dip[2]*ty[ip];
-	b=p1[j].r.dip[2]*tx[ip]-p1[j].r.dip[0]*tz[ip];
-	c=p1[j].r.dip[0]*ty[ip]-p1[j].r.dip[1]*tx[ip];
+	a=p1[j].dip()[1]*tz[ip]-p1[j].dip()[2]*ty[ip];
+	b=p1[j].dip()[2]*tx[ip]-p1[j].dip()[0]*tz[ip];
+	c=p1[j].dip()[0]*ty[ip]-p1[j].dip()[1]*tx[ip];
 	tx[ip]=a;
 	ty[ip]=b;
 	tz[ip]=c;
@@ -406,8 +406,8 @@ double get_DLC_energy_dipolar(int kcut){
 	  for(j = 0; j < np; j++)  {
 	    if(p1[j].p.dipm>0){
 	    
-	      a=gx*p1[j].r.dip[0]+gy*p1[j].r.dip[1];{
-		b=gr*p1[j].r.dip[2];
+	      a=gx*p1[j].dip()[0]+gy*p1[j].dip()[1];{
+		b=gr*p1[j].dip()[2];
 		er=gx*p1[j].pos()[0] +gy*p1[j].pos()[1] ;
 		ez=gr*p1[j].pos()[2];
 		c=cos(er);
@@ -551,9 +551,9 @@ void    add_mdlc_force_corrections(){
 	  dy=0.0;
 	  dz=correc*(-1.0)*mz;    
 		
-	  p[i].f.torque[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].r.dip[1]*dz  - p[i].r.dip[2]*dy ) ; 
-	  p[i].f.torque[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].r.dip[2]*dx  - p[i].r.dip[0]*dz ) ;
-	  p[i].f.torque[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].r.dip[0]*dy  - p[i].r.dip[1]*dx ); 
+	  p[i].f.torque[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].dip()[1]*dz  - p[i].dip()[2]*dy ) ; 
+	  p[i].f.torque[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].dip()[2]*dx  - p[i].dip()[0]*dz ) ;
+	  p[i].f.torque[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].dip()[0]*dy  - p[i].dip()[1]*dx ); 
 
 
 	}else{
@@ -563,9 +563,9 @@ void    add_mdlc_force_corrections(){
 	  dy=correps*my;
 	  dz=correc*(-1.0+1./(2.0*dp3m.params.epsilon+1.0))*mz;    
 		
-	  p[i].f.torque[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].r.dip[1]*dz  - p[i].r.dip[2]*dy ) ; 
-	  p[i].f.torque[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].r.dip[2]*dx  - p[i].r.dip[0]*dz ) ;
-	  p[i].f.torque[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].r.dip[0]*dy  - p[i].r.dip[1]*dx ); 
+	  p[i].f.torque[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].dip()[1]*dz  - p[i].dip()[2]*dy ) ; 
+	  p[i].f.torque[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].dip()[2]*dx  - p[i].dip()[0]*dz ) ;
+	  p[i].f.torque[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].dip()[0]*dy  - p[i].dip()[1]*dx ); 
 		
 		   
 	}   

@@ -143,29 +143,29 @@ void set_cpu_temp(int temp);
 #ifdef ROTATION
 inline void thermo_define_rotation_matrix(Particle *p, double A[9])
 {
-  double q0q0 =p->r.quat[0];
+  double q0q0 =p->quat()[0];
   q0q0 *=q0q0;
 
-  double q1q1 =p->r.quat[1];
+  double q1q1 =p->quat()[1];
   q1q1 *=q1q1;
 
-  double q2q2 =p->r.quat[2];
+  double q2q2 =p->quat()[2];
   q2q2 *=q2q2;
 
-  double q3q3 =p->r.quat[3];
+  double q3q3 =p->quat()[3];
   q3q3 *=q3q3;
 
   A[0 + 3*0] = q0q0 + q1q1 - q2q2 - q3q3;
   A[1 + 3*1] = q0q0 - q1q1 + q2q2 - q3q3;
   A[2 + 3*2] = q0q0 - q1q1 - q2q2 + q3q3;
 
-  A[0 + 3*1] = 2*(p->r.quat[1]*p->r.quat[2] + p->r.quat[0]*p->r.quat[3]);
-  A[0 + 3*2] = 2*(p->r.quat[1]*p->r.quat[3] - p->r.quat[0]*p->r.quat[2]);
-  A[1 + 3*0] = 2*(p->r.quat[1]*p->r.quat[2] - p->r.quat[0]*p->r.quat[3]);
+  A[0 + 3*1] = 2*(p->quat()[1]*p->quat()[2] + p->quat()[0]*p->quat()[3]);
+  A[0 + 3*2] = 2*(p->quat()[1]*p->quat()[3] - p->quat()[0]*p->quat()[2]);
+  A[1 + 3*0] = 2*(p->quat()[1]*p->quat()[2] - p->quat()[0]*p->quat()[3]);
 
-  A[1 + 3*2] = 2*(p->r.quat[2]*p->r.quat[3] + p->r.quat[0]*p->r.quat[1]);
-  A[2 + 3*0] = 2*(p->r.quat[1]*p->r.quat[3] + p->r.quat[0]*p->r.quat[2]);
-  A[2 + 3*1] = 2*(p->r.quat[2]*p->r.quat[3] - p->r.quat[0]*p->r.quat[1]);
+  A[1 + 3*2] = 2*(p->quat()[2]*p->quat()[3] + p->quat()[0]*p->quat()[1]);
+  A[2 + 3*0] = 2*(p->quat()[1]*p->quat()[3] + p->quat()[0]*p->quat()[2]);
+  A[2 + 3*1] = 2*(p->quat()[2]*p->quat()[3] - p->quat()[0]*p->quat()[1]);
 }
 
 inline void thermo_convert_forces_body_to_space(Particle *p, double *force)
@@ -293,7 +293,7 @@ inline void friction_thermo_langevin(Particle *p)
       // In case of the engine feature, the velocity is relaxed
       // towards a swimming velocity oriented parallel to the
       // particles director
-      velocity[i] -= (p->swim.v_swim*time_step)*p->r.quatu[i];
+      velocity[i] -= (p->swim.v_swim*time_step)*p->quatu()[i];
     #endif
 
     // Local effective velocity for leeds-edwards boundary conditions

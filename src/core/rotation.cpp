@@ -122,29 +122,29 @@ int convert_quatu_to_quat(double d[3], double quat[4])
     the body-fixed frames */  
 void define_rotation_matrix(Particle *p, double A[9])
 {
-  double q0q0 =p->r.quat[0];
+  double q0q0 =p->quat()[0];
   q0q0 *=q0q0;
 
-  double q1q1 =p->r.quat[1];
+  double q1q1 =p->quat()[1];
   q1q1 *=q1q1;
 
-  double q2q2 =p->r.quat[2];
+  double q2q2 =p->quat()[2];
   q2q2 *=q2q2;
 
-  double q3q3 =p->r.quat[3];
+  double q3q3 =p->quat()[3];
   q3q3 *=q3q3;
 
   A[0 + 3*0] = q0q0 + q1q1 - q2q2 - q3q3;
   A[1 + 3*1] = q0q0 - q1q1 + q2q2 - q3q3;
   A[2 + 3*2] = q0q0 - q1q1 - q2q2 + q3q3;
 
-  A[0 + 3*1] = 2*(p->r.quat[1]*p->r.quat[2] + p->r.quat[0]*p->r.quat[3]);
-  A[0 + 3*2] = 2*(p->r.quat[1]*p->r.quat[3] - p->r.quat[0]*p->r.quat[2]);
-  A[1 + 3*0] = 2*(p->r.quat[1]*p->r.quat[2] - p->r.quat[0]*p->r.quat[3]);
+  A[0 + 3*1] = 2*(p->quat()[1]*p->quat()[2] + p->quat()[0]*p->quat()[3]);
+  A[0 + 3*2] = 2*(p->quat()[1]*p->quat()[3] - p->quat()[0]*p->quat()[2]);
+  A[1 + 3*0] = 2*(p->quat()[1]*p->quat()[2] - p->quat()[0]*p->quat()[3]);
 
-  A[1 + 3*2] = 2*(p->r.quat[2]*p->r.quat[3] + p->r.quat[0]*p->r.quat[1]);
-  A[2 + 3*0] = 2*(p->r.quat[1]*p->r.quat[3] + p->r.quat[0]*p->r.quat[2]);
-  A[2 + 3*1] = 2*(p->r.quat[2]*p->r.quat[3] - p->r.quat[0]*p->r.quat[1]);
+  A[1 + 3*2] = 2*(p->quat()[2]*p->quat()[3] + p->quat()[0]*p->quat()[1]);
+  A[2 + 3*0] = 2*(p->quat()[1]*p->quat()[3] + p->quat()[0]*p->quat()[2]);
+  A[2 + 3*1] = 2*(p->quat()[2]*p->quat()[3] - p->quat()[0]*p->quat()[1]);
 }
 
 /** calculate the second derivative of the quaternion of a given particle
@@ -154,21 +154,21 @@ void define_Qdd(Particle *p, double Qd[4], double Qdd[4], double S[3], double Wd
   double S1;
 
   /* calculate the first derivative of the quaternion */
-  Qd[0] = 0.5 * ( -p->r.quat[1] * p->m.omega[0] -
-                   p->r.quat[2] * p->m.omega[1] -
-		   p->r.quat[3] * p->m.omega[2] );
+  Qd[0] = 0.5 * ( -p->quat()[1] * p->m.omega[0] -
+                   p->quat()[2] * p->m.omega[1] -
+		   p->quat()[3] * p->m.omega[2] );
 
-  Qd[1] = 0.5 * (  p->r.quat[0] * p->m.omega[0] -
-                   p->r.quat[3] * p->m.omega[1] +
-		   p->r.quat[2] * p->m.omega[2] );
+  Qd[1] = 0.5 * (  p->quat()[0] * p->m.omega[0] -
+                   p->quat()[3] * p->m.omega[1] +
+		   p->quat()[2] * p->m.omega[2] );
 
-  Qd[2] = 0.5 * (  p->r.quat[3] * p->m.omega[0] +
-                   p->r.quat[0] * p->m.omega[1] -
-		   p->r.quat[1] * p->m.omega[2] );
+  Qd[2] = 0.5 * (  p->quat()[3] * p->m.omega[0] +
+                   p->quat()[0] * p->m.omega[1] -
+		   p->quat()[1] * p->m.omega[2] );
 
-  Qd[3] = 0.5 * ( -p->r.quat[2] * p->m.omega[0] +
-                   p->r.quat[1] * p->m.omega[1] +
-		   p->r.quat[0] * p->m.omega[2] );
+  Qd[3] = 0.5 * ( -p->quat()[2] * p->m.omega[0] +
+                   p->quat()[1] * p->m.omega[1] +
+		   p->quat()[0] * p->m.omega[2] );
 
   /* calculate the second derivative of the quaternion */
   
@@ -184,21 +184,21 @@ void define_Qdd(Particle *p, double Qd[4], double Qdd[4], double S[3], double Wd
 
   S1 = Qd[0]*Qd[0] + Qd[1]*Qd[1] + Qd[2]*Qd[2] + Qd[3]*Qd[3];
 
-  Qdd[0] = 0.5 * ( -p->r.quat[1] * Wd[0] -
-		    p->r.quat[2] * Wd[1] -
-	  	    p->r.quat[3] * Wd[2] ) - p->r.quat[0] * S1;
+  Qdd[0] = 0.5 * ( -p->quat()[1] * Wd[0] -
+		    p->quat()[2] * Wd[1] -
+	  	    p->quat()[3] * Wd[2] ) - p->quat()[0] * S1;
 
-  Qdd[1] = 0.5 * (  p->r.quat[0] * Wd[0] -
-		    p->r.quat[3] * Wd[1] +
-		    p->r.quat[2] * Wd[2] ) - p->r.quat[1] * S1;
+  Qdd[1] = 0.5 * (  p->quat()[0] * Wd[0] -
+		    p->quat()[3] * Wd[1] +
+		    p->quat()[2] * Wd[2] ) - p->quat()[1] * S1;
   
-  Qdd[2] = 0.5 * (  p->r.quat[3] * Wd[0] +
-		    p->r.quat[0] * Wd[1] -
-		    p->r.quat[1] * Wd[2] ) - p->r.quat[2] * S1;
+  Qdd[2] = 0.5 * (  p->quat()[3] * Wd[0] +
+		    p->quat()[0] * Wd[1] -
+		    p->quat()[1] * Wd[2] ) - p->quat()[2] * S1;
   
-  Qdd[3] = 0.5 * ( -p->r.quat[2] * Wd[0] +
-                    p->r.quat[1] * Wd[1] +
-		    p->r.quat[0] * Wd[2] ) - p->r.quat[3] * S1;
+  Qdd[3] = 0.5 * ( -p->quat()[2] * Wd[0] +
+                    p->quat()[1] * Wd[1] +
+		    p->quat()[0] * Wd[2] ) - p->quat()[3] * S1;
 
   S[0] = S1;
   S[1] = Qd[0]*Qdd[0]  + Qd[1]*Qdd[1]  + Qd[2]*Qdd[2]  + Qd[3]*Qdd[3];
@@ -225,15 +225,15 @@ void propagate_omega_quat_particle(Particle* p)
   }
   ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: PV_1 v_new = (%.3e,%.3e,%.3e)\n",this_node,p->m.v[0],p->m.v[1],p->m.v[2]));
   
-  p->r.quat[0]+= time_step*(Qd[0] + time_step_half*Qdd[0]) - lambda*p->r.quat[0];
-  p->r.quat[1]+= time_step*(Qd[1] + time_step_half*Qdd[1]) - lambda*p->r.quat[1];
-  p->r.quat[2]+= time_step*(Qd[2] + time_step_half*Qdd[2]) - lambda*p->r.quat[2];
-  p->r.quat[3]+= time_step*(Qd[3] + time_step_half*Qdd[3]) - lambda*p->r.quat[3];
+  p->quat()[0]+= time_step*(Qd[0] + time_step_half*Qdd[0]) - lambda*p->quat()[0];
+  p->quat()[1]+= time_step*(Qd[1] + time_step_half*Qdd[1]) - lambda*p->quat()[1];
+  p->quat()[2]+= time_step*(Qd[2] + time_step_half*Qdd[2]) - lambda*p->quat()[2];
+  p->quat()[3]+= time_step*(Qd[3] + time_step_half*Qdd[3]) - lambda*p->quat()[3];
   // Update the director
-  convert_quat_to_quatu(p->r.quat, p->r.quatu);
+  convert_quat_to_quatu(p->quat(), p->quatu());
 #ifdef DIPOLES
   // When dipoles are enabled, update dipole moment
-  convert_quatu_to_dip(p->r.quatu, p->p.dipm, p->r.dip);
+  convert_quatu_to_dip(p->quatu(), p->p.dipm, p->dip());
 #endif
   
   
@@ -320,9 +320,9 @@ void convert_torques_propagate_omega()
         double cross[3];
         double l_diff, l_cross;
 
-        dip[0]   = p[i].swim.dipole_length * p[i].r.quatu[0];
-        dip[1]   = p[i].swim.dipole_length * p[i].r.quatu[1];
-        dip[2]   = p[i].swim.dipole_length * p[i].r.quatu[2];
+        dip[0]   = p[i].swim.dipole_length * p[i].quatu()[0];
+        dip[1]   = p[i].swim.dipole_length * p[i].quatu()[1];
+        dip[2]   = p[i].swim.dipole_length * p[i].quatu()[2];
 
         diff[0]  = ( p[i].swim.v_center[0] - p[i].swim.v_source[0] );
         diff[1]  = ( p[i].swim.v_center[1] - p[i].swim.v_source[1] );
@@ -541,13 +541,13 @@ void rotate_particle(Particle* p, double* aSpaceFrame, double phi)
 
   // Rotate the particle
   double qn[4]; // Resulting quaternion
-  multiply_quaternions(p->r.quat,q,qn);
+  multiply_quaternions(p->quat(),q,qn);
   for (int k=0; k<4; k++)
-    p->r.quat[k]=qn[k];
-  convert_quat_to_quatu(p->r.quat, p->r.quatu);
+    p->quat()[k]=qn[k];
+  convert_quat_to_quatu(p->quat(), p->quatu());
 #ifdef DIPOLES
   // When dipoles are enabled, update dipole moment
-  convert_quatu_to_dip(p->r.quatu, p->p.dipm, p->r.dip);
+  convert_quatu_to_dip(p->quatu(), p->p.dipm, p->dip());
 #endif
 }
 

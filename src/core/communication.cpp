@@ -868,13 +868,13 @@ void mpi_send_quat(int pnode, int part, double quat[4]) {
 
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    p->r.quat[0] = quat[0];
-    p->r.quat[1] = quat[1];
-    p->r.quat[2] = quat[2];
-    p->r.quat[3] = quat[3];
-    convert_quat_to_quatu(p->r.quat, p->r.quatu);
+    p->quat()[0] = quat[0];
+    p->quat()[1] = quat[1];
+    p->quat()[2] = quat[2];
+    p->quat()[3] = quat[3];
+    convert_quat_to_quatu(p->quat(), p->quatu());
 #ifdef DIPOLES
-    convert_quatu_to_dip(p->r.quatu, p->p.dipm, p->r.dip);
+    convert_quatu_to_dip(p->quatu(), p->p.dipm, p->dip());
 #endif
   } else {
     MPI_Send(quat, 4, MPI_DOUBLE, pnode, SOME_TAG, comm_cart);
@@ -888,11 +888,11 @@ void mpi_send_quat_slave(int pnode, int part) {
 #ifdef ROTATION
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    MPI_Recv(p->r.quat, 4, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
+    MPI_Recv(p->quat(), 4, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
              MPI_STATUS_IGNORE);
-    convert_quat_to_quatu(p->r.quat, p->r.quatu);
+    convert_quat_to_quatu(p->quat(), p->quatu());
 #ifdef DIPOLES
-    convert_quatu_to_dip(p->r.quatu, p->p.dipm, p->r.dip);
+    convert_quatu_to_dip(p->quatu(), p->p.dipm, p->dip());
 #endif
   }
 
@@ -971,15 +971,15 @@ void mpi_send_dip(int pnode, int part, double dip[3]) {
 
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    p->r.dip[0] = dip[0];
-    p->r.dip[1] = dip[1];
-    p->r.dip[2] = dip[2];
+    p->dip()[0] = dip[0];
+    p->dip()[1] = dip[1];
+    p->dip()[2] = dip[2];
 #ifdef ROTATION
-    convert_dip_to_quat(p->r.dip, p->r.quat, &p->p.dipm);
-    convert_quat_to_quatu(p->r.quat, p->r.quatu);
+    convert_dip_to_quat(p->dip(), p->quat(), &p->p.dipm);
+    convert_quat_to_quatu(p->quat(), p->quatu());
 #else
-    p->p.dipm = sqrt(p->r.dip[0] * p->r.dip[0] + p->r.dip[1] * p->r.dip[1] +
-                     p->r.dip[2] * p->r.dip[2]);
+    p->p.dipm = sqrt(p->dip()[0] * p->dip()[0] + p->dip()[1] * p->dip()[1] +
+                     p->dip()[2] * p->dip()[2]);
 #endif
   } else {
     MPI_Send(dip, 3, MPI_DOUBLE, pnode, SOME_TAG, comm_cart);
@@ -993,14 +993,14 @@ void mpi_send_dip_slave(int pnode, int part) {
 #ifdef DIPOLES
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    MPI_Recv(p->r.dip, 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
+    MPI_Recv(p->dip(), 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
              MPI_STATUS_IGNORE);
 #ifdef ROTATION
-    convert_dip_to_quat(p->r.dip, p->r.quat, &p->p.dipm);
-    convert_quat_to_quatu(p->r.quat, p->r.quatu);
+    convert_dip_to_quat(p->dip(), p->quat(), &p->p.dipm);
+    convert_quat_to_quatu(p->quat(), p->quatu());
 #else
-    p->p.dipm = sqrt(p->r.dip[0] * p->r.dip[0] + p->r.dip[1] * p->r.dip[1] +
-                     p->r.dip[2] * p->r.dip[2]);
+    p->p.dipm = sqrt(p->dip()[0] * p->dip()[0] + p->dip()[1] * p->dip()[1] +
+                     p->dip()[2] * p->dip()[2]);
 #endif
   }
 
@@ -1018,7 +1018,7 @@ void mpi_send_dipm(int pnode, int part, double dipm) {
     Particle *p = local_particles[part];
     p->p.dipm = dipm;
 #ifdef ROTATION
-    convert_quatu_to_dip(p->r.quatu, p->p.dipm, p->r.dip);
+    convert_quatu_to_dip(p->quatu(), p->p.dipm, p->dip());
 #endif
   } else {
     MPI_Send(&dipm, 1, MPI_DOUBLE, pnode, SOME_TAG, comm_cart);
@@ -1035,7 +1035,7 @@ void mpi_send_dipm_slave(int pnode, int part) {
     MPI_Recv(&p->p.dipm, 1, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
              MPI_STATUS_IGNORE);
 #ifdef ROTATION
-    convert_quatu_to_dip(p->r.quatu, p->p.dipm, p->r.dip);
+    convert_quatu_to_dip(p->quatu(), p->p.dipm, p->dip());
 #endif
   }
 
@@ -1702,8 +1702,8 @@ void mpi_get_particles(Particle *result, IntList *bi) {
   COMM_TRACE(for (i = 0; i < tot_size; i++) {
     printf("%d: %d -> %d %d  (%f, %f, %f) (%f, %f, %f)\n", this_node, i,
            result[i].id(), result[i].p.type, result[i].pos()[0],
-           result[i].pos()[1], result[i].pos()[2], result[i].r.dip[0],
-           result[i].r.dip[1], result[i].r.dip[2]);
+           result[i].pos()[1], result[i].pos()[2], result[i].dip()[0],
+           result[i].dip()[1], result[i].dip()[2]);
   });
 #endif
 

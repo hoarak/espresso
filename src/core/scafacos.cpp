@@ -91,9 +91,9 @@ int ScafacosData::update_particle_data() {
       }
       else {
         #ifdef SCAFACOS_DIPOLES
-          dipoles.push_back(p[i].r.dip[0]);
-          dipoles.push_back(p[i].r.dip[1]);
-          dipoles.push_back(p[i].r.dip[2]);
+          dipoles.push_back(p[i].dip()[0]);
+          dipoles.push_back(p[i].dip()[1]);
+          dipoles.push_back(p[i].dip()[2]);
         #endif
       }
     }    
@@ -130,7 +130,7 @@ void ScafacosData::update_particle_forces() const {
 	  // The scafacos term "potential" here in fact refers to the magnetic field
 	  // So, the torques are given by m \times B
 	  double t[3];
-	  utils::cross_product(p[i].r.dip, &(potentials[it_p]),t);
+	  utils::cross_product(p[i].dip(), &(potentials[it_p]),t);
 	  // The force is given by G m, where G is a matrix
 	  // which comes from teh "fields" output of scafacos like this
 	  // 0 1 2
@@ -138,9 +138,9 @@ void ScafacosData::update_particle_forces() const {
 	  // 2 4 5
 	  // where the numbers refer to indices in the "field" output from scafacos
 	  double f[3];
-	  f[0] = fields[it_f+0] *p[i].r.dip[0] +fields[it_f+1]*p[i].r.dip[1] +fields[it_f+2] *p[i].r.dip[2];
-	  f[1] = fields[it_f+1] *p[i].r.dip[0] +fields[it_f+3]*p[i].r.dip[1] +fields[it_f+4] *p[i].r.dip[2];
-	  f[2] = fields[it_f+2] *p[i].r.dip[0] +fields[it_f+4]*p[i].r.dip[1] +fields[it_f+5] *p[i].r.dip[2];
+	  f[0] = fields[it_f+0] *p[i].dip()[0] +fields[it_f+1]*p[i].dip()[1] +fields[it_f+2] *p[i].dip()[2];
+	  f[1] = fields[it_f+1] *p[i].dip()[0] +fields[it_f+3]*p[i].dip()[1] +fields[it_f+4] *p[i].dip()[2];
+	  f[2] = fields[it_f+2] *p[i].dip()[0] +fields[it_f+4]*p[i].dip()[1] +fields[it_f+5] *p[i].dip()[2];
 
 	  // Add to particles
 	  for (int j=0;j<3;j++) {

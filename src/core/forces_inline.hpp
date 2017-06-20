@@ -103,12 +103,12 @@ inline void init_ghost_force(Particle *part) {
     part->f.torque[2] = 0;
 
     /* and rescale quaternion, so it is exactly of unit length */
-    scale = sqrt(SQR(part->r.quat[0]) + SQR(part->r.quat[1]) +
-                 SQR(part->r.quat[2]) + SQR(part->r.quat[3]));
-    part->r.quat[0] /= scale;
-    part->r.quat[1] /= scale;
-    part->r.quat[2] /= scale;
-    part->r.quat[3] /= scale;
+    scale = sqrt(SQR(part->quat()[0]) + SQR(part->quat()[1]) +
+                 SQR(part->quat()[2]) + SQR(part->quat()[3]));
+    part->quat()[0] /= scale;
+    part->quat()[1] /= scale;
+    part->quat()[2] /= scale;
+    part->quat()[3] /= scale;
   }
 #endif
 }
@@ -151,19 +151,19 @@ inline void init_local_particle_force(Particle *part) {
     // apply a swimming force in the direction of
     // the particle's orientation axis
     if (part->swim.swimming) {
-      part->f.f[0] += part->swim.f_swim * part->r.quatu[0];
-      part->f.f[1] += part->swim.f_swim * part->r.quatu[1];
-      part->f.f[2] += part->swim.f_swim * part->r.quatu[2];
+      part->f.f[0] += part->swim.f_swim * part->quatu()[0];
+      part->f.f[1] += part->swim.f_swim * part->quatu()[1];
+      part->f.f[2] += part->swim.f_swim * part->quatu()[2];
     }
 #endif
 
     /* and rescale quaternion, so it is exactly of unit length */
-    scale = sqrt(SQR(part->r.quat[0]) + SQR(part->r.quat[1]) +
-                 SQR(part->r.quat[2]) + SQR(part->r.quat[3]));
-    part->r.quat[0] /= scale;
-    part->r.quat[1] /= scale;
-    part->r.quat[2] /= scale;
-    part->r.quat[3] /= scale;
+    scale = sqrt(SQR(part->quat()[0]) + SQR(part->quat()[1]) +
+                 SQR(part->quat()[2]) + SQR(part->quat()[3]));
+    part->quat()[0] /= scale;
+    part->quat()[1] /= scale;
+    part->quat()[2] /= scale;
+    part->quat()[3] /= scale;
   }
 #endif
 }

@@ -62,8 +62,8 @@ inline void add_gb_pair_force(const Particle * const p1, const Particle * const 
     FikX,FikY,FikZ,			/*  help for forces        */
     Gx,Gy,Gz;			/*  help for torques       */
 
-    u1x = p1->r.quatu[0]; u1y = p1->r.quatu[1]; u1z = p1->r.quatu[2];
-    u2x = p2->r.quatu[0]; u2y = p2->r.quatu[1]; u2z = p2->r.quatu[2]; 
+    u1x = p1->quatu()[0]; u1y = p1->quatu()[1]; u1z = p1->quatu()[2];
+    u2x = p2->quatu()[0]; u2y = p2->quatu()[1]; u2z = p2->quatu()[2]; 
     
     a = d[0]*u1x + d[1]*u1y + d[2]*u1z;
     b = d[0]*u2x + d[1]*u2y + d[2]*u2z;
@@ -166,8 +166,8 @@ inline double gb_pair_energy(Particle *p1, Particle *p2, IA_parameters *ia_param
     Plus2, Minus2;
 	
     
-    u1x = p1->r.quatu[0]; u1y = p1->r.quatu[1]; u1z = p1->r.quatu[2];
-    u2x = p2->r.quatu[0]; u2y = p2->r.quatu[1]; u2z = p2->r.quatu[2]; 
+    u1x = p1->quatu()[0]; u1y = p1->quatu()[1]; u1z = p1->quatu()[2];
+    u2x = p2->quatu()[0]; u2y = p2->quatu()[1]; u2z = p2->quatu()[2]; 
 
     a = d[0]*u1x + d[1]*u1y + d[2]*u1z;
     b = d[0]*u2x + d[1]*u2y + d[2]*u2z;

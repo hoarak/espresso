@@ -56,7 +56,7 @@ void update_mol_pos_particle(Particle *p)
  // of the real particle with the quaternion of the virtual particle, which 
  // specifies the relative orientation.
  double q[4];
- multiply_quaternions(p_real->r.quat,p->p.vs_relative_rel_orientation,q);
+ multiply_quaternions(p_real->quat(),p->p.vs_relative_rel_orientation,q);
  // Calculate the director resulting from the quaternions
  double director[3];
  convert_quat_to_quatu(q,director);
@@ -115,7 +115,7 @@ void update_mol_vel_particle(Particle *p)
  // of the real particle with the quaternion of the virtual particle, which 
  // specifies the relative orientation.
  double q[4];
- multiply_quaternions(p_real->r.quat,p->p.vs_relative_rel_orientation,q);
+ multiply_quaternions(p_real->quat(),p->p.vs_relative_rel_orientation,q);
  // Calculate the director resulting from the quaternions
  double director[3];
  convert_quat_to_quatu(q,director);
@@ -194,31 +194,33 @@ void distribute_mol_force()
 // Setup the virtual_sites_relative properties of a particle so that the given virtaul particle will follow the given real particle
 int vs_relate_to(int part_num, int relate_to)
 {
-    // Get the data for the particle we act on and the one we wnat to relate
-    // it to.
-    Particle  p_current,p_relate_to;
-    if ((get_particle_data(relate_to,&p_relate_to)!=ES_OK) || 
-        (get_particle_data(part_num,&p_current)!=ES_OK)) {
-        ostringstream msg;
-        msg <<"Could not retrieve particle data for the given id";
-        runtimeError(msg);
-      return ES_ERROR;
-    }
-    
-    // get teh distance between the particles
-    double d[3];
-    get_mi_vector(d, p_current.pos(),p_relate_to.pos());
-    
-    
-    
-    // Check, if the distance between virtual and non-virtual particles is larger htan minimum global cutoff
-    // If so, warn user
-    double l=sqrt(sqrlen(d));
-    if (l>min_global_cut) {
-        ostringstream msg;
-        msg << "Warning: The distance between virtual and non-virtual particle (" << l << ") is\nlarger than the minimum global cutoff (" << min_global_cut << "). This may lead to incorrect simulations\nunder certain conditions. Use \"setmd min_global_cut\" to increase the minimum cutoff.\n";
-        runtimeWarning(msg);
-      return ES_ERROR;
+  // Get the data for the particle we act on and the one we wnat to relate
+  // it to.
+  Particle p_current{part_num}, p_relate_to{relate_to};
+  if ((get_particle_data(relate_to, &p_relate_to) != ES_OK) ||
+      (get_particle_data(part_num, &p_current) != ES_OK)) {
+    ostringstream msg;
+    msg << "Could not retrieve particle data for the given id";
+    runtimeError(msg);
+    return ES_ERROR;
+  }
+
+  // get teh distance between the particles
+  double d[3];
+  get_mi_vector(d, p_current.pos(), p_relate_to.pos());
+
+  // Check, if the distance between virtual and non-virtual particles is larger
+  // htan minimum global cutoff If so, warn user
+  double l = sqrt(sqrlen(d));
+  if (l > min_global_cut) {
+    ostringstream msg;
+    msg << "Warning: The distance between virtual and non-virtual particle ("
+        << l << ") is\nlarger than the minimum global cutoff ("
+        << min_global_cut << "). This may lead to incorrect simulations\nunder "
+                             "certain conditions. Use \"setmd min_global_cut\" "
+                             "to increase the minimum cutoff.\n";
+    runtimeWarning(msg);
+    return ES_ERROR;
     }
 
     // Now, calculate the quaternions which specify the angle between 
@@ -251,31 +253,31 @@ int vs_relate_to(int part_num, int relate_to)
       // Define quat as described above:
       double x=0;
       for (i=0;i<4;i++)
-       x+=p_relate_to.r.quat[i]*p_relate_to.r.quat[i];
+       x+=p_relate_to.quat()[i]*p_relate_to.quat()[i];
   
       quat[0]=0;
       for (i=0;i<4;i++)
-       quat[0] +=p_relate_to.r.quat[i]*quat_director[i];
+       quat[0] +=p_relate_to.quat()[i]*quat_director[i];
       
-      quat[1] =-quat_director[0] *p_relate_to.r.quat[1] 
-         +quat_director[1] *p_relate_to.r.quat[0]
-         +quat_director[2] *p_relate_to.r.quat[3]
-         -quat_director[3] *p_relate_to.r.quat[2];
-      quat[2] =p_relate_to.r.quat[1] *quat_director[3] 
-        + p_relate_to.r.quat[0] *quat_director[2] 
-        - p_relate_to.r.quat[3] *quat_director[1] 
-        - p_relate_to.r.quat[2] * quat_director[0];
-      quat[3] =quat_director[3] *p_relate_to.r.quat[0]
-        - p_relate_to.r.quat[3] *quat_director[0] 
-        + p_relate_to.r.quat[2] * quat_director[1] 
-        - p_relate_to.r.quat[1] *quat_director[2];
+      quat[1] =-quat_director[0] *p_relate_to.quat()[1] 
+         +quat_director[1] *p_relate_to.quat()[0]
+         +quat_director[2] *p_relate_to.quat()[3]
+         -quat_director[3] *p_relate_to.quat()[2];
+      quat[2] =p_relate_to.quat()[1] *quat_director[3] 
+        + p_relate_to.quat()[0] *quat_director[2] 
+        - p_relate_to.quat()[3] *quat_director[1] 
+        - p_relate_to.quat()[2] * quat_director[0];
+      quat[3] =quat_director[3] *p_relate_to.quat()[0]
+        - p_relate_to.quat()[3] *quat_director[0] 
+        + p_relate_to.quat()[2] * quat_director[1] 
+        - p_relate_to.quat()[1] *quat_director[2];
       for (i=0;i<4;i++)
        quat[i]/=x;
      
      
      // Verify result
      double qtemp[4];
-     multiply_quaternions(p_relate_to.r.quat,quat,qtemp);
+     multiply_quaternions(p_relate_to.quat(),quat,qtemp);
      for (i=0;i<4;i++)
        if (fabs(qtemp[i]-quat_director[i])>1E-9)
          fprintf(stderr, "vs_relate_to: component %d: %f instead of %f\n",

@@ -1126,36 +1126,6 @@ typedef struct {
   double Prefactor;
 } SinusoidalField;
 
-/** Structure to specify a constraint. */
-struct Constraint {
-  Constraint() : type(CONSTRAINT_NONE) {}
-
-  /** type of the constraint. */
-  ConstraintApplied type;
-
-  union {
-    Constraint_wall wal;
-    Constraint_sphere sph;
-    Constraint_cylinder cyl;
-    Constraint_spherocylinder spherocyl;
-    Constraint_rhomboid rhomboid;
-    Constraint_rod rod;
-    Constraint_plate plate;
-    Constraint_maze maze;
-    Constraint_pore pore;
-    Constraint_slitpore slitpore;
-    Constraint_stomatocyte stomatocyte;
-    Constraint_hollow_cone hollow_cone;
-    Constraint_voxel voxel;
-    // ER
-    Constraint_ext_magn_field emfield;
-  } c;
-
-  /** particle representation of this constraint. Actually needed are only the
-     identity,
-      the type and the force. */
-  Particle part_rep;
-};
 /*@}*/
 #endif
 
