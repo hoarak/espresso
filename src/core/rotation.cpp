@@ -44,7 +44,7 @@
 #include "ghosts.hpp"
 #include "forces.hpp"
 #include "p3m.hpp"
-#include "thermostat.hpp"
+#include "thermostat_inline.hpp"
 #include "initialize.hpp"
 #include "cuda_interface.hpp"
 

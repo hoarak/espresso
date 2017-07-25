@@ -27,6 +27,7 @@
 #include "topology.hpp"
 #endif
 
+#include "thermostat_inline.hpp"
 #include "angle_cosine.hpp"
 #include "angle_cossquare.hpp"
 #include "angle_harmonic.hpp"
