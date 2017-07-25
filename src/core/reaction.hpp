@@ -23,9 +23,6 @@
 /** \file reaction.hpp
  *
  */
- 
-#include "utils.hpp"
-#include "particle_data.hpp"
 
 typedef struct {
   int reactant_type;

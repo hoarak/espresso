@@ -29,7 +29,7 @@
  *  MDDS => Magnetic dipoles direct sum, compute the interactions via direct sum, 
  *
  */
-#include "utils.hpp"
+#include "config.hpp"
 
 #ifdef DIPOLES
 #include "particle_data.hpp"

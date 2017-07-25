@@ -31,10 +31,13 @@
  *
  */
 
-#include "domain_decomposition.hpp"
+
 #include "magnetic_non_p3m_methods.hpp"
 
 #ifdef DIPOLES
+
+#include "grid.hpp"
+#include "cells.hpp"
 
 // Calculates dipolar energy and/or force between two particles
 double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)

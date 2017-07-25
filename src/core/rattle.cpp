@@ -26,6 +26,7 @@
 #include <cmath>
 #include "domain_decomposition.hpp"
 #include "rattle.hpp"
+#include "grid.hpp"
 
 int n_rigidbonds = 0;
 

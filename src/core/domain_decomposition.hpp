@@ -57,9 +57,7 @@
 
 #include "utils.hpp"
 #include "cells.hpp"
-#include "integrate.hpp"
 #include "verlet.hpp"
-#include "thermostat.hpp"
 
 /** Structure containing information about non bonded interactions
     with particles in a neighbor cell. */

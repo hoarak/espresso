@@ -26,12 +26,13 @@
 #include "cells.hpp"
 #include "domain_decomposition.hpp"
 #include "errorhandling.hpp"
-#include "forces.hpp"
 #include "initialize.hpp"
 #include "utils.hpp"
 #include <algorithm>
 #include <random>
 #include <vector>
+#include "random.hpp"
+#include "grid.hpp"
 
 reaction_struct reaction;
 
