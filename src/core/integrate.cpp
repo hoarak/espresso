@@ -25,13 +25,15 @@
  *  see \ref integrate.hpp "integrate.hpp".
 */
 
+#include "config.hpp"
+
 #include "integrate.hpp"
 #include "cells.hpp"
 #include "communication.hpp"
 #include "domain_decomposition.hpp"
 #include "electrokinetics.hpp"
 #include "errorhandling.hpp"
-#include "forces.hpp"
+#include "forces_inline.hpp"
 #include "ghmc.hpp"
 #include "ghosts.hpp"
 #include "grid.hpp"
@@ -47,6 +49,7 @@
 #include "minimize_energy.hpp"
 #include "nemd.hpp"
 #include "nsquare.hpp"
+#include "npt.hpp"
 #include "p3m.hpp"
 #include "particle_data.hpp"
 #include "pressure.hpp"
@@ -59,6 +62,7 @@
 #include "utils.hpp"
 #include "verlet.hpp"
 #include "virtual_sites.hpp"
+#include "collision.hpp"
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>

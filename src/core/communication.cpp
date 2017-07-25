@@ -84,6 +84,13 @@
 #include "topology.hpp"
 #include "virtual_sites.hpp"
 #include "observables/LbRadialVelocityProfile.hpp"
+#include "p3m-dipolar.hpp"
+#include "debye_hueckel.hpp"
+#include "reaction_field.hpp"
+#include "collision.hpp"
+#include "npt.hpp"
+#include "ljgen.hpp"
+#include "ljcos2.hpp"
 
 using namespace std;
 using Communication::mpiCallbacks;
