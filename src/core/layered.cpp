@@ -37,6 +37,7 @@
 #include "utils.hpp"
 #include <cstring>
 #include <mpi.h>
+#include "pressure_inline.hpp"
 
 /* Organization: Layers only in one direction.
    ghost_bottom

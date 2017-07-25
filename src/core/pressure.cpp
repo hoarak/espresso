@@ -29,6 +29,10 @@
 #include "nsquare.hpp"
 #include "layered.hpp"
 #include "virtual_sites_relative.hpp" 
+#include "p3m.hpp"
+#include "p3m-dipolar.hpp"
+#include "npt.hpp"
+#include "pressure_inline.hpp"
 
 Observable_stat virials  = {0, {}, 0,0,0,0,0};
 Observable_stat total_pressure = {0, {}, 0,0,0,0,0};

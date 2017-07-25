@@ -30,7 +30,7 @@
 #include "lees_edwards.hpp"
 #include "errorhandling.hpp"
 #include "forces.hpp"
-#include "pressure.hpp"
+#include "pressure_inline.hpp"
 #include "energy_inline.hpp"
 #include "constraints.hpp"
 #include "initialize.hpp"
