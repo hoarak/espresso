@@ -335,9 +335,9 @@ void File::fill_arrays_for_h5md_write_with_particle_property(
     /* Scale the stored force with m/(0.5*dt**2.0) to get a real
      * world force. */
     double fac = current_particle->p.mass / (0.5 * time_step * time_step);
-    f[0][particle_index][0] = current_particle->f.f[0] * fac;
-    f[0][particle_index][1] = current_particle->f.f[1] * fac;
-    f[0][particle_index][2] = current_particle->f.f[2] * fac;
+    f[0][particle_index][0] = current_particle->f()[0] * fac;
+    f[0][particle_index][1] = current_particle->f()[1] * fac;
+    f[0][particle_index][2] = current_particle->f()[2] * fac;
   }
   if (write_charge) {
 #ifdef ELECTROSTATICS

@@ -241,11 +241,6 @@ struct ParticlePosition {
   double m_dip[3];
 #endif
 
-#ifdef BOND_CONSTRAINT
-  /**stores the particle position at the previous time step*/
-  double p_old[3];
-#endif
-
 #ifdef SHANCHEN
   double composition[LB_COMPONENTS];
 #endif
@@ -253,16 +248,21 @@ struct ParticlePosition {
 
 /** Force information on a particle. Forces of ghost particles are
     collected and added up to the force of the original particle. */
-typedef struct {
+struct ParticleForce {
   /** force. */
-  double f[3];
+  double (&f())[3] { return m_f; }
+  double const (&f() const)[3] { return m_f; }
+
+  double m_f[3];
 
 #ifdef ROTATION
-  /** torque */
-  double torque[3];
-#endif
+  double (&torque())[3] { return m_torque; }
+  double const (&torque() const)[3] { return m_torque; }
 
-} ParticleForce;
+  /** torque */
+  double m_torque[3];
+#endif
+};
 
 /** Momentum information on a particle. Information not contained in
     communication of ghost particles so far, but a communication would
@@ -336,8 +336,6 @@ struct Particle : public ParticlePosition {
 
   ///
   ParticleProperties p;
-  ///
-  //  ParticlePosition r;
   ///
   ParticleMomentum m;
   ///

@@ -56,7 +56,7 @@ int comfixed_set_params(int part_type_a, int part_type_b, int flag)
       if(p[i].p.type==part_type_a) {
 	for(j = 0; j < 3; j++) {
 	  p[i].m.v[j] = 0.;
-	  p[i].f.f[j] = 0.;
+	  p[i].f()[j] = 0.;
 	}
       }
     }
@@ -90,7 +90,7 @@ void calc_comfixed()
 	  if(p[i].p.type==t0) {
 	    type_mass += (p[i]).p.mass;
       	    for(j = 0; j < 3; j++) {
-	      fsum0[j] += p[i].f.f[j];
+	      fsum0[j] += p[i].f()[j];
 	    }
 	  }
         }
@@ -103,7 +103,7 @@ void calc_comfixed()
         for(i = 0; i < np; i++) {
 	  if(p[i].p.type==t0) {
       	    for(j = 0; j < 3; j++) {
-	      p[i].f.f[j] -= fsum0[j]/type_mass*(p[i]).p.mass;
+	      p[i].f()[j] -= fsum0[j]/type_mass*(p[i]).p.mass;
 	    }
 	  }
         }

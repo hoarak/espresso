@@ -29,7 +29,7 @@ int ObservableForceDensityProfile::actual_calculate() {
     binz= (int) floor( pdata->zbins*  (ppos[2]-pdata->minz)/(pdata->maxz-pdata->minz));
     if (binx>=0 && binx < pdata->xbins && biny>=0 && biny < pdata->ybins && binz>=0 && binz < pdata->zbins) {
       for(int dim = 0; dim < 3; dim++)
-        A[3*(binx*pdata->ybins*pdata->zbins + biny*pdata->zbins + binz) + dim] += partCfg[ids->e[i]].f.f[dim]/bin_volume;
+        A[3*(binx*pdata->ybins*pdata->zbins + biny*pdata->zbins + binz) + dim] += partCfg[ids->e[i]].f()[dim]/bin_volume;
     } 
   }
   return 0;

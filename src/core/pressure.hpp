@@ -495,14 +495,14 @@ inline void add_kinetic_virials(Particle *p1,int v_comp)
 #ifdef MULTI_TIMESTEP
   if (smaller_time_step > 0.) {
     if(v_comp)
-      virials.data.e[0] += SQR(time_step/smaller_time_step)*(SQR(p1->m.v[0] - p1->f.f[0]) + SQR(p1->m.v[1] - p1->f.f[1]) + SQR(p1->m.v[2] - p1->f.f[2]))*(*p1).p.mass;
+      virials.data.e[0] += SQR(time_step/smaller_time_step)*(SQR(p1->m.v[0] - p1->f()[0]) + SQR(p1->m.v[1] - p1->f()[1]) + SQR(p1->m.v[2] - p1->f()[2]))*(*p1).p.mass;
     else
       virials.data.e[0] += SQR(time_step/smaller_time_step)*(SQR(p1->m.v[0]) + SQR(p1->m.v[1]) + SQR(p1->m.v[2]))*(*p1).p.mass;
   } else
 #endif
   {
     if(v_comp) 
-      virials.data.e[0] += (SQR(p1->m.v[0] - p1->f.f[0]) + SQR(p1->m.v[1] - p1->f.f[1]) + SQR(p1->m.v[2] - p1->f.f[2]))*(*p1).p.mass;
+      virials.data.e[0] += (SQR(p1->m.v[0] - p1->f()[0]) + SQR(p1->m.v[1] - p1->f()[1]) + SQR(p1->m.v[2] - p1->f()[2]))*(*p1).p.mass;
     else
       virials.data.e[0] += (SQR(p1->m.v[0]) + SQR(p1->m.v[1]) + SQR(p1->m.v[2]))*(*p1).p.mass;
   }

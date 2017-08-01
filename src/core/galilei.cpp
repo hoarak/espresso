@@ -72,15 +72,15 @@ void local_kill_particle_forces( int torque ) {
     np = cell->n;
         
     for(i = 0; i < np; i++) {
-      part[i].f.f[0] = 0.0;
-      part[i].f.f[1] = 0.0;
-      part[i].f.f[2] = 0.0;
+      part[i].f()[0] = 0.0;
+      part[i].f()[1] = 0.0;
+      part[i].f()[2] = 0.0;
 
       if( torque != 0 ) { 
 #ifdef ROTATION
-      part[i].f.torque[0] = 0.0;
-      part[i].f.torque[1] = 0.0;
-      part[i].f.torque[2] = 0.0;
+      part[i].torque()[0] = 0.0;
+      part[i].torque()[1] = 0.0;
+      part[i].torque()[2] = 0.0;
 #endif
       }
     }

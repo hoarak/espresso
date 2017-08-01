@@ -116,13 +116,13 @@ void IBM_Tribend_CalcForce(Particle *p1, const int numPartners, Particle **const
     vector_product(tmp,v1, term1);
     vector_product(tmp2,v2, term2);
     for (int i = 0; i < 3; i++ )
-      p1->f.f[i] += Pre*(term1[i]/Ai + term2[i]/Aj);
+      p1->f()[i] += Pre*(term1[i]/Ai + term2[i]/Aj);
     
      // Force for particle 2:
     get_mi_vector(tmp,p3->pos(),p1->pos());
     vector_product(tmp,v1, term1);
     for (int i = 0; i < 3; i++)
-      p2->f.f[i] += Pre*(term1[i]/Ai);
+      p2->f()[i] += Pre*(term1[i]/Ai);
     
     // Force for Particle 3:
     get_mi_vector(tmp,p1->pos(),p2->pos());
@@ -130,12 +130,12 @@ void IBM_Tribend_CalcForce(Particle *p1, const int numPartners, Particle **const
     vector_product(tmp,v1, term1);
     vector_product(tmp2,v2, term2);
     for (int i = 0; i < 3; i++)
-      p3->f.f[i] += Pre*(term1[i]/Ai + term2[i]/Aj);
+      p3->f()[i] += Pre*(term1[i]/Ai + term2[i]/Aj);
     
     // Force for Particle 4:
     get_mi_vector(tmp,p1->pos(),p3->pos());
     vector_product(tmp,v2, term1);
-    for (int i = 0; i < 3; i++) p4->f.f[i] += Pre*(term1[i]/Aj);
+    for (int i = 0; i < 3; i++) p4->f()[i] += Pre*(term1[i]/Aj);
   }
 }
 
@@ -378,9 +378,9 @@ void CalcForceGompper(Particle *xi, const int numNeighbors, Particle **const nei
     
 //    if ( xl->id() == 0)
 //      printf("  Adding to node = %d when treating node %d: f = %.12e %.12e %.12e\n", xl->id(), xi->id(), force.el[0], force.el[1], force.el[2]);
-    xl->f.f[0] += force.el[0];
-    xl->f.f[1] += force.el[1];
-    xl->f.f[2] += force.el[2];
+    xl->f()[0] += force.el[0];
+    xl->f()[1] += force.el[1];
+    xl->f()[2] += force.el[2];
     
     // DEBUG stuff
 /*    for (int i=0; i < numNeighbors; i++)

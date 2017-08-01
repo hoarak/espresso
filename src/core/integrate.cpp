@@ -655,14 +655,14 @@ void rescale_forces() {
     np = cell->n;
     for (i = 0; i < np; i++) {
       check_particle_force(&p[i]);
-      p[i].f.f[0] *= scale / (p[i]).p.mass;
-      p[i].f.f[1] *= scale / (p[i]).p.mass;
-      p[i].f.f[2] *= scale / (p[i]).p.mass;
+      p[i].f()[0] *= scale / (p[i]).p.mass;
+      p[i].f()[1] *= scale / (p[i]).p.mass;
+      p[i].f()[2] *= scale / (p[i]).p.mass;
 
       ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr,
           "%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",
-          this_node, p[i].f.f[0], p[i].f.f[1], p[i].f.f[2], p[i].m.v[0],
+          this_node, p[i].f()[0], p[i].f()[1], p[i].f()[2], p[i].m.v[0],
           p[i].m.v[1], p[i].m.v[2]));
     }
   }
@@ -699,14 +699,14 @@ void rescale_forces_propagate_vel() {
     for (i = 0; i < np; i++) {
       check_particle_force(&p[i]);
       /* Rescale forces: f_rescaled = 0.5*dt*dt * f_calculated * (1/mass) */
-      p[i].f.f[0] *= scale / (p[i]).p.mass;
-      p[i].f.f[1] *= scale / (p[i]).p.mass;
-      p[i].f.f[2] *= scale / (p[i]).p.mass;
+      p[i].f()[0] *= scale / (p[i]).p.mass;
+      p[i].f()[1] *= scale / (p[i]).p.mass;
+      p[i].f()[2] *= scale / (p[i]).p.mass;
 
       ONEPART_TRACE(if (p[i].id() == check_id) fprintf(
           stderr,
           "%d: OPT: SCAL f = (%.3e,%.3e,%.3e) v_old = (%.3e,%.3e,%.3e)\n",
-          this_node, p[i].f.f[0], p[i].f.f[1], p[i].f.f[2], p[i].m.v[0],
+          this_node, p[i].f()[0], p[i].f()[1], p[i].f()[2], p[i].m.v[0],
           p[i].m.v[1], p[i].m.v[2]));
 #ifdef VIRTUAL_SITES
       // Virtual sites are not propagated during integration
@@ -723,16 +723,16 @@ void rescale_forces_propagate_vel() {
             nptiso.p_vel[j] += SQR(p[i].m.v[j]) * (p[i]).p.mass;
 #ifdef MULTI_TIMESTEP
             if (smaller_time_step > 0. && current_time_step_is_small == 1)
-              p[i].m.v[j] += p[i].f.f[j];
+              p[i].m.v[j] += p[i].f()[j];
             else
 #endif
               p[i].m.v[j] +=
-                  p[i].f.f[j] +
+                  p[i].f()[j] +
                   friction_therm0_nptiso(p[i].m.v[j]) / (p[i]).p.mass;
           } else
 #endif
             /* Propagate velocity: v(t+dt) = v(t+0.5*dt) + 0.5*dt * f(t+dt) */
-            p[i].m.v[j] += p[i].f.f[j];
+            p[i].m.v[j] += p[i].f()[j];
 #ifdef EXTERNAL_FORCES
         }
 #endif
@@ -955,17 +955,17 @@ void propagate_vel() {
               (nptiso.geometry & nptiso.nptgeom_dir[j])) {
 #ifdef MULTI_TIMESTEP
             if (smaller_time_step > 0. && current_time_step_is_small == 1)
-              p[i].m.v[j] += p[i].f.f[j];
+              p[i].m.v[j] += p[i].f()[j];
             else
 #endif
               p[i].m.v[j] +=
-                  p[i].f.f[j] +
+                  p[i].f()[j] +
                   friction_therm0_nptiso(p[i].m.v[j]) / (p[i]).p.mass;
             nptiso.p_vel[j] += SQR(p[i].m.v[j]) * (p[i]).p.mass;
           } else
 #endif
             /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-            p[i].m.v[j] += p[i].f.f[j];
+            p[i].m.v[j] += p[i].f()[j];
 
 /* SPECIAL TASKS in particle loop */
 #ifdef NEMD
@@ -1072,7 +1072,7 @@ void propagate_vel_pos() {
 #endif
         {
           /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-          p[i].m.v[j] += p[i].f.f[j];
+          p[i].m.v[j] += p[i].f()[j];
 
 #ifdef MULTI_TIMESTEP
           if (smaller_time_step < 0. || current_time_step_is_small == 1)
@@ -1176,10 +1176,10 @@ void force_and_velocity_check(Particle *p) {
     }
 
   /* force check */
-  db_force = SQR(p->f.f[0]) + SQR(p->f.f[1]) + SQR(p->f.f[2]);
+  db_force = SQR(p->f()[0]) + SQR(p->f()[1]) + SQR(p->f()[2]);
   if (db_force > skin2)
     fprintf(stderr, "%d: Part %d has force %f (%f,%f,%f)\n", this_node,
-            p->id(), sqrt(db_force), p->f.f[0], p->f.f[1], p->f.f[2]);
+            p->id(), sqrt(db_force), p->f()[0], p->f()[1], p->f()[2]);
   if (db_force > db_max_force) {
     db_max_force = db_force;
     db_maxf_id = p->id();
@@ -1200,9 +1200,9 @@ void force_and_velocity_display() {
 #ifdef ADDITIONAL_CHECKS
   if (db_max_force > skin2)
     fprintf(stderr, "%d: max_force=%e, part=%d f=(%e,%e,%e)\n", this_node,
-            sqrt(db_max_force), db_maxf_id, local_particles[db_maxf_id]->f.f[0],
-            local_particles[db_maxf_id]->f.f[1],
-            local_particles[db_maxf_id]->f.f[2]);
+            sqrt(db_max_force), db_maxf_id, local_particles[db_maxf_id]->f()[0],
+            local_particles[db_maxf_id]->f()[1],
+            local_particles[db_maxf_id]->f()[2]);
   if (db_max_vel > skin2)
     fprintf(stderr, "%d: max_vel=%e, part=%d v=(%e,%e,%e)\n", this_node,
             sqrt(db_max_vel), db_maxv_id, local_particles[db_maxv_id]->m.v[0],

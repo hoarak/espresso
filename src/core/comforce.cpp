@@ -100,12 +100,12 @@ void calc_comforce()
           for(int i = 0; i < np; i++) {
             if(p[i].p.type==t0) {
       	      for(int j = 0; j < 3; j++) {
-                p[i].f.f[j] -= ia_params->COMFORCE_fratio * ia_params->COMFORCE_force * fvect[j];
+                p[i].f()[j] -= ia_params->COMFORCE_fratio * ia_params->COMFORCE_force * fvect[j];
               }
             }
             if(p[i].p.type==t1) {
       	      for (int j = 0; j < 3; j++) {
-                p[i].f.f[j] +=  ia_params->COMFORCE_force * fvect[j];
+                p[i].f()[j] +=  ia_params->COMFORCE_force * fvect[j];
               }
             }
           }

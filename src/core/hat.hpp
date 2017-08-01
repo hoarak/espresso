@@ -73,8 +73,8 @@ inline void add_hat_pair_force(const Particle * const p1, const Particle * const
 #endif
     }
     
-    ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: hat    f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),dist,fac));
-    ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: hat    f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),dist,fac));
+    ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: hat    f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f()[0],p1->f()[1],p1->f()[2],p2->id(),dist,fac));
+    ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: hat    f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f()[0],p2->f()[1],p2->f()[2],p1->id(),dist,fac));
   }
 }
 

@@ -33,7 +33,7 @@ public:
     int binz= (int) floor( zbins*  (ppos[2]-minz)/(maxz-minz));
     if (binx>=0 && binx < xbins && biny>=0 && biny < ybins && binz>=0 && binz < zbins) {
       for(int dim = 0; dim < 3; dim++)
-        last_value[3*(binx*ybins*zbins + biny*zbins + binz) + dim] += partCfg[id].f.f[dim]/bin_volume;
+        last_value[3*(binx*ybins*zbins + biny*zbins + binz) + dim] += partCfg[id].f()[dim]/bin_volume;
     } 
   }
   return 0;

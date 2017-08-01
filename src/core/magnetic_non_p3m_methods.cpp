@@ -79,12 +79,12 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
     ffy=ab*dr[1]+cc*p1->dip()[1]+d*p2->dip()[1];
     ffz=ab*dr[2]+cc*p1->dip()[2]+d*p2->dip()[2];
     // Add the force to the particles
-    p1->f.f[0] +=coulomb.Dprefactor*ffx;
-    p1->f.f[1] +=coulomb.Dprefactor*ffy;
-    p1->f.f[2] +=coulomb.Dprefactor*ffz;
-    p2->f.f[0] -=coulomb.Dprefactor*ffx;
-    p2->f.f[1] -=coulomb.Dprefactor*ffy;
-    p2->f.f[2] -=coulomb.Dprefactor*ffz;
+    p1->f()[0] +=coulomb.Dprefactor*ffx;
+    p1->f()[1] +=coulomb.Dprefactor*ffy;
+    p1->f()[2] +=coulomb.Dprefactor*ffz;
+    p2->f()[0] -=coulomb.Dprefactor*ffx;
+    p2->f()[1] -=coulomb.Dprefactor*ffy;
+    p2->f()[2] -=coulomb.Dprefactor*ffz;
 //    if (p1->id()==248)
 //    {
 //      printf("xxx %g %g %g\n", dr[0],dr[1],dr[2]);
@@ -106,18 +106,18 @@ double calc_dipole_dipole_ia(Particle* p1, Particle *p2, int force_flag)
     by=dr[0]*p1->dip()[2]-p1->dip()[0]*dr[2];
     bz=p1->dip()[0]*dr[1]-dr[0]*p1->dip()[1];
     
-    p1->f.torque[0]+=coulomb.Dprefactor*(-ax/r3+bx*cc);
-    p1->f.torque[1]+=coulomb.Dprefactor *(-ay/r3+by*cc);
-    p1->f.torque[2]+=coulomb.Dprefactor*(-az/r3+bz*cc);
+    p1->torque()[0]+=coulomb.Dprefactor*(-ax/r3+bx*cc);
+    p1->torque()[1]+=coulomb.Dprefactor *(-ay/r3+by*cc);
+    p1->torque()[2]+=coulomb.Dprefactor*(-az/r3+bz*cc);
     
     // 2nd particle     
     bx=p2->dip()[1]*dr[2]-dr[1]*p2->dip()[2];
     by=dr[0]*p2->dip()[2]-p2->dip()[0]*dr[2];
     bz=p2->dip()[0]*dr[1]-dr[0]*p2->dip()[1];
 	     
-    p2->f.torque[0]+=coulomb.Dprefactor* (ax/r3+bx*d);
-    p2->f.torque[1]+=coulomb.Dprefactor*(ay/r3+by*d);
-    p2->f.torque[2]+=coulomb.Dprefactor* (az/r3+bz*d);
+    p2->torque()[0]+=coulomb.Dprefactor* (ax/r3+bx*d);
+    p2->torque()[1]+=coulomb.Dprefactor*(ay/r3+by*d);
+    p2->torque()[2]+=coulomb.Dprefactor* (az/r3+bz*d);
 #endif
   }    
 	
@@ -411,14 +411,14 @@ double  magnetic_dipolar_direct_sum_calculations(int force_flag, int energy_flag
       for(i=0;i<np;i++) {
 	if( part[i].p.dipm != 0.0 ) {
 	 
-	  part[i].f.f[0]+=coulomb.Dprefactor*fx[dip_particles2];
-	  part[i].f.f[1]+=coulomb.Dprefactor*fy[dip_particles2];
-	  part[i].f.f[2]+=coulomb.Dprefactor*fz[dip_particles2];
+	  part[i].f()[0]+=coulomb.Dprefactor*fx[dip_particles2];
+	  part[i].f()[1]+=coulomb.Dprefactor*fy[dip_particles2];
+	  part[i].f()[2]+=coulomb.Dprefactor*fz[dip_particles2];
 	
 #ifdef ROTATION 
-	  part[i].f.torque[0]+=coulomb.Dprefactor*tx[dip_particles2];
-	  part[i].f.torque[1]+=coulomb.Dprefactor*ty[dip_particles2];
-	  part[i].f.torque[2]+=coulomb.Dprefactor*tz[dip_particles2];
+	  part[i].torque()[0]+=coulomb.Dprefactor*tx[dip_particles2];
+	  part[i].torque()[1]+=coulomb.Dprefactor*ty[dip_particles2];
+	  part[i].torque()[2]+=coulomb.Dprefactor*tz[dip_particles2];
 #endif
 	  dip_particles2++;
 	  	 

@@ -172,9 +172,9 @@ void CoupleIBMParticleToFluid(Particle *p)
 {
   // Convert units from MD to LB
   double delta_j[3];
-  delta_j[0] = p->f.f[0]*time_step*lbpar.tau/lbpar.agrid;
-  delta_j[1] = p->f.f[1]*time_step*lbpar.tau/lbpar.agrid;
-  delta_j[2] = p->f.f[2]*time_step*lbpar.tau/lbpar.agrid;
+  delta_j[0] = p->f()[0]*time_step*lbpar.tau/lbpar.agrid;
+  delta_j[1] = p->f()[1]*time_step*lbpar.tau/lbpar.agrid;
+  delta_j[2] = p->f()[2]*time_step*lbpar.tau/lbpar.agrid;
   
   // Get indices and weights of affected nodes using discrete delta function
   index_t node_index[8];
@@ -392,7 +392,7 @@ void ParticleVelocitiesFromLB_CPU()
         double dummy[3];
         // Get interpolated velocity and store in the force (!) field
         // for later communication (see below)
-        GetIBMInterpolatedVelocity(p[j].pos(), p[j].f.f, dummy);
+        GetIBMInterpolatedVelocity(p[j].pos(), p[j].f(), dummy);
       }
   }
   
@@ -419,14 +419,14 @@ void ParticleVelocitiesFromLB_CPU()
           GetIBMInterpolatedVelocity(p[j].pos(), dummy, force);
           
           // Rescale and store in the force field of the particle (for communication, see below)
-          p[j].f.f[0] = force[0] * lbpar.agrid/lbpar.tau;
-          p[j].f.f[1] = force[1] * lbpar.agrid/lbpar.tau;
-          p[j].f.f[2] = force[2] * lbpar.agrid/lbpar.tau;
+          p[j].f()[0] = force[0] * lbpar.agrid/lbpar.tau;
+          p[j].f()[1] = force[1] * lbpar.agrid/lbpar.tau;
+          p[j].f()[2] = force[2] * lbpar.agrid/lbpar.tau;
         }
-        else { p[j].f.f[0] = p[j].f.f[1] = p[j].f.f[2] = 0; }   // Reset, necessary because we add all forces below. Also needs to be done for the real particles!
+        else { p[j].f()[0] = p[j].f()[1] = p[j].f()[2] = 0; }   // Reset, necessary because we add all forces below. Also needs to be done for the real particles!
         
       }
-      else { p[j].f.f[0] = p[j].f.f[1] = p[j].f.f[2] = 0; }   // Reset, necessary because we add all forces below
+      else { p[j].f()[0] = p[j].f()[1] = p[j].f()[2] = 0; }   // Reset, necessary because we add all forces below
   }
   
   
@@ -445,9 +445,9 @@ void ParticleVelocitiesFromLB_CPU()
     for(int j = 0; j < cell->n; j++)
       if (p[j].p.isVirtual)
       {
-        p[j].m.v[0] = p[j].f.f[0];
-        p[j].m.v[1] = p[j].f.f[1];
-        p[j].m.v[2] = p[j].f.f[2];
+        p[j].m.v[0] = p[j].f()[0];
+        p[j].m.v[1] = p[j].f()[1];
+        p[j].m.v[2] = p[j].f()[2];
       }
   }
 }

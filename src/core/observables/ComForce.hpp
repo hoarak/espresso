@@ -22,9 +22,9 @@ public:
   for (int i = 0; i<ids.size(); i++ ) {
     if (ids[i] >= n_part)
       return 1;
-    last_value[0] += scale * partCfg[ids[i]].f.f[0] *partCfg[ids[i]].p.mass;
-    last_value[1] += scale * partCfg[ids[i]].f.f[1] *partCfg[ids[i]].p.mass;
-    last_value[2] += scale * partCfg[ids[i]].f.f[2] *partCfg[ids[i]].p.mass;
+    last_value[0] += scale * partCfg[ids[i]].f()[0] *partCfg[ids[i]].p.mass;
+    last_value[1] += scale * partCfg[ids[i]].f()[1] *partCfg[ids[i]].p.mass;
+    last_value[2] += scale * partCfg[ids[i]].f()[2] *partCfg[ids[i]].p.mass;
   }
   return 0;
 };

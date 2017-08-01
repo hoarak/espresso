@@ -90,17 +90,17 @@
 
 /** initialize the forces for a ghost particle */
 inline void init_ghost_force(Particle *part) {
-  part->f.f[0] = 0;
-  part->f.f[1] = 0;
-  part->f.f[2] = 0;
+  part->f()[0] = 0;
+  part->f()[1] = 0;
+  part->f()[2] = 0;
 
 #ifdef ROTATION
   {
     double scale;
     /* set torque to zero */
-    part->f.torque[0] = 0;
-    part->f.torque[1] = 0;
-    part->f.torque[2] = 0;
+    part->torque()[0] = 0;
+    part->torque()[1] = 0;
+    part->torque()[2] = 0;
 
     /* and rescale quaternion, so it is exactly of unit length */
     scale = sqrt(SQR(part->quat()[0]) + SQR(part->quat()[1]) +
@@ -118,16 +118,16 @@ inline void init_local_particle_force(Particle *part) {
   if (thermo_switch & THERMO_LANGEVIN)
     friction_thermo_langevin(part);
   else {
-    part->f.f[0] = 0;
-    part->f.f[1] = 0;
-    part->f.f[2] = 0;
+    part->f()[0] = 0;
+    part->f()[1] = 0;
+    part->f()[2] = 0;
   }
 
 #ifdef EXTERNAL_FORCES
   if (part->p.ext_flag & PARTICLE_EXT_FORCE) {
-    part->f.f[0] += part->p.ext_force[0];
-    part->f.f[1] += part->p.ext_force[1];
-    part->f.f[2] += part->p.ext_force[2];
+    part->f()[0] += part->p.ext_force[0];
+    part->f()[1] += part->p.ext_force[1];
+    part->f()[2] += part->p.ext_force[2];
   }
 #endif
 
@@ -135,15 +135,15 @@ inline void init_local_particle_force(Particle *part) {
   {
     double scale;
     /* set torque to zero */
-    part->f.torque[0] = 0;
-    part->f.torque[1] = 0;
-    part->f.torque[2] = 0;
+    part->torque()[0] = 0;
+    part->torque()[1] = 0;
+    part->torque()[2] = 0;
 
 #ifdef EXTERNAL_FORCES
     if (part->p.ext_flag & PARTICLE_EXT_TORQUE) {
-      part->f.torque[0] += part->p.ext_torque[0];
-      part->f.torque[1] += part->p.ext_torque[1];
-      part->f.torque[2] += part->p.ext_torque[2];
+      part->torque()[0] += part->p.ext_torque[0];
+      part->torque()[1] += part->p.ext_torque[1];
+      part->torque()[2] += part->p.ext_torque[2];
     }
 #endif
 
@@ -151,9 +151,9 @@ inline void init_local_particle_force(Particle *part) {
     // apply a swimming force in the direction of
     // the particle's orientation axis
     if (part->swim.swimming) {
-      part->f.f[0] += part->swim.f_swim * part->quatu()[0];
-      part->f.f[1] += part->swim.f_swim * part->quatu()[1];
-      part->f.f[2] += part->swim.f_swim * part->quatu()[2];
+      part->f()[0] += part->swim.f_swim * part->quatu()[0];
+      part->f()[1] += part->swim.f_swim * part->quatu()[1];
+      part->f()[2] += part->swim.f_swim * part->quatu()[2];
     }
 #endif
 
@@ -389,7 +389,7 @@ inline void add_non_bonded_pair_force(Particle *p1, Particle *p2, double d[3],
       // forces from the virtual charges
       // they go directly onto the particles, since they are not pairwise forces
       if (elc_params.dielectric_contrast_on)
-        ELC_P3M_dielectric_layers_force_contribution(p1, p2, p1->f.f, p2->f.f);
+        ELC_P3M_dielectric_layers_force_contribution(p1, p2, p1->f(), p2->f());
     }
     break;
   }
@@ -466,11 +466,11 @@ inline void add_non_bonded_pair_force(Particle *p1, Particle *p2, double d[3],
   /***********************************************/
 
   for (j = 0; j < 3; j++) {
-    p1->f.f[j] += force[j];
-    p2->f.f[j] -= force[j];
+    p1->f()[j] += force[j];
+    p2->f()[j] -= force[j];
 #ifdef ROTATION
-    p1->f.torque[j] += torque1[j];
-    p2->f.torque[j] += torque2[j];
+    p1->torque()[j] += torque1[j];
+    p2->torque()[j] += torque2[j];
 #endif
   }
 }
@@ -788,16 +788,16 @@ inline void add_bonded_force(Particle *p1) {
         switch (type) {
 #ifdef BOND_ENDANGLEDIST
         case BONDED_IA_ENDANGLEDIST:
-          p1->f.f[j] += force[j];
-          p2->f.f[j] += force2[j];
+          p1->f()[j] += force[j];
+          p2->f()[j] += force2[j];
           break;
 #endif // BOND_ENDANGLEDIST
         default:
-          p1->f.f[j] += force[j];
-          p2->f.f[j] -= force[j];
+          p1->f()[j] += force[j];
+          p2->f()[j] -= force[j];
 #ifdef ROTATION
-          p1->f.torque[j] += torque1[j];
-          p2->f.torque[j] += torque2[j];
+          p1->torque()[j] += torque1[j];
+          p2->torque()[j] += torque2[j];
 #endif
         }
 
@@ -822,9 +822,9 @@ inline void add_bonded_force(Particle *p1) {
           break;
 #endif
         default:
-          p1->f.f[j] += force[j];
-          p2->f.f[j] += force2[j];
-          p3->f.f[j] -= (force[j] + force2[j]);
+          p1->f()[j] += force[j];
+          p2->f()[j] += force2[j];
+          p3->f()[j] -= (force[j] + force2[j]);
         }
       }
       break;
@@ -839,30 +839,30 @@ inline void add_bonded_force(Particle *p1) {
       switch (type) {
       case BONDED_IA_DIHEDRAL:
         for (j = 0; j < 3; j++) {
-          p1->f.f[j] += force[j];
-          p2->f.f[j] += force2[j];
-          p3->f.f[j] += force3[j];
-          p4->f.f[j] -= force[j] + force2[j] + force3[j];
+          p1->f()[j] += force[j];
+          p2->f()[j] += force2[j];
+          p3->f()[j] += force3[j];
+          p4->f()[j] -= force[j] + force2[j] + force3[j];
         }
         break;
 
 #ifdef OIF_LOCAL_FORCES
       case BONDED_IA_OIF_LOCAL_FORCES:
         for (j = 0; j < 3; j++) {
-          p1->f.f[j] += force2[j];
-          p2->f.f[j] += force[j];
-          p3->f.f[j] += force3[j];
-          p4->f.f[j] += force4[j];
+          p1->f()[j] += force2[j];
+          p2->f()[j] += force[j];
+          p3->f()[j] += force3[j];
+          p4->f()[j] += force4[j];
         }
         break;
 #endif
 #ifdef CG_DNA
       default:
         for (j = 0; j < 3; j++) {
-          p1->f.f[j] += force[j];
-          p2->f.f[j] += force2[j];
-          p3->f.f[j] += force3[j];
-          p4->f.f[j] += force4[j];
+          p1->f()[j] += force[j];
+          p2->f()[j] += force2[j];
+          p3->f()[j] += force3[j];
+          p4->f()[j] += force4[j];
         }
         break;
 #endif
@@ -879,14 +879,14 @@ inline void add_bonded_force(Particle *p1) {
       case BONDED_IA_CG_DNA_STACKING:
 #ifdef CG_DNA
         for (j = 0; j < 3; j++) {
-          p1->f.f[j] += force[j];
-          p2->f.f[j] += force2[j];
-          p3->f.f[j] += force3[j];
-          p4->f.f[j] += force4[j];
-          p5->f.f[j] += force5[j];
-          p6->f.f[j] += force6[j];
-          p7->f.f[j] += force7[j];
-          p8->f.f[j] += force8[j];
+          p1->f()[j] += force[j];
+          p2->f()[j] += force2[j];
+          p3->f()[j] += force3[j];
+          p4->f()[j] += force4[j];
+          p5->f()[j] += force5[j];
+          p6->f()[j] += force6[j];
+          p7->f()[j] += force7[j];
+          p8->f()[j] += force8[j];
         }
 #endif
         break;
@@ -907,7 +907,7 @@ inline void add_force(ParticleForce *F_to, ParticleForce *F_add) {
 
 inline void check_particle_force(Particle *part) {
   for (int i = 0; i < 3; i++) {
-    if (std::isnan(part->f.f[i])) {
+    if (std::isnan(part->f()[i])) {
       runtimeErrorMsg() << "force on particle " << part->id()
                         << " was NAN.";
     }
@@ -915,7 +915,7 @@ inline void check_particle_force(Particle *part) {
 
 #ifdef ROTATION
   for (int i = 0; i < 3; i++) {
-    if (std::isnan(part->f.torque[i])) {
+    if (std::isnan(part->torque()[i])) {
       runtimeErrorMsg() << "torque on particle " << part->id()
                         << " was NAN.";
     }

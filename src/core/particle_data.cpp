@@ -196,13 +196,13 @@ void init_particle(Particle *part)
 #endif
 
   /* ParticleForce */
-  part->f.f[0]     = 0.0;
-  part->f.f[1]     = 0.0;
-  part->f.f[2]     = 0.0;
+  part->f()[0]     = 0.0;
+  part->f()[1]     = 0.0;
+  part->f()[2]     = 0.0;
 #ifdef ROTATION
-  part->f.torque[0] = 0.0;
-  part->f.torque[1] = 0.0;
-  part->f.torque[2] = 0.0;
+  part->torque()[0] = 0.0;
+  part->torque()[1] = 0.0;
+  part->torque()[2] = 0.0;
 
   // Swimming parameters
 #ifdef ENGINE
@@ -2166,7 +2166,7 @@ void pointer_to_omega_body(Particle* p, double*&  res)
 
 void pointer_to_torque_lab(Particle* p, double*& res)
 {
-  res=p->f.torque;
+  res=p->torque();
 }
 
 void pointer_to_quat(Particle* p, double*& res)

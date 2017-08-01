@@ -210,30 +210,30 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 	/* Propagate all forces in this function rather than in the forces.hpp file */
 	if (dist > 0.0){
 	  for(j=0;j<3;++j){
-	    p1->f.f[j] += angular_jik * angular_ikn * rik[j]/l_rik *radprime 
+	    p1->f()[j] += angular_jik * angular_ikn * rik[j]/l_rik *radprime 
 	      + angular_ikn * rad * angular_jik_prime 
 	      * ( ( 2*rik[j]-rij[j] )/( l_rij*l_rik )
 		  - cos_jik*( 2*rij[j]/l_rij2 - rik[j]/l_rik2 ) )
 	      + angular_jik * rad * angular_ikn_prime
 	      * ( rkn[j]/( l_rik*l_rkn )
 		  + cos_ikn*rik[j]/l_rik2 );
-	    p2->f.f[j] += -angular_jik * angular_ikn * rik[j]/l_rik *radprime
+	    p2->f()[j] += -angular_jik * angular_ikn * rik[j]/l_rik *radprime
 	      + angular_ikn * rad * angular_jik_prime 
 	      * ( rij[j]/( l_rij*l_rik )
 		  - cos_jik*rik[j]/l_rik2 )
 	      + angular_jik * rad * angular_ikn_prime
 	      * ( -(2*rik[j]+rkn[j])/(l_rik*l_rkn)
 		  - cos_ikn*( 2*rkn[j]/l_rkn2 + rik[j]/l_rik2 ) );
-	    p3->f.f[j] += angular_ikn * rad * angular_jik_prime 
+	    p3->f()[j] += angular_ikn * rad * angular_jik_prime 
 	      * ( -rik[j]/(l_rij*l_rik) 
 		  + cos_jik*rij[j]/l_rij2 );
-	    p4->f.f[j] += angular_ikn * rad * angular_jik_prime 
+	    p4->f()[j] += angular_ikn * rad * angular_jik_prime 
 	      * ( -rik[j]/(l_rij*l_rik) 
 		  + cos_jik*rij[j]/l_rij2 );
-	    p5->f.f[j] += angular_jik * rad * angular_ikn_prime
+	    p5->f()[j] += angular_jik * rad * angular_ikn_prime
 	      * ( rik[j]/(l_rik*l_rkn)
 		  + cos_ikn*rkn[j]/l_rkn2 );
-	    p6->f.f[j] += angular_jik * rad * angular_ikn_prime
+	    p6->f()[j] += angular_jik * rad * angular_ikn_prime
 	      * ( rik[j]/(l_rik*l_rkn)
 		  + cos_ikn*rkn[j]/l_rkn2 );
 	  }
@@ -248,12 +248,12 @@ inline void add_ljangle_force(Particle *p1, Particle *p2, IA_parameters *ia_para
 	  frac10 = frac2*frac2*frac2*frac2*frac2;
 	  rad   = effective_eps * frac10*(5.0 * frac2 - 6.0) / ia_params->LJANGLE_capradius;
 		  
-	  p1->f.f[0] += rad * ia_params->LJANGLE_capradius;
+	  p1->f()[0] += rad * ia_params->LJANGLE_capradius;
 	}
 	      
 	      
-	ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),dist,radprime));
-	ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),dist,radprime));
+	ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f()[0],p1->f()[1],p1->f()[2],p2->id(),dist,radprime));
+	ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: LJANGLE   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f()[0],p2->f()[1],p2->f()[2],p1->id(),dist,radprime));
 	      
 	LJ_TRACE(fprintf(stderr,"%d: LJANGLE: Pair (%d-%d) dist=%.3f: force+-: (%.3e,%.3e,%.3e)\n",
 			 this_node,p1->id(),p2->id(),dist,rad*d[0],rad*d[1],rad*d[2]));

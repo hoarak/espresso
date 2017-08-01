@@ -188,9 +188,9 @@ int iccp3m_iteration() {
                     /* the dielectric-related prefactor: */                     
                     del_eps = (iccp3m_cfg.ein[id]-iccp3m_cfg.eout)/(iccp3m_cfg.ein[id] + iccp3m_cfg.eout);
                     /* calculate the electric field at the certain position */
-                    ex=part[i].f.f[0]/part[i].p.q;
-                    ey=part[i].f.f[1]/part[i].p.q;
-                    ez=part[i].f.f[2]/part[i].p.q;
+                    ex=part[i].f()[0]/part[i].p.q;
+                    ey=part[i].f()[1]/part[i].p.q;
+                    ez=part[i].f()[2]/part[i].p.q;
                     /* let's add the contribution coming from the external field */
                     ex += iccp3m_cfg.extx; 
                     ey += iccp3m_cfg.exty; 
@@ -676,30 +676,30 @@ void resize_verlet_list_iccp3m(PairList *pl)
 /** initialize the forces for a real particle */
 inline void init_local_particle_force_iccp3m(Particle *part)
 {
-    part->f.f[0] = 0.0; /* no need to friction_thermo_langevin function */
-    part->f.f[1] = 0.0;
-    part->f.f[2] = 0.0;
+    part->f()[0] = 0.0; /* no need to friction_thermo_langevin function */
+    part->f()[1] = 0.0;
+    part->f()[2] = 0.0;
 
 #ifdef ROTATION
     /* set torque to zero */
-    part->f.torque[0] = 0;
-    part->f.torque[1] = 0;
-    part->f.torque[2] = 0;
+    part->torque()[0] = 0;
+    part->torque()[1] = 0;
+    part->torque()[2] = 0;
 #endif
 }
 
 /** initialize the forces for a ghost particle */
 inline void init_ghost_force_iccp3m(Particle *part)
 {
-    part->f.f[0] = 0.0;
-    part->f.f[1] = 0.0;
-    part->f.f[2] = 0.0;
+    part->f()[0] = 0.0;
+    part->f()[1] = 0.0;
+    part->f()[2] = 0.0;
 
 #ifdef ROTATION
     /* set torque to zero */
-    part->f.torque[0] = 0;
-    part->f.torque[1] = 0;
-    part->f.torque[2] = 0;
+    part->torque()[0] = 0;
+    part->torque()[1] = 0;
+    part->torque()[2] = 0;
 #endif
 }
 
@@ -723,7 +723,7 @@ void reset_forces() {
         part = cell->part;
         np   = cell->n;
         for(i=0 ; i < np; i++) {
-            part[i].f.f[0]=0.0;  part[i].f.f[1]=0.0;  part[i].f.f[2]=0.0;
+            part[i].f()[0]=0.0;  part[i].f()[1]=0.0;  part[i].f()[2]=0.0;
         }
     }
 }
@@ -737,9 +737,9 @@ void iccp3m_revive_forces() {
         part = cell->part;
         np   = cell->n;
         for(i=0 ; i < np; i++) {
-            part[i].f.f[0]=iccp3m_cfg.fx[part[i].id()];
-            part[i].f.f[1]=iccp3m_cfg.fy[part[i].id()];
-            part[i].f.f[2]=iccp3m_cfg.fz[part[i].id()];
+            part[i].f()[0]=iccp3m_cfg.fx[part[i].id()];
+            part[i].f()[1]=iccp3m_cfg.fy[part[i].id()];
+            part[i].f()[2]=iccp3m_cfg.fz[part[i].id()];
         }
     }
 }
@@ -754,9 +754,9 @@ void iccp3m_store_forces() {
         part = cell->part;
         np   = cell->n;
         for(i=0 ; i < np; i++) {
-            iccp3m_cfg.fx[part[i].id()]=part[i].f.f[0];
-            iccp3m_cfg.fy[part[i].id()]=part[i].f.f[1];
-            iccp3m_cfg.fz[part[i].id()]=part[i].f.f[2];
+            iccp3m_cfg.fx[part[i].id()]=part[i].f()[0];
+            iccp3m_cfg.fy[part[i].id()]=part[i].f()[1];
+            iccp3m_cfg.fz[part[i].id()]=part[i].f()[2];
         }
     }
 }

@@ -92,8 +92,8 @@ inline void add_ljcos2_pair_force(const Particle * const p1, const Particle * co
       force[0] += fac * ia_params->LJCOS2_capradius;
     }
 
-    ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: LJ   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),dist,fac));
-    ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: LJ   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),dist,fac));
+    ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: LJ   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f()[0],p1->f()[1],p1->f()[2],p2->id(),dist,fac));
+    ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: LJ   f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f()[0],p2->f()[1],p2->f()[2],p1->id(),dist,fac));
 
     LJ_TRACE(fprintf(stderr,"%d: LJ: Pair (%d-%d) dist=%.3f: force+-: (%.3e,%.3e,%.3e)\n",
 		     this_node,p1->id(),p2->id(),dist,fac*d[0],fac*d[1],fac*d[2]));

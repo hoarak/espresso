@@ -610,10 +610,10 @@ static void add_z_force()
     np   = cells[c].n;
     part = cells[c].part;
     for (i = 0; i < np; i++) {
-      part[i].f.f[2] += part[i].p.q*(add+field_tot);
+      part[i].f()[2] += part[i].p.q*(add+field_tot);
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].id(), part[i].f.f[0],
-			 part[i].f.f[1], part[i].f.f[2]));
+			 this_node, part[i].id(), part[i].f()[0],
+			 part[i].f()[1], part[i].f()[2]));
     }
   }
 }
@@ -913,16 +913,16 @@ static void add_P_force()
     othcblk = block(gblcblk, c - 1, size);
 
     for (i = 0; i < np; i++) {
-      part[i].f.f[0] +=
+      part[i].f()[0] +=
 	partblk[size*ic + POQESM]*othcblk[POQECP] - partblk[size*ic + POQECM]*othcblk[POQESP] +
 	partblk[size*ic + POQESP]*othcblk[POQECM] - partblk[size*ic + POQECP]*othcblk[POQESM];
-      part[i].f.f[2] +=
+      part[i].f()[2] +=
 	partblk[size*ic + POQECM]*othcblk[POQECP] + partblk[size*ic + POQESM]*othcblk[POQESP] -
 	partblk[size*ic + POQECP]*othcblk[POQECM] - partblk[size*ic + POQESP]*othcblk[POQESM];
 
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].id(), part[i].f.f[0],
-			 part[i].f.f[1], part[i].f.f[2]));
+			 this_node, part[i].id(), part[i].f()[0],
+			 part[i].f()[1], part[i].f()[2]));
       ic++;
     }
   }
@@ -963,16 +963,16 @@ static void add_Q_force()
     othcblk = block(gblcblk, c - 1, size);
 
     for (i = 0; i < np; i++) {
-      part[i].f.f[1] +=
+      part[i].f()[1] +=
 	partblk[size*ic + POQESM]*othcblk[POQECP] - partblk[size*ic + POQECM]*othcblk[POQESP] +
 	partblk[size*ic + POQESP]*othcblk[POQECM] - partblk[size*ic + POQECP]*othcblk[POQESM];
-      part[i].f.f[2] +=
+      part[i].f()[2] +=
 	partblk[size*ic + POQECM]*othcblk[POQECP] + partblk[size*ic + POQESM]*othcblk[POQESP] -
 	partblk[size*ic + POQECP]*othcblk[POQECM] - partblk[size*ic + POQESP]*othcblk[POQESM];
 
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].id(), part[i].f.f[0],
-			 part[i].f.f[1], part[i].f.f[2]));
+			 this_node, part[i].id(), part[i].f()[0],
+			 part[i].f()[1], part[i].f()[2]));
       ic++;
     }
   }
@@ -1133,25 +1133,25 @@ static void add_PQ_force(int p, int q, double omega)
     othcblk = block(gblcblk, c - 1, size);
 
     for (i = 0; i < np; i++) {
-      part[i].f.f[0] +=
+      part[i].f()[0] +=
 	pref_x*(partblk[size*ic + PQESCM]*othcblk[PQECCP] + partblk[size*ic + PQESSM]*othcblk[PQECSP] -
 		partblk[size*ic + PQECCM]*othcblk[PQESCP] - partblk[size*ic + PQECSM]*othcblk[PQESSP] +
 		partblk[size*ic + PQESCP]*othcblk[PQECCM] + partblk[size*ic + PQESSP]*othcblk[PQECSM] -
 		partblk[size*ic + PQECCP]*othcblk[PQESCM] - partblk[size*ic + PQECSP]*othcblk[PQESSM]);
-      part[i].f.f[1] +=
+      part[i].f()[1] +=
 	pref_y*(partblk[size*ic + PQECSM]*othcblk[PQECCP] + partblk[size*ic + PQESSM]*othcblk[PQESCP] -
 		partblk[size*ic + PQECCM]*othcblk[PQECSP] - partblk[size*ic + PQESCM]*othcblk[PQESSP] +
 		partblk[size*ic + PQECSP]*othcblk[PQECCM] + partblk[size*ic + PQESSP]*othcblk[PQESCM] -
 		partblk[size*ic + PQECCP]*othcblk[PQECSM] - partblk[size*ic + PQESCP]*othcblk[PQESSM]);
-      part[i].f.f[2] +=
+      part[i].f()[2] +=
 	       (partblk[size*ic + PQECCM]*othcblk[PQECCP] + partblk[size*ic + PQECSM]*othcblk[PQECSP] +
 	        partblk[size*ic + PQESCM]*othcblk[PQESCP] + partblk[size*ic + PQESSM]*othcblk[PQESSP] -
 	        partblk[size*ic + PQECCP]*othcblk[PQECCM] - partblk[size*ic + PQECSP]*othcblk[PQECSM] -
 	        partblk[size*ic + PQESCP]*othcblk[PQESCM] - partblk[size*ic + PQESSP]*othcblk[PQESSM]);
 
       LOG_FORCES(fprintf(stderr, "%d: part %d force %10.3g %10.3g %10.3g\n",
-			 this_node, part[i].id(), part[i].f.f[0],
-			 part[i].f.f[1], part[i].f.f[2]));
+			 this_node, part[i].id(), part[i].f()[0],
+			 part[i].f()[1], part[i].f()[2]));
       ic++;
     }
   }
@@ -1988,7 +1988,7 @@ void  MMM2D_dielectric_layers_force_contribution()
 	force[2] -= pref*charge_factor;
       }
       for (j = 0; j < 3; j++) { 
-	p1->f.f[j] += force[j];
+	p1->f()[j] += force[j];
       }
     }
   }
@@ -2012,7 +2012,7 @@ void  MMM2D_dielectric_layers_force_contribution()
 	force[2] += pref*charge_factor;
       }
       for (j = 0; j < 3; j++) { 
-	p1->f.f[j] += force[j];
+	p1->f()[j] += force[j];
       }
     }
   }

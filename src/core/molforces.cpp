@@ -63,7 +63,7 @@ void apply_mol_constraints()
       mi = p[i].p.mol_id;
       for(j = 0; j < 3; j++) {
 	/* Applies the trap force for this coordinate and this particle. */  
-	p[i].f.f[j] += topology[mi].trap_force[j];
+	p[i].f()[j] += topology[mi].trap_force[j];
       }
     }
   }
@@ -201,7 +201,7 @@ void calc_local_mol_info (IntList *local_trapped_mols)
         unfold_position(p[i].pos(), p[i].m.v, p[i].l.i);
 
 	for ( j = 0 ; j < 3 ; j++ ) {
-	  topology[mol].f[j] += p[i].f.f[j];
+	  topology[mol].f[j] += p[i].f()[j];
 	  topology[mol].com[j] += p[i].pos()[j]*(p[i]).p.mass; 
 	  topology[mol].v[j] += p[i].m.v[j]*(p[i]).p.mass; 
 	}

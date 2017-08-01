@@ -204,8 +204,8 @@ void meta_perform()
    
    /* cancel previous force to external force of particle */
    for (i = 0; i<3; ++i) {
-      p1->f.f[i] +=       factor * meta_apply_direction[i];
-      p2->f.f[i] += -1. * factor * meta_apply_direction[i];
+      p1->f()[i] +=       factor * meta_apply_direction[i];
+      p2->f()[i] += -1. * factor * meta_apply_direction[i];
    }
 }
 

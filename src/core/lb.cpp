@@ -2944,7 +2944,7 @@ inline void lb_viscous_coupling(Particle *p, double force[3]) {
                       {
                         fprintf(stderr,
                                 "%d: OPT: f = (%.3e,%.3e,%.3e)\n",
-                                this_node, p->f.f[0], p->f.f[1], p->f.f[2]);
+                                this_node, p->f()[0], p->f()[1], p->f()[2]);
                       }
                     );
     }
@@ -3320,12 +3320,12 @@ void calc_particle_lattice_ia() {
           lb_viscous_coupling(&p[i],force);
         
           /* add force to the particle */
-          p[i].f.f[0] += force[0];
-          p[i].f.f[1] += force[1];
-          p[i].f.f[2] += force[2];
+          p[i].f()[0] += force[0];
+          p[i].f()[1] += force[1];
+          p[i].f()[2] += force[2];
         
           ONEPART_TRACE( if (p->id() == check_id)  {
-                          fprintf(stderr, "%d: OPT: LB f = (%.6e,%.3e,%.3e)\n", this_node, p->f.f[0], p->f.f[1], p->f.f[2]);  } );
+                          fprintf(stderr, "%d: OPT: LB f = (%.6e,%.3e,%.3e)\n", this_node, p->f()[0], p->f()[1], p->f()[2]);  } );
         }
       }
     }
@@ -3368,7 +3368,7 @@ void calc_particle_lattice_ia() {
                             {
                               fprintf(stderr,
                                       "%d: OPT: LB f = (%.6e,%.3e,%.3e)\n",
-                                      this_node, p->f.f[0], p->f.f[1], p->f.f[2]);
+                                      this_node, p->f()[0], p->f()[1], p->f()[2]);
                             }
                           );
           }

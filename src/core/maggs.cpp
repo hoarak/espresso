@@ -505,7 +505,7 @@ maggs.pref2      = maggs.bjerrum * temperature;
         np = cell->n;
         for(i=0; i<np; i++)
             for (dim=0;dim<3;dim++)
-                p[i].f.f[dim] += p[i].p.q * dipole_prefactor * dipole_moment[dim];
+                p[i].f()[dim] += p[i].p.q * dipole_prefactor * dipole_moment[dim];
     }
 }
 
@@ -2140,7 +2140,7 @@ void maggs_calc_interpolated_self_force(Particle *p)
   double local_rho[8];
   double local_permittivity[12];
   double local_D_field[12];
-  double *force = p->f.f;
+  double *force = p->f();
 
   // calculate position in cell, normalized to lattice size:
   FOR3D(k) {
@@ -2238,7 +2238,7 @@ void maggs_calc_self_influence(Particle* P)
 	
   /* Correct force: */
   FOR3D(k) {
-    P->f.f[k] -= local_force[k];
+    P->f()[k] -= local_force[k];
   }
 }
 
@@ -2289,7 +2289,7 @@ void maggs_calc_part_link_forces(Particle *p, int index, double *grad)
   }  
   /* Attention! Here, the INTERLACING is done! */
   FOR3D(j){
-    p->f.f[j] += maggs.prefactor * local_force[j];
+    p->f()[j] += maggs.prefactor * local_force[j];
   }
 }
 
@@ -2347,9 +2347,9 @@ void maggs_calc_forces()
 	index = maggs_get_linear_index(first[0],first[1],first[2],lparams.dim);
 	maggs_calc_part_link_forces(&p[i], index, &grad[ip]);
 	maggs_calc_self_influence(&p[i]);
-	//      	printf("before: %f\n", p->f.f[0]);
+	//      	printf("before: %f\n", p->f()[0]);
 	//	maggs_calc_interpolated_self_force(&p[i]);
-	//	printf("after: %f\n", p->f.f[0]);
+	//	printf("after: %f\n", p->f()[0]);
 	ip+=12;
       }
     }

@@ -99,11 +99,11 @@ void ShapeBasedConstraint::add_force(Particle *p, double *folded_pos) {
     }
   }
   for (int j = 0; j < 3; j++) {
-    p->f.f[j] += force[j];
+    p->f()[j] += force[j];
     m_local_force[j] -= force[j];
 #ifdef ROTATION
-    p->f.torque[j] += torque1[j];
-    part_rep.f.torque[j] += torque2[j];
+    p->torque()[j] += torque1[j];
+    part_rep.torque()[j] += torque2[j];
 #endif
   }
 }

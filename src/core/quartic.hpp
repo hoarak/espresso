@@ -69,8 +69,8 @@ inline int calc_quartic_pair_force(Particle *p1, Particle *p2, Bonded_ia_paramet
 
   //  printf("Quartic (%d-%d), dist %e, dx %e %e %e, dr %e, f %e %e %e\n", p1->id(), p2->id(), dist, dx[0], dx[1], dx[2], dr, force[0], force[1], force[2]);
 
-  ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: QUARTIC f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),dist2,fac));
-  ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: QUARTIC f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),dist2,fac));
+  ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: QUARTIC f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p1->f()[0],p1->f()[1],p1->f()[2],p2->id(),dist2,fac));
+  ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: QUARTIC f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac %.3e\n",this_node,p2->f()[0],p2->f()[1],p2->f()[2],p1->id(),dist2,fac));
 
   return 0;
 }

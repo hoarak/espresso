@@ -196,8 +196,8 @@ inline void add_non_bonded_pair_force_iccp3m(Particle *p1, Particle *p2,
   /* add total nonbonded forces to particle      */
   /***********************************************/
    for (j = 0; j < 3; j++) { 
-      p1->f.f[j] += force[j];
-      p2->f.f[j] -= force[j];
+      p1->f()[j] += force[j];
+      p2->f()[j] -= force[j];
    }
    /***********************************************/
 }

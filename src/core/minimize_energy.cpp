@@ -85,10 +85,10 @@ bool steepest_descent_step(void) {
 #endif
         {
             // Square of force on particle
-	    f += SQR(p[i].f.f[j]);	    	    
+	    f += SQR(p[i].f()[j]);	    	    
 	    
 	    // Positional increment
-	    dp = params->gamma * p[i].f.f[j];
+	    dp = params->gamma * p[i].f()[j];
 	    if(fabs(dp) > params->max_displacement)
 	      // Crop to maximum allowed by user
 	      dp = sgn<double>(dp)*params->max_displacement;
@@ -96,7 +96,7 @@ bool steepest_descent_step(void) {
             
 	    // Move particle
 	    p[i].pos()[j] += dp;
-	    MINIMIZE_ENERGY_TRACE(printf("part %d dim %d dp %e gamma*f %e\n", i, j, dp, params->gamma * p[i].f.f[j]));
+	    MINIMIZE_ENERGY_TRACE(printf("part %d dim %d dp %e gamma*f %e\n", i, j, dp, params->gamma * p[i].f()[j]));
           }
 	}
 #ifdef ROTATION
@@ -106,10 +106,10 @@ bool steepest_descent_step(void) {
         for (int j=0;j<3;j++){
           dq[j]=0;
           // Square of torque
-	  t += SQR(p[i].f.torque[j]);	    	    
+	  t += SQR(p[i].torque()[j]);	    	    
 	    
 	  // Rotational increment
-	  dq[j] = params->gamma * p[i].f.torque[j];
+	  dq[j] = params->gamma * p[i].torque()[j];
 	    
       }
       // Normalize rotation axis and compute amount of rotation

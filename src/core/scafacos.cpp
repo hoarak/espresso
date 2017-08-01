@@ -114,9 +114,9 @@ void ScafacosData::update_particle_forces() const {
     
     for(int i = 0; i < np; i++) {
       if (!dipolar()) { 
-        p[i].f.f[0] += coulomb.prefactor*p[i].p.q*fields[it++];
-        p[i].f.f[1] += coulomb.prefactor*p[i].p.q*fields[it++];
-        p[i].f.f[2] += coulomb.prefactor*p[i].p.q*fields[it++];
+        p[i].f()[0] += coulomb.prefactor*p[i].p.q*fields[it++];
+        p[i].f()[1] += coulomb.prefactor*p[i].p.q*fields[it++];
+        p[i].f()[2] += coulomb.prefactor*p[i].p.q*fields[it++];
       } 
       else
       {
@@ -144,8 +144,8 @@ void ScafacosData::update_particle_forces() const {
 
 	  // Add to particles
 	  for (int j=0;j<3;j++) {
-	    p[i].f.f[j]+=coulomb.Dprefactor *f[j];
-	    p[i].f.torque[j]+=coulomb.Dprefactor *t[j];
+	    p[i].f()[j]+=coulomb.Dprefactor *f[j];
+	    p[i].torque()[j]+=coulomb.Dprefactor *t[j];
 	  }
 	  it++;
 	#endif
@@ -174,8 +174,8 @@ void add_pair_force(Particle *p1, Particle *p2, double *d, double dist, double *
   const double fak = p2->p.q * p1->p.q * field * coulomb.prefactor / dist;
   
   for(int i=0; i<3; i++){
-    p1->f.f[i] -= fak * d[i];
-    p2->f.f[i] += fak * d[i];
+    p1->f()[i] -= fak * d[i];
+    p2->f()[i] += fak * d[i];
   }
 }
 

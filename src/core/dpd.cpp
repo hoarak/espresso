@@ -231,8 +231,8 @@ void add_dpd_thermo_pair_force(Particle * p1, Particle * p2, double d[3], double
     // random force prefactor
     noise    = dpd_pref2 * omega      * (d_random()-0.5);
     for(j=0; j<3; j++) {
-       p1->f.f[j] += ( tmp = (noise - friction)*d[j] );
-       p2->f.f[j] -= tmp;
+       p1->f()[j] += ( tmp = (noise - friction)*d[j] );
+       p2->f()[j] -= tmp;
     }
   }
 #ifdef TRANS_DPD
@@ -274,8 +274,8 @@ void add_dpd_thermo_pair_force(Particle * p1, Particle * p2, double d[3], double
       }
       for(j=0; j<3; j++) {
         tmp=f_R[j]-f_D[j];
-        p1->f.f[j] += tmp;
-        p2->f.f[j] -= tmp;
+        p1->f()[j] += tmp;
+        p2->f()[j] -= tmp;
       }
   }
 #endif
@@ -439,8 +439,8 @@ void add_inter_dpd_pair_force(Particle *p1, Particle *p2, IA_parameters *ia_para
     // random force prefactor
     noise    = ia_params->dpd_pref2 * omega      * (d_random()-0.5);
     for(j=0; j<3; j++) {
-       p1->f.f[j] += ( tmp = (noise - friction)*d[j] );
-       p2->f.f[j] -= tmp;
+       p1->f()[j] += ( tmp = (noise - friction)*d[j] );
+       p2->f()[j] -= tmp;
     }
   }
   //DPD2 part
@@ -481,8 +481,8 @@ void add_inter_dpd_pair_force(Particle *p1, Particle *p2, IA_parameters *ia_para
       }
       for(j=0; j<3; j++) {
         tmp=f_R[j]-f_D[j];
-        p1->f.f[j] += tmp;
-        p2->f.f[j] -= tmp;
+        p1->f()[j] += tmp;
+        p2->f()[j] -= tmp;
       }
   }
 }

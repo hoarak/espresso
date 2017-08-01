@@ -109,7 +109,7 @@ void init_correction_vector()
     np = cell->n;
     for(i = 0; i < np; i++) {
       for(j=0;j<3;j++)
-        p[i].f.f[j] = 0.0;
+        p[i].f()[j] = 0.0;
      } //for i loop
   }// for c loop
 
@@ -120,7 +120,7 @@ void init_correction_vector()
     np = cell->n;
     for(i = 0; i < np; i++) {
        for(j=0;j<3;j++)
-          p[i].f.f[j] = 0.0;
+          p[i].f()[j] = 0.0;
     }
   }
 }
@@ -164,8 +164,8 @@ void compute_pos_corr_vec(int *repeat_)
 #endif
 	    for (j=0;j<3;j++) {
 	      pos_corr = G*r_ij_t[j];
-	      p1->f.f[j] += pos_corr*(*p2).p.mass;
-	      p2->f.f[j] -= pos_corr*(*p1).p.mass;
+	      p1->f()[j] += pos_corr*(*p2).p.mass;
+	      p2->f()[j] -= pos_corr*(*p1).p.mass;
 	    }
 	    /*Increase the 'repeat' flag by one */
 	      *repeat_ = *repeat_ + 1;
@@ -196,8 +196,8 @@ void app_pos_correction()
       for(i = 0; i < np; i++) {
         p1 = &p[i];
 	for (j=0;j<3;j++) {
-	   p1->pos()[j] += p1->f.f[j];
-	   p1->m.v[j] += p1->f.f[j];
+	   p1->pos()[j] += p1->f()[j];
+	   p1->m.v[j] += p1->f()[j];
 	}
 
 	/**Completed for one particle*/
@@ -252,8 +252,8 @@ void transfer_force_init_vel()
       for(i = 0; i < np; i++) {
 	for(j=0;j<3;j++)
 	  {
-	    p[i].pos()_old[j]=p[i].f.f[j];
-	    p[i].f.f[j]=0.0;
+	    p[i].pos()_old[j]=p[i].f()[j];
+	    p[i].f()[j]=0.0;
 	  }
       } //for i loop
     }// for c loop
@@ -266,8 +266,8 @@ void transfer_force_init_vel()
       for(i = 0; i < np; i++) {
 	for(j=0;j<3;j++)
 	  {
-	    p[i].pos()_old[j]=p[i].f.f[j];
-	    p[i].f.f[j]=0.0;
+	    p[i].pos()_old[j]=p[i].f()[j];
+	    p[i].f()[j]=0.0;
 	  }
       }
     }
@@ -314,8 +314,8 @@ void compute_vel_corr_vec(int *repeat_)
 		for (j=0;j<3;j++)
 		  {
 		    vel_corr = K*r_ij[j];
-		    p1->f.f[j] -= vel_corr*(*p2).p.mass;
-		    p2->f.f[j] += vel_corr*(*p1).p.mass;
+		    p1->f()[j] -= vel_corr*(*p2).p.mass;
+		    p2->f()[j] += vel_corr*(*p1).p.mass;
 		  }
 		  *repeat_ = *repeat_ + 1 ;
 		}
@@ -344,7 +344,7 @@ void apply_vel_corr()
       for(i = 0; i < np; i++) {
         p1 = &p[i];
 	for (j=0;j<3;j++) {
-	   p1->m.v[j] += p1->f.f[j];
+	   p1->m.v[j] += p1->f()[j];
 
 	}
 	/**Completed for one particle*/
@@ -366,7 +366,7 @@ void revert_force()
     np = cell->n;
     for(i = 0; i < np; i++) {
       for(j=0;j<3;j++)
-      	p[i].f.f[j]=p[i].pos()_old[j];
+      	p[i].f()[j]=p[i].pos()_old[j];
 
      } //for i loop
   }// for c loop
@@ -380,7 +380,7 @@ void revert_force()
     for(i = 0; i < np; i++)
     {
        for(j=0;j<3;j++)
-  	  p[i].f.f[j]=p[i].pos()_old[j];
+  	  p[i].f()[j]=p[i].pos()_old[j];
     }
   }
 }

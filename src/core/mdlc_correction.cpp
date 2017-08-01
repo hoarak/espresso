@@ -538,9 +538,9 @@ void    add_mdlc_force_corrections(){
     for(i=0; i<np; i++) { 
       if( (p[i].p.dipm) != 0.0 ) {
 
-	p[i].f.f[0] += coulomb.Dprefactor*dip_DLC_f_x[ip];    
-	p[i].f.f[1] += coulomb.Dprefactor*dip_DLC_f_y[ip];
-	p[i].f.f[2] += coulomb.Dprefactor*dip_DLC_f_z[ip]; //SDC correction term is zero for the forces
+	p[i].f()[0] += coulomb.Dprefactor*dip_DLC_f_x[ip];    
+	p[i].f()[1] += coulomb.Dprefactor*dip_DLC_f_y[ip];
+	p[i].f()[2] += coulomb.Dprefactor*dip_DLC_f_z[ip]; //SDC correction term is zero for the forces
    
 #if defined(ROTATION) && defined(DP3M)
     double correc= 4.*M_PI/volume;
@@ -551,9 +551,9 @@ void    add_mdlc_force_corrections(){
 	  dy=0.0;
 	  dz=correc*(-1.0)*mz;    
 		
-	  p[i].f.torque[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].dip()[1]*dz  - p[i].dip()[2]*dy ) ; 
-	  p[i].f.torque[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].dip()[2]*dx  - p[i].dip()[0]*dz ) ;
-	  p[i].f.torque[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].dip()[0]*dy  - p[i].dip()[1]*dx ); 
+	  p[i].torque()[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].dip()[1]*dz  - p[i].dip()[2]*dy ) ; 
+	  p[i].torque()[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].dip()[2]*dx  - p[i].dip()[0]*dz ) ;
+	  p[i].torque()[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].dip()[0]*dy  - p[i].dip()[1]*dx ); 
 
 
 	}else{
@@ -563,9 +563,9 @@ void    add_mdlc_force_corrections(){
 	  dy=correps*my;
 	  dz=correc*(-1.0+1./(2.0*dp3m.params.epsilon+1.0))*mz;    
 		
-	  p[i].f.torque[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].dip()[1]*dz  - p[i].dip()[2]*dy ) ; 
-	  p[i].f.torque[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].dip()[2]*dx  - p[i].dip()[0]*dz ) ;
-	  p[i].f.torque[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].dip()[0]*dy  - p[i].dip()[1]*dx ); 
+	  p[i].torque()[0] +=coulomb.Dprefactor*(dip_DLC_t_x[ip]+p[i].dip()[1]*dz  - p[i].dip()[2]*dy ) ; 
+	  p[i].torque()[1] +=coulomb.Dprefactor*(dip_DLC_t_y[ip]+p[i].dip()[2]*dx  - p[i].dip()[0]*dz ) ;
+	  p[i].torque()[2] +=coulomb.Dprefactor*(dip_DLC_t_z[ip]+p[i].dip()[0]*dy  - p[i].dip()[1]*dx ); 
 		
 		   
 	}   

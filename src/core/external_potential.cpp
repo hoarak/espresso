@@ -248,9 +248,9 @@ void add_external_potential_tabulated_forces(ExternalPotential* e, Particle* p) 
   fold_position(ppos, img);
  
   e->tabulated.potential.interpolate_gradient(p->pos(), field);
-  p->f.f[0]-=e->scale[p->p.type]*field[0];
-  p->f.f[1]-=e->scale[p->p.type]*field[1];
-  p->f.f[2]-=e->scale[p->p.type]*field[2];
+  p->f()[0]-=e->scale[p->p.type]*field[0];
+  p->f()[1]-=e->scale[p->p.type]*field[1];
+  p->f()[2]-=e->scale[p->p.type]*field[2];
 //  printf("%d %f force: %f %f %f\n", p->p.type, e->scale[p->p.type], e->scale[p->p.type]*field[0], e->scale[p->p.type]*field[1], e->scale[p->p.type]*field[2]);
 }
 

@@ -588,7 +588,7 @@ void mpi_send_f(int pnode, int part, double F[3]) {
     F[0] /= (*p).p.mass;
     F[1] /= (*p).p.mass;
     F[2] /= (*p).p.mass;
-    memmove(p->f.f, F, 3 * sizeof(double));
+    memmove(p->f(), F, 3 * sizeof(double));
   } else
     MPI_Send(F, 3, MPI_DOUBLE, pnode, SOME_TAG, comm_cart);
 
@@ -598,10 +598,10 @@ void mpi_send_f(int pnode, int part, double F[3]) {
 void mpi_send_f_slave(int pnode, int part) {
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    MPI_Recv(p->f.f, 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart, MPI_STATUS_IGNORE);
-    p->f.f[0] /= (*p).p.mass;
-    p->f.f[1] /= (*p).p.mass;
-    p->f.f[2] /= (*p).p.mass;
+    MPI_Recv(p->f(), 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart, MPI_STATUS_IGNORE);
+    p->f()[0] /= (*p).p.mass;
+    p->f()[1] /= (*p).p.mass;
+    p->f()[2] /= (*p).p.mass;
   }
 
   on_particle_change();
@@ -940,9 +940,9 @@ void mpi_send_torque(int pnode, int part, double torque[3]) {
 
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    p->f.torque[0] = torque[0];
-    p->f.torque[1] = torque[1];
-    p->f.torque[2] = torque[2];
+    p->torque()[0] = torque[0];
+    p->torque()[1] = torque[1];
+    p->torque()[2] = torque[2];
   } else {
     MPI_Send(torque, 3, MPI_DOUBLE, pnode, SOME_TAG, comm_cart);
   }
@@ -955,7 +955,7 @@ void mpi_send_torque_slave(int pnode, int part) {
 #ifdef ROTATION
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    MPI_Recv(p->f.torque, 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
+    MPI_Recv(p->torque(), 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
              MPI_STATUS_IGNORE);
   }
 

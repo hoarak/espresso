@@ -391,11 +391,11 @@ void propagate_pos_sd()
 	for (int d=0;d<3;d++){
 	  pos[3*j+d]        = p[i].pos()[d];
 	  pos[3*j+d]        -=rint(pos[3*j+d]/box_l[d])*box_l[d];
-	  force[3*j+d]      = p[i].f.f[d];
+	  force[3*j+d]      = p[i].f()[d];
 	}
 #else
         memmove(&pos[3*j], p[i].pos(), 3*sizeof(double));
-        memmove(&force[3*j], p[i].f.f, 3*sizeof(double));
+        memmove(&force[3*j], p[i].f(), 3*sizeof(double));
 	for (int d=0;d<3;d++){
 	  pos[3*j+d]        -=rint(pos[3*j+d]/box_l[d])*box_l[d];
 	}
@@ -450,7 +450,7 @@ void propagate_pos_sd()
       for (int d=0;d<3;d++){
 	p[i].pos()[d] = pos[3*j+d]+box_l[d]*rint(p[i].pos()[d]/box_l[d]);
 	p[i].m.v[d] = velocity[3*j+d];
-	//p[i].f.f[d] *= (0.5*time_step*time_step)/(*part).p.mass;
+	//p[i].f()[d] *= (0.5*time_step*time_step)/(*part).p.mass;
       }
 #else
       for (int d=0;d<3;d++){
@@ -460,7 +460,7 @@ void propagate_pos_sd()
 #endif
       // somehow this does not effect anything, although it is called ...
       for (int d=0;d<3;d++){
-	p[i].f.f[d] *= (0.5*time_step*time_step)/(*p).p.mass;
+	p[i].f()[d] *= (0.5*time_step*time_step)/(*p).p.mass;
       }
       for (int d=0;d<DIM;d++){
         assert(!isnan(pos[DIM*i+d]));

@@ -348,11 +348,11 @@ void CalcVolumeForce()
              
              double n[3];
              vector_product(x3, x2, n);
-             for (int k=0; k < 3; k++) p1.f.f[k] += fact*n[k];
+             for (int k=0; k < 3; k++) p1.f()[k] += fact*n[k];
              vector_product(x1, x3, n);
-             for (int k=0; k < 3; k++) p2->f.f[k] += fact*n[k];
+             for (int k=0; k < 3; k++) p2->f()[k] += fact*n[k];
              vector_product(x2, x1, n);
-             for (int k=0; k < 3; k++) p3->f.f[k] += fact*n[k];*/
+             for (int k=0; k < 3; k++) p3->f()[k] += fact*n[k];*/
             
             
             // This is Dupin 2008. I guess the result will be very similar as the code above
@@ -374,9 +374,9 @@ void CalcVolumeForce()
             // Add forces
             for (int k=0; k < 3; k++)
             {
-              p1.f.f[k] += force[k];
-              p2->f.f[k] += force[k];
-              p3->f.f[k] += force[k];
+              p1.f()[k] += force[k];
+              p2->f()[k] += force[k];
+              p3->f()[k] += force[k];
             }
             
           }

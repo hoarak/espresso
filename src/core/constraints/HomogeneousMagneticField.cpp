@@ -9,7 +9,7 @@ void HomogeneousMagneticField::add_force(Particle *p, double *folded_pos) {
     double c[3];
     utils::cross_product(p->dip(), &m_field.front(), c);
     for (int i=0; i<3; ++i) {
-        p->f.torque[i] += c[i];
+        p->torque()[i] += c[i];
     }
 #endif
 #endif

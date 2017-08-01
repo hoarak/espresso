@@ -173,9 +173,9 @@ inline void thermo_convert_forces_body_to_space(Particle *p, double *force)
   double A[9];
   thermo_define_rotation_matrix(p, A);
 
-  force[0] = A[0 + 3*0]*p->f.f[0] + A[1 + 3*0]*p->f.f[1] + A[2 + 3*0]*p->f.f[2];
-  force[1] = A[0 + 3*1]*p->f.f[0] + A[1 + 3*1]*p->f.f[1] + A[2 + 3*1]*p->f.f[2];
-  force[2] = A[0 + 3*2]*p->f.f[0] + A[1 + 3*2]*p->f.f[1] + A[2 + 3*2]*p->f.f[2];
+  force[0] = A[0 + 3*0]*p->f()[0] + A[1 + 3*0]*p->f()[1] + A[2 + 3*0]*p->f()[2];
+  force[1] = A[0 + 3*1]*p->f()[0] + A[1 + 3*1]*p->f()[1] + A[2 + 3*1]*p->f()[2];
+  force[2] = A[0 + 3*2]*p->f()[0] + A[1 + 3*2]*p->f()[1] + A[2 + 3*2]*p->f()[2];
 }
 
 inline void thermo_convert_vel_space_to_body(Particle *p, double *vel_space, double *vel_body)
@@ -267,7 +267,7 @@ inline void friction_thermo_langevin(Particle *p)
   if (ifParticleIsVirtual(p))
     {
       for (j=0;j<3;j++)
-        p->f.f[j]=0;
+        p->f()[j]=0;
   
       return;
     }
@@ -277,7 +277,7 @@ inline void friction_thermo_langevin(Particle *p)
   if (!ifParticleIsVirtual(p))
     {
       for (j=0;j<3;j++)
-        p->f.f[j]=0;
+        p->f()[j]=0;
   
       return;
     }
@@ -402,19 +402,19 @@ inline void friction_thermo_langevin(Particle *p)
     #ifdef EXTERNAL_FORCES
       // If individual coordinates are fixed, set force to 0.
       if ((p->p.ext_flag & COORD_FIXED(j)))
-        p->f.f[j] = 0;
+        p->f()[j] = 0;
       else	
     #endif
     {
       // Apply the force
 #ifndef PARTICLE_ANISOTROPY
-      p->f.f[j] = langevin_pref1_temp*velocity[j] + switch_trans*langevin_pref2_temp*noise;
+      p->f()[j] = langevin_pref1_temp*velocity[j] + switch_trans*langevin_pref2_temp*noise;
 #else
       // In case of anisotropic particle: body-fixed reference frame. Otherwise: lab-fixed reference frame.
       if (aniso_flag)
-          p->f.f[j] = langevin_pref1_temp[j]*velocity_body[j] + switch_trans*langevin_pref2_temp[j]*noise;
+          p->f()[j] = langevin_pref1_temp[j]*velocity_body[j] + switch_trans*langevin_pref2_temp[j]*noise;
       else
-          p->f.f[j] = langevin_pref1_temp[j]*velocity[j] + switch_trans*langevin_pref2_temp[j]*noise;
+          p->f()[j] = langevin_pref1_temp[j]*velocity[j] + switch_trans*langevin_pref2_temp[j]*noise;
 #endif
     }
   } // END LOOP OVER ALL COMPONENTS
@@ -429,15 +429,15 @@ inline void friction_thermo_langevin(Particle *p)
           if (!(p->p.ext_flag & COORD_FIXED(j)))
 #endif
           {
-              p->f.f[j] = particle_force[j];
+              p->f()[j] = particle_force[j];
           }
       }
   }
 #endif // PARTICLE_ANISOTROPY
 
-  // printf("%d: %e %e %e %e %e %e\n",p->id(), p->f.f[0],p->f.f[1],p->f.f[2], p->m.v[0],p->m.v[1],p->m.v[2]);
-  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: LANG f = (%.3e,%.3e,%.3e)\n",this_node,p->f.f[0],p->f.f[1],p->f.f[2]));
-  THERMO_TRACE(fprintf(stderr,"%d: Thermo: P %d: force=(%.3e,%.3e,%.3e)\n",this_node,p->id(),p->f.f[0],p->f.f[1],p->f.f[2]));
+  // printf("%d: %e %e %e %e %e %e\n",p->id(), p->f()[0],p->f()[1],p->f()[2], p->m.v[0],p->m.v[1],p->m.v[2]);
+  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: LANG f = (%.3e,%.3e,%.3e)\n",this_node,p->f()[0],p->f()[1],p->f()[2]));
+  THERMO_TRACE(fprintf(stderr,"%d: Thermo: P %d: force=(%.3e,%.3e,%.3e)\n",this_node,p->id(),p->f()[0],p->f()[1],p->f()[2]));
 }
 
 #ifdef ROTATION
@@ -541,14 +541,14 @@ inline void friction_thermo_langevin_rotation(Particle *p)
   for ( j = 0 ; j < 3 ; j++) 
   {
 #ifdef ROTATIONAL_INERTIA
-    p->f.torque[j] = -langevin_pref1_temp[j]*p->m.omega[j] + switch_rotate*langevin_pref2_temp[j]*noise;
+    p->torque()[j] = -langevin_pref1_temp[j]*p->m.omega[j] + switch_rotate*langevin_pref2_temp[j]*noise;
 #else
-    p->f.torque[j] = -langevin_pref1_temp*p->m.omega[j] + switch_rotate*langevin_pref2_temp*noise;
+    p->torque()[j] = -langevin_pref1_temp*p->m.omega[j] + switch_rotate*langevin_pref2_temp*noise;
 #endif
   }
 
-  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: LANG f = (%.3e,%.3e,%.3e)\n",this_node,p->f.f[0],p->f.f[1],p->f.f[2]));
-  THERMO_TRACE(fprintf(stderr,"%d: Thermo: P %d: force=(%.3e,%.3e,%.3e)\n",this_node,p->id(),p->f.f[0],p->f.f[1],p->f.f[2]));
+  ONEPART_TRACE(if(p->id()==check_id) fprintf(stderr,"%d: OPT: LANG f = (%.3e,%.3e,%.3e)\n",this_node,p->f()[0],p->f()[1],p->f()[2]));
+  THERMO_TRACE(fprintf(stderr,"%d: Thermo: P %d: force=(%.3e,%.3e,%.3e)\n",this_node,p->id(),p->f()[0],p->f()[1],p->f()[2]));
 }
 
 

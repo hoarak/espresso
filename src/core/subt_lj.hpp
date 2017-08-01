@@ -91,8 +91,8 @@ inline int calc_subt_lj_pair_force(Particle *p1, Particle *p2, Bonded_ia_paramet
 
 
 
-  ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: SUBT_LJ f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac_lj %.3e\n",this_node,p1->f.f[0],p1->f.f[1],p1->f.f[2],p2->id(),sqrt(dist2),fac_lj));
-  ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: SUBT_LJ f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac_lj %.3e\n",this_node,p2->f.f[0],p2->f.f[1],p2->f.f[2],p1->id(),sqrt(dist2),fac_lj));
+  ONEPART_TRACE(if(p1->id()==check_id) fprintf(stderr,"%d: OPT: SUBT_LJ f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac_lj %.3e\n",this_node,p1->f()[0],p1->f()[1],p1->f()[2],p2->id(),sqrt(dist2),fac_lj));
+  ONEPART_TRACE(if(p2->id()==check_id) fprintf(stderr,"%d: OPT: SUBT_LJ f = (%.3e,%.3e,%.3e) with part id=%d at dist %f fac_lj %.3e\n",this_node,p2->f()[0],p2->f()[1],p2->f()[2],p1->id(),sqrt(dist2),fac_lj));
 
   return 0;
 }
