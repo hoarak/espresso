@@ -267,28 +267,50 @@ struct ParticleForce {
 /** Momentum information on a particle. Information not contained in
     communication of ghost particles so far, but a communication would
     be necessary for velocity dependend potentials. */
-typedef struct {
-  /** velocity. */
-  double v[3];
+struct ParticleMomentum {
+  double (&v())[3] { return m_v; }
+  double const (&v() const)[3] { return m_v; }
+
+  double m_v[3];
 
 #ifdef ROTATION
   /** angular velocity
       ALWAYS IN PARTICLE FIXEXD, I.E., CO-ROTATING COORDINATE SYSTEM */
-  double omega[3];
+  double (&omega())[3] { return m_omega; }
+  double const (&omega() const)[3] { return m_omega; }
+
+  double m_omega[3];
 #endif
-} ParticleMomentum;
+};
 
 /** Information on a particle that is needed only on the
     node the particle belongs to */
-typedef struct {
+struct ParticleLocal {
+public:
   /** position in the last time step befor last Verlet list update. */
-  double p_old[3];
+  double (&p_old())[3] { return m_p_old; }
+  double const (&p_old() const)[3] { return m_p_old; }
+
+private:
+  double m_p_old[3];
+
+public:
   /** index of the simulation box image where the particle really sits. */
-  int i[3];
+  int (&image_box())[3] { return m_image_box; }
+  int const (&image_box() const)[3] { return m_image_box; }
+
+private:
+  int m_image_box[3];
 
 #ifdef GHOST_FLAG
+public:
   /** check whether a particle is a ghost or not */
-  int ghost;
+  /** index of the simulation box image where the particle really sits. */
+  int &ghost_flag())[ { return m_ghost_flag; }
+  int const &ghost_flag() const { return m_ghost_flag; }
+
+private:
+  int m_ghost_flag;
 #endif
 
 #ifdef GHMC
@@ -297,17 +319,20 @@ typedef struct {
   ParticlePosition r_ls;
   ParticleMomentum m_ls;
 #endif
-} ParticleLocal;
+};
 
 #ifdef LB
 /** Data related to the Lattice Boltzmann hydrodynamic coupling */
-typedef struct {
+struct ParticleLatticeCoupling {
   /** fluctuating part of the coupling force */
-  double f_random[3];
-} ParticleLatticeCoupling;
+  double (&f_random())[3] { return m_f_random; }
+  double const (&f_random() const)[3] { return m_f_random; }
+
+  double m_f_random[3];
+};
 #endif
 
-typedef struct {
+struct ParticleParametersSwimming {
 // ifdef inside because we need this type for some MPI prototypes
 #ifdef ENGINE
   bool swimming;
@@ -321,27 +346,33 @@ typedef struct {
   double rotational_friction;
 #endif
 #endif
-} ParticleParametersSwimming;
+};
 
 /** Struct holding all information for one particle. */
-struct Particle : public ParticlePosition {
+struct Particle : public ParticlePosition,
+                  public ParticleForce,
+                  public ParticleMomentum,
+                  public ParticleLocal {
   Particle() = default;
   Particle(int id) : p{id} {}
   int id() const { return p.identity; }
 
-  Particle &operator=(ParticlePosition const &rhs) {
-     ParticlePosition::operator=(rhs);
-     return *this;
+  /**
+   * @brief Assign from an instance of a base class.
+   */
+  template <typename T> Particle &operator=(T const &rhs) {
+    T::operator=(rhs);
+    return *this;
   }
 
   ///
   ParticleProperties p;
   ///
-  ParticleMomentum m;
+  // ParticleMomentum m;
   ///
-  ParticleForce f;
+  // ParticleForce f;
   ///
-  ParticleLocal l;
+  //ParticleLocal l;
 ///
 #ifdef LB
   ParticleLatticeCoupling lc;
