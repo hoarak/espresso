@@ -306,8 +306,10 @@ private:
 public:
   /** check whether a particle is a ghost or not */
   /** index of the simulation box image where the particle really sits. */
-  int &ghost_flag())[ { return m_ghost_flag; }
-  int const &ghost_flag() const { return m_ghost_flag; }
+  int &ghost_flag())[ {
+    return m_ghost_flag; }
+  int const &ghost_flag() const {
+    return m_ghost_flag; }
 
 private:
   int m_ghost_flag;
@@ -367,29 +369,40 @@ struct Particle : public ParticlePosition,
 
   ///
   ParticleProperties p;
-  ///
-  // ParticleMomentum m;
-  ///
-  // ParticleForce f;
-  ///
-  //ParticleLocal l;
+///
+// ParticleMomentum m;
+///
+// ParticleForce f;
+///
+// ParticleLocal l;
 ///
 #ifdef LB
   ParticleLatticeCoupling lc;
 #endif
+
   /** bonded interactions list. The format is pretty simple:
       Just the bond type, and then the particle ids. The number of particle
-     ids
-     can be determined
+      ids
+      can be determined
       easily from the bonded_ia_params entry for the type. */
-  IntList bl;
+  IntList &bonds() { return bl; }
+  IntList const &bonds() const { return bl; }
 
+  IntList &exclusions() {
 #ifdef EXCLUSIONS
-  /** list of particles, with which this particle has no nonbonded
-   * interactions
-   */
-  IntList el;
+    return el;
+#else
+    throw std::runtime_error{"Exclusions not enabled."};
 #endif
+  }
+
+  IntList const &exclusions() const {
+#ifdef EXCLUSIONS
+    return el;
+#else
+    throw std::runtime_error{"Exclusions not enabled."};
+#endif
+  }
 
 #ifdef ENGINE
   ParticleParametersSwimming swim;
