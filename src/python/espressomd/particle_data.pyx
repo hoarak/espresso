@@ -1149,6 +1149,14 @@ cdef class ParticleHandle(object):
                     raise Exception("Set particle position first.")
 
         def delete_exclusion(self, *_partners):
+            """
+            Remove exclusions with given partners
+
+            Parameters
+            ----------
+            _partners : list of partners
+
+            """
             for partner in _partners:
                 check_type_or_throw_except(
                     partner, 1, int, "PID of partner has to be an int.")
