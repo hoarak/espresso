@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <vector>
+#include <bitset>
 
 #include <boost/iterator/transform_iterator.hpp>
 
@@ -18,9 +19,17 @@ class Cell : public ParticleList {
 
   using neighbors_t = std::vector<std::reference_wrapper<Cell>>;
 
+  enum class Flags { GHOST = 0, INNER = 1 };
+  std::bitset<2> flags;
+
 public:
   using neighbor_iterator =
       boost::transform_iterator<GetReference, neighbors_t::iterator>;
+
+  void set_ghost(bool val) { flags[static_cast<size_t>(Flags::GHOST)] = val; }
+  void set_inner(bool val) { flags[static_cast<size_t>(Flags::INNER)] = val; }
+  bool is_ghost() const { return flags[static_cast<size_t>(Flags::GHOST)]; }
+  bool is_inner() const { return flags[static_cast<size_t>(Flags::INNER)]; }
 
   /** Topological neighbors of the cell */
   std::vector<std::reference_wrapper<Cell>> m_neighbors;

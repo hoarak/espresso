@@ -127,6 +127,8 @@ struct CellPList {
   Cell **begin() { return cell; }
   Cell **end() { return cell + n; }
 
+  int size() const { return n; }
+
   Cell **cell;
   int n;
   int max;
@@ -193,6 +195,11 @@ extern std::vector<Cell> cells;
 extern CellPList local_cells;
 /** list of all cells containing ghosts */
 extern CellPList ghost_cells;
+/** list of pointers to all cells that do not have ghost cells
+    as neighbors */
+extern std::vector<Cell *> inner_cells;
+/** Cells that are not inner cells */
+extern std::vector<Cell *> outer_cells;
 
 /** Type of cell structure in use ( \ref Cell Structure ). */
 extern CellStructure cell_structure;

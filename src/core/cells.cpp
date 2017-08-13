@@ -54,6 +54,11 @@ std::vector<Cell> cells;
 CellPList local_cells = {NULL, 0, 0};
 /** list of pointers to all cells containing ghosts. */
 CellPList ghost_cells = {NULL, 0, 0};
+/** list of pointers to all cells that do not have ghost cells
+    as neighbors */
+std::vector<Cell *> inner_cells;
+/** Cells that are not inner cells */
+std::vector<Cell *> outer_cells;
 
 /** Type of cell structure in use */
 CellStructure cell_structure = {/* type */ CELL_STRUCTURE_NONEYET,
@@ -62,6 +67,53 @@ CellStructure cell_structure = {/* type */ CELL_STRUCTURE_NONEYET,
 double max_range = 0.0;
 
 int rebuild_verletlist = 1;
+
+void update_ghost_flags(CellPList &local_cells, CellPList &ghost_cells) {
+  for (auto &c : local_cells) {
+    c->set_ghost(false);
+  }
+
+  for (auto &c : ghost_cells) {
+    c->set_ghost(true);
+  }
+}
+
+template <typename Container, typename Value>
+bool contains(Container const &c, Value const &val) {
+  return std::find(std::begin(c), std::end(c), val) != std::end(c);
+}
+
+void update_inner_cells(CellPList &local_cells) {
+  inner_cells.clear();
+  outer_cells.clear();
+  /* Usually most cells are inner, so this is
+     a good guess. */
+  inner_cells.reserve(local_cells.size());
+
+  for (auto &c : local_cells) {
+    auto const neighbors = c->neighbors();
+    auto const is_inner =
+        std::none_of(neighbors.begin(), neighbors.end(),
+                     [](Cell const &n) { return n.is_ghost(); });
+    if (is_inner) {
+      inner_cells.push_back(c);
+    } else {
+      outer_cells.push_back(c);
+    }
+
+    c->set_inner(is_inner);
+  }
+
+  /* All local cells are either inner or outer */
+  assert((inner_cells.size() + outer_cells.size()) == local_cells.size());
+
+  for (auto &c : local_cells) {
+    assert((contains(inner_cells, c) xor (contains(outer_cells, c))));
+  }
+
+  inner_cells.shrink_to_fit();
+  outer_cells.shrink_to_fit();
+}
 
 /**
  * @brief Get pairs closer than distance from the cells.
@@ -77,11 +129,11 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
   std::vector<std::pair<int, int>> ret;
   auto const cutoff2 = distance * distance;
 
-  auto pair_kernel = [&ret, &cutoff2](Particle const &p1, Particle const &p2,
-                                      double dist2) {
-    if (dist2 < cutoff2)
-      ret.emplace_back(p1.p.identity, p2.p.identity);
-  };
+  auto pair_kernel =
+      [&ret, &cutoff2](Particle const &p1, Particle const &p2, double dist2) {
+        if (dist2 < cutoff2)
+          ret.emplace_back(p1.p.identity, p2.p.identity);
+      };
 
   switch (cell_structure.type) {
   case CELL_STRUCTURE_DOMDEC:
@@ -152,6 +204,9 @@ static void topology_release(int cs) {
             cs);
     errexit();
   }
+
+  /* Will just reset bc local_cells is empty now */
+  update_inner_cells(local_cells);
 }
 
 /** Switch for choosing the topology init function of a certain
@@ -178,6 +233,9 @@ static void topology_init(int cs, CellPList *local) {
             cs);
     errexit();
   }
+
+  update_ghost_flags(local_cells, ghost_cells);
+  update_inner_cells(local_cells);
 }
 
 /*@}*/
