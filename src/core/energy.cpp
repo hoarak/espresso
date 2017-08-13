@@ -156,7 +156,7 @@ void energy_calc(double *result) {
                        add_non_bonded_pair_energy(&p1, &p2, d.vec21,
                                                   sqrt(d.dist2), d.dist2);
                      }
-                   });
+                   }, local_cells);
 
 /* rescale kinetic energy */
 #ifdef MULTI_TIMESTEP

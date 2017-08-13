@@ -122,9 +122,41 @@ void check_forces() {
   }
 }
 
+#include <future>
+
 void force_calc() {
-  // Communication step: distribute ghost positions
-  cells_update_ghosts();
+  auto single_force = [](Particle &p) { add_single_particle_force(&p); };
+  auto pair_force = [](Particle &p1, Particle &p2, Distance &d) {
+#ifdef EXCLUSIONS
+    if (do_nonbonded(&p1, &p2))
+#endif
+
+    {
+      add_non_bonded_pair_force(&(p1), &(p2), d.vec21, sqrt(d.dist2), d.dist2);
+    }
+  };
+
+  if (resort_particles) {
+    // Communication step: distribute ghost positions
+    cells_update_ghosts();
+
+    init_forces();
+    short_range_loop(single_force, pair_force, local_cells);
+  } else {
+    /* Communication step: ghost information */
+    auto gc = std::async(std::launch::async, []() {
+      ghost_communicator(&cell_structure.update_ghost_pos_comm);
+    });
+
+    init_forces();
+    auto const rebuild_verletlist_ = rebuild_verletlist;
+    short_range_loop(single_force, pair_force, inner_cells);
+    rebuild_verletlist = rebuild_verletlist_;
+
+    gc.wait();
+
+    short_range_loop(single_force, pair_force, outer_cells);
+  }
 
 // VIRTUAL_SITES pos (and vel for DPD) update for security reason !!!
 #ifdef VIRTUAL_SITES
@@ -166,7 +198,6 @@ void force_calc() {
   if (iccp3m_initialized && iccp3m_cfg.set_flag)
     iccp3m_iteration();
 #endif
-  init_forces();
 
   for (ActorList::iterator actor = forceActors.begin();
        actor != forceActors.end(); ++actor) {
@@ -177,17 +208,6 @@ void force_calc() {
   }
 
   calc_long_range_forces();
-
-  short_range_loop([](Particle &p) { add_single_particle_force(&p); },
-                   [](Particle &p1, Particle &p2, Distance &d) {
-#ifdef EXCLUSIONS
-                     if (do_nonbonded(&p1, &p2))
-#endif
-                     {
-                       add_non_bonded_pair_force(&(p1), &(p2), d.vec21,
-                                                 sqrt(d.dist2), d.dist2);
-                     }
-                   });
 
 #ifdef OIF_GLOBAL_FORCES
   double area_volume[2]; // There are two global quantities that need to be
@@ -365,21 +385,21 @@ void calc_long_range_forces() {
 #endif /*ifdef DIPOLES */
 }
 
-void
-calc_non_bonded_pair_force_from_partcfg(Particle const *p1, Particle const *p2, IA_parameters *ia_params,
-                                        double d[3], double dist, double dist2,
-                                        double force[3],
-                                        double torque1[3], double torque2[3]) {
-     calc_non_bonded_pair_force_parts(p1, p2, ia_params,
-                                      d, dist, dist2, force, torque1, torque2);
+void calc_non_bonded_pair_force_from_partcfg(
+    Particle const *p1, Particle const *p2, IA_parameters *ia_params,
+    double d[3], double dist, double dist2, double force[3], double torque1[3],
+    double torque2[3]) {
+  calc_non_bonded_pair_force_parts(p1, p2, ia_params, d, dist, dist2, force,
+                                   torque1, torque2);
 }
 
-void
-calc_non_bonded_pair_force_from_partcfg_simple(Particle const *p1, Particle const *p2,
-                                               double d[3], double dist,
-                                               double dist2, double force[3]){
-   IA_parameters *ia_params = get_ia_param(p1->p.type,p2->p.type);
-   double torque1[3],torque2[3];
-   calc_non_bonded_pair_force_from_partcfg(p1, p2, ia_params, d, dist, dist2,
-                                           force, torque1, torque2);
+void calc_non_bonded_pair_force_from_partcfg_simple(Particle const *p1,
+                                                    Particle const *p2,
+                                                    double d[3], double dist,
+                                                    double dist2,
+                                                    double force[3]) {
+  IA_parameters *ia_params = get_ia_param(p1->p.type, p2->p.type);
+  double torque1[3], torque2[3];
+  calc_non_bonded_pair_force_from_partcfg(p1, p2, ia_params, d, dist, dist2,
+                                          force, torque1, torque2);
 }

@@ -180,7 +180,7 @@ int aggregation(double dist_criteria2, int min_contact, int s_mol_id,
         }
       }
     }
-  });
+    }, local_cells);
 
   /* count number of aggregates 
      find aggregate size

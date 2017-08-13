@@ -86,13 +86,13 @@ void decide_distance(CellIterator first, CellIterator last,
 }
 }
 
-template <typename ParticleKernel, typename PairKernel>
+template <typename ParticleKernel, typename PairKernel, typename Cells>
 void short_range_loop(ParticleKernel &&particle_kernel,
-                      PairKernel &&pair_kernel) {
+                      PairKernel &&pair_kernel, Cells  &cells_) {
   using Utils::make_batch;
 
-  auto first = boost::make_indirect_iterator(local_cells.begin());
-  auto last = boost::make_indirect_iterator(local_cells.end());
+  auto first = boost::make_indirect_iterator(cells_.begin());
+  auto last = boost::make_indirect_iterator(cells_.end());
 
   /* In this case we reset l.p_old on the particles */
   if (rebuild_verletlist) {

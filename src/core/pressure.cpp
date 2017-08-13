@@ -117,7 +117,7 @@ void pressure_calc(double *result, double *result_t, double *result_nb, double *
           add_non_bonded_pair_virials(&(p1), &(p2), d.vec21, sqrt(d.dist2),
                                       d.dist2);
         }
-      });
+      }, local_cells);
 
 /* rescale kinetic energy (=ideal contribution) */
 #ifdef ROTATION_PER_PARTICLE
@@ -1021,7 +1021,7 @@ int local_stress_tensor_calc(DoubleList *TensorInBin, int bins[3],
               return 0;
           }
         }
-      });
+      }, local_cells );
 
   for (int i = 0; i < bins[0] * bins[1] * bins[2]; i++) {
     for (int j = 0; j < 9; j++) {
