@@ -445,7 +445,8 @@ void integrate_vv(int n_steps, int reuse_forces) {
     transfer_momentum_gpu = 1;
 #endif
 
-    force_calc();
+    auto fc = force_calc();
+    fc.wait();
 
 // IMMERSED_BOUNDARY
 #ifdef IMMERSED_BOUNDARY
@@ -462,9 +463,6 @@ void integrate_vv(int n_steps, int reuse_forces) {
     integrate_reaction();
 #endif
 
-    if (check_runtime_errors())
-      break;
-
 #ifdef MULTI_TIMESTEP
 #ifdef NPT
     if (smaller_time_step > 0. && integ_switch == INTEG_METHOD_NPT_ISO)
@@ -480,6 +478,7 @@ void integrate_vv(int n_steps, int reuse_forces) {
       convert_torques_propagate_omega();
 #endif
     }
+
 // SHAKE velocity updates
 #ifdef BOND_CONSTRAINT
     ghost_communicator(&cell_structure.update_ghost_pos_comm);

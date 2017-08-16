@@ -105,8 +105,6 @@ void update_inner_cells(CellPList &local_cells) {
   }
 
   /* All local cells are either inner or outer */
-  assert((inner_cells.size() + outer_cells.size()) == local_cells.size());
-
   for (auto &c : local_cells) {
     assert((contains(inner_cells, c) xor (contains(outer_cells, c))));
   }

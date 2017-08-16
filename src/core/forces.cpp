@@ -82,6 +82,20 @@ void init_forces() {
 #endif
 }
 
+void init_forces_local() {
+  Cell *cell;
+  Particle *p;
+  int np, c, i;
+
+  for (c = 0; c < local_cells.n; c++) {
+    cell = local_cells.cell[c];
+    p = cell->part;
+    np = cell->n;
+    for (i = 0; i < np; i++)
+      init_local_particle_force(&p[i]);
+  }
+}
+
 void init_forces_ghosts() {
   Cell *cell;
   Particle *p;
@@ -122,9 +136,7 @@ void check_forces() {
   }
 }
 
-#include <future>
-
-void force_calc() {
+std::future<void> force_calc() {
   auto single_force = [](Particle &p) { add_single_particle_force(&p); };
   auto pair_force = [](Particle &p1, Particle &p2, Distance &d) {
 #ifdef EXCLUSIONS
@@ -146,9 +158,10 @@ void force_calc() {
     /* Communication step: ghost information */
     auto gc = std::async(std::launch::async, []() {
       ghost_communicator(&cell_structure.update_ghost_pos_comm);
+      init_forces_ghosts();
     });
 
-    init_forces();
+    init_forces_local();
     auto const rebuild_verletlist_ = rebuild_verletlist;
     short_range_loop(single_force, pair_force, inner_cells);
     rebuild_verletlist = rebuild_verletlist_;
@@ -254,7 +267,9 @@ void force_calc() {
 #endif
 
   // Communication Step: ghost forces
-  ghost_communicator(&cell_structure.collect_ghost_force_comm);
+  auto fc = std::async(std::launch::async, []() {
+    ghost_communicator(&cell_structure.collect_ghost_force_comm);
+  });
 
 // apply trap forces to trapped molecules
 #ifdef MOLFORCES
@@ -268,6 +283,8 @@ void force_calc() {
 
   // mark that forces are now up-to-date
   recalc_forces = 0;
+
+  return fc;
 }
 
 void calc_long_range_forces() {

@@ -73,7 +73,8 @@ void init_forces_ghosts();
  *  </ol>
  */
 
-void force_calc();
+#include <future>
+std::future<void> force_calc();
 
 /** Check if forces are NAN 
  */
