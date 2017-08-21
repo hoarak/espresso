@@ -44,7 +44,6 @@ function(UNIT_TEST)
 endfunction(UNIT_TEST)
 
 # Add tests here
-
 unit_test(NAME Vector_test SRC Vector_test.cpp)
 unit_test(NAME RuntimeError_test SRC RuntimeError_test.cpp)
 unit_test(NAME RunningAverage_test SRC RunningAverage_test.cpp)
@@ -71,3 +70,4 @@ unit_test(NAME Range_test SRC Range_test.cpp)
 unit_test(NAME ParticleCache_test SRC ParticleCache_test.cpp ../MpiCallbacks.cpp NUM_PROC 2)
 unit_test(NAME SkipIterator_test SRC SkipIterator_test.cpp)
 unit_test(NAME List_test SRC List_test.cpp)
+unit_test(NAME Particle_test SRC Particle_test.cpp)
