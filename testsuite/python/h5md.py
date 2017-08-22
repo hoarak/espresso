@@ -42,7 +42,6 @@ class CommonTests(ut.TestCase):
     system.box_l = [npart, npart, npart]
     system.cell_system.skin = 0.4
     system.time_step = 0.01
-    print system.cell_system.get_state()
     for i in range(npart):
         system.part.add(id=i, pos=np.array([float(i),
                                             float(i),
