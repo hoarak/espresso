@@ -54,8 +54,7 @@ class CommonTests(ut.TestCase):
             system.part[i].ext_force = [0.1, 0.2, 0.3]
     system.integrator.run(steps=0)
 
-    @classmethod
-    def setUpClass(self):
+    def setUp(self):
         self.py_file = self.py_pos = self.py_vel = self.py_f = self.py_id = None
 
     def test_pos(self):
@@ -146,5 +145,4 @@ if __name__ == "__main__":
     suite.addTests(ut.TestLoader().loadTestsFromTestCase(H5mdTestUnordered))
     suite.addTests(ut.TestLoader().loadTestsFromTestCase(H5mdTestOrdered))
     result = ut.TextTestRunner(verbosity=4).run(suite)
-    print "before exit"
     sys.exit(not result.wasSuccessful())
