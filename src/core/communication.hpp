@@ -190,14 +190,6 @@ void mpi_send_f(int node, int part, const Vector3d & F);
 */
 void mpi_send_solvation(int node, int part, double *solvation);
 
-/** Issue REQ_SET_M: send particle mass.
-    Also calls \ref on_particle_change.
-    \param part the particle.
-    \param node the node it is attached to.
-    \param mass its new mass.
-*/
-void mpi_send_mass(int node, int part, double mass);
-
 /** Issue REQ_SET_Q: send particle charge.
     Also calls \ref on_particle_change.
     \param part the particle.
@@ -320,22 +312,6 @@ void mpi_send_vs_quat(int node, int part, double *vs_quat);
 void mpi_send_vs_relative(int node, int part, int vs_relative_to,
                           double vs_distance, double* rel_ori);
 #endif
-
-/** Issue REQ_SET_TYPE: send particle type.
-    Also calls \ref on_particle_change.
-    \param part the particle.
-    \param node the node it is attached to.
-    \param type its new type.
-*/
-void mpi_send_type(int node, int part, int type);
-
-/** Issue REQ_SET_MOL_ID: send molecule id.
-    Also calls \ref on_particle_change.
-    \param part the particle.
-    \param node the node it is attached to.
-    \param mid its new mol_id.
-*/
-void mpi_send_mol_id(int node, int part, int mid);
 
 /** Issue REQ_SET_BOND: send bond.
     Also calls \ref on_particle_change.

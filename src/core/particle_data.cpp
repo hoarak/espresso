@@ -40,8 +40,8 @@
 #include "partCfg_global.hpp"
 #include "rotation.hpp"
 #include "virtual_sites.hpp"
+#include "initialize.hpp"
 
-#include "utils.hpp"
 #include "utils/Cache.hpp"
 #include "utils/make_unique.hpp"
 #include "utils/mpi/gatherv.hpp"
@@ -76,7 +76,7 @@ int n_part = 0;
 /**
  * @brief id -> rank
  */
-std::unordered_map<int, int> particle_node;
+static std::unordered_map<int, int> particle_node;
 
 int max_local_particles = 0;
 Particle **local_particles = nullptr;
@@ -410,17 +410,14 @@ void prefetch_particle_data(std::vector<int> ids) {
     return;
 
   /* Remove local, already cached and non-existent particles from the list. */
-  ids.erase(std::remove_if(ids.begin(), ids.end(),
-                           [](int id) {
-                             if (not particle_exists(id)) {
-                               return true;
-                             } else {
-                               auto const pnode = get_particle_node(id);
-                               return (pnode == this_node) ||
-                                      particle_fetch_cache.has(id);
-                             }
-                           }),
-            ids.end());
+  ids.erase(std::remove_if(ids.begin(), ids.end(), [](int id) {
+    if (not particle_exists(id)) {
+      return true;
+    } else {
+      auto const pnode = get_particle_node(id);
+      return (pnode == this_node) || particle_fetch_cache.has(id);
+    }
+  }), ids.end());
 
   /* Don't prefetch more particles than fit the cache. */
   if (ids.size() > particle_fetch_cache.max_size())
@@ -461,6 +458,74 @@ int place_particle(int part, double p[3]) {
   return retcode;
 }
 
+#include "utils/type_traits.hpp"
+#include "utils/tuple_find.hpp"
+#include "utils/visit_at.hpp"
+
+namespace detail {
+template <class C> struct MpiRecvMember {
+  boost::mpi::communicator const &comm;
+  C &target;
+
+  template <typename T> void operator()(T C::*prop) {
+    comm.recv(0, 42, target.*prop);
+  }
+};
+
+template <typename T> struct mpi_export_traits {};
+
+#define PART_PROP(A) &ParticleProperties::A
+
+template <> struct mpi_export_traits<ParticleProperties> {
+#define PART_PROP(A) &ParticleProperties::A
+  static constexpr auto mpi_exported_members = std::make_tuple(
+      PART_PROP(mol_id), PART_PROP(type), PART_PROP(mass), PART_PROP(rinertia),
+      PART_PROP(bond_site), PART_PROP(out_direction), PART_PROP(rotation),
+      PART_PROP(q), PART_PROP(mu_E), PART_PROP(dipm), PART_PROP(is_virtual),
+      PART_PROP(T), PART_PROP(gamma), PART_PROP(gamma_rot),
+      PART_PROP(catalyzer_count), PART_PROP(ext_flag), PART_PROP(ext_force),
+      PART_PROP(ext_torque));
+
+  static auto members() -> decltype(mpi_exported_members) {
+    return mpi_exported_members;
+  }
+};
+}
+
+template <class C> void mpi_set_class_member_slave(C &target, int mem_id) {
+  auto const &members = detail::mpi_export_traits<C>::members();
+  Utils::visit_at(members, mem_id, detail::MpiRecvMember<C>{comm_cart, target});
+}
+
+void mpi_set_particle_property_slave(int part_id, int mem_id) {
+  auto p = local_particles[part_id];
+
+  if (p) {
+    mpi_set_class_member_slave<ParticleProperties>(p->p, mem_id);
+  }
+
+  on_particle_change();
+}
+
+template <typename T>
+void mpi_set_particle_property(int part, T ParticleProperties::*prop,
+                               T const &value) {
+  auto const pnode = get_particle_node(part);
+  if (pnode == this_node) {
+    auto p = local_particles[part];
+    assert(p);
+    p->p.*prop = value;
+  } else {
+    auto const &members =
+        detail::mpi_export_traits<ParticleProperties>::members();
+    auto const prop_id = Utils::tuple_find(members, prop);
+
+    mpi_call(mpi_set_particle_property_slave, part, prop_id);
+    comm_cart.send(pnode, 42, value);
+  }
+
+  on_particle_change();
+}
 int set_particle_v(int part, double v[3]) {
   auto const pnode = get_particle_node(part);
 
@@ -494,11 +559,10 @@ int set_particle_solvation(int part, double *solvation) {
 
 #endif
 
-#if defined(MASS) || defined(LB_BOUNDARIES_GPU)
+#if defined(MASS)
 int set_particle_mass(int part, double mass) {
-  auto const pnode = get_particle_node(part);
+  mpi_set_particle_property(part, PART_PROP(mass), mass);
 
-  mpi_send_mass(pnode, part, mass);
   return ES_OK;
 }
 #else
@@ -608,7 +672,7 @@ int set_particle_mu_E(int part, double mu_E[3]) {
   return ES_OK;
 }
 
-void get_particle_mu_E(int part, double (&mu_E)[3]) {
+void get_particle_mu_E(int part, double(&mu_E)[3]) {
   auto const &p = get_particle_data(part);
 
   for (int i = 0; i < 3; i++) {
@@ -618,7 +682,6 @@ void get_particle_mu_E(int part, double (&mu_E)[3]) {
 #endif
 
 int set_particle_type(int p_id, int type) {
-  auto const pnode = get_particle_node(p_id);
   make_particle_type_exist(type);
 
   if (type_list_enable) {
@@ -626,22 +689,21 @@ int set_particle_type(int p_id, int type) {
     // it from the list which contains it
     auto const &cur_par = get_particle_data(p_id);
     int prev_type = cur_par.p.type;
-    if (prev_type != type ) {
+    if (prev_type != type) {
       // particle existed before so delete it from the list
       remove_id_from_map(p_id, prev_type);
     }
     add_id_to_type_map(p_id, type);
   }
 
-  mpi_send_type(pnode, p_id, type);
+  mpi_set_particle_property(p_id, PART_PROP(type), type);
 
   return ES_OK;
 }
 
 int set_particle_mol_id(int part, int mid) {
-  auto const pnode = get_particle_node(part);
+  mpi_set_particle_property(part, PART_PROP(mol_id), mid);
 
-  mpi_send_mol_id(pnode, part, mid);
   return ES_OK;
 }
 
@@ -1203,7 +1265,7 @@ void init_type_map(int type) {
 }
 
 void remove_id_from_map(int part_id, int type) {
-  if(particle_type_map.find(type)!=particle_type_map.end())
+  if (particle_type_map.find(type) != particle_type_map.end())
     particle_type_map.at(type).erase(part_id);
 }
 
@@ -1215,7 +1277,7 @@ int get_random_p_id(int type) {
 }
 
 void add_id_to_type_map(int part_id, int type) {
-  if(particle_type_map.find(type)!=particle_type_map.end())
+  if (particle_type_map.find(type) != particle_type_map.end())
     particle_type_map.at(type).insert(part_id);
 }
 
@@ -1237,7 +1299,9 @@ void pointer_to_torque_lab(Particle const *p, double const *&res) {
   res = p->f.torque.data();
 }
 
-void pointer_to_quat(Particle const *p, double const *&res) { res = p->r.quat.data(); }
+void pointer_to_quat(Particle const *p, double const *&res) {
+  res = p->r.quat.data();
+}
 
 void pointer_to_quatu(Particle const *p, double const *&res) {
   res = p->r.quatu.data();
@@ -1268,7 +1332,9 @@ void pointer_to_vs_relative(Particle const *p, int const *&res1,
 #endif
 
 #ifdef DIPOLES
-void pointer_to_dip(Particle const *p, double const *&res) { res = p->r.dip.data(); }
+void pointer_to_dip(Particle const *p, double const *&res) {
+  res = p->r.dip.data();
+}
 
 void pointer_to_dipm(Particle const *p, double const *&res) {
   res = &(p->p.dipm);
@@ -1335,18 +1401,16 @@ void pointer_to_rotational_inertia(Particle const *p, double const *&res) {
 #endif
 
 #ifdef AFFINITY
-void pointer_to_bond_site(Particle const* p, double const*& res) {
-  res =p->p.bond_site.data();
+void pointer_to_bond_site(Particle const *p, double const *&res) {
+  res = p->p.bond_site.data();
 }
 #endif
 
 #ifdef MEMBRANE_COLLISION
-void pointer_to_out_direction(const Particle* p, const double*& res) {
- res = p->p.out_direction.data();
+void pointer_to_out_direction(const Particle *p, const double *&res) {
+  res = p->p.out_direction.data();
 }
 #endif
-
-
 
 bool particle_exists(int part_id) {
   if (particle_node.empty())

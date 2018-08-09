@@ -126,7 +126,6 @@ static int terminated = 0;
   CB(mpi_send_swimming_slave)                                                  \
   CB(mpi_send_f_slave)                                                         \
   CB(mpi_send_q_slave)                                                         \
-  CB(mpi_send_type_slave)                                                      \
   CB(mpi_send_bond_slave)                                                      \
   CB(mpi_recv_part_slave)                                                      \
   CB(mpi_integrate_slave)                                                      \
@@ -146,11 +145,9 @@ static int terminated = 0;
   CB(mpi_send_quat_slave)                                                      \
   CB(mpi_send_omega_slave)                                                     \
   CB(mpi_send_torque_slave)                                                    \
-  CB(mpi_send_mol_id_slave)                                                    \
   CB(mpi_bcast_nptiso_geom_slave)                                              \
   CB(mpi_update_mol_ids_slave)                                                 \
   CB(mpi_sync_topo_part_info_slave)                                            \
-  CB(mpi_send_mass_slave)                                                      \
   CB(mpi_send_solvation_slave)                                                 \
   CB(mpi_send_exclusion_slave)                                                 \
   CB(mpi_bcast_lb_params_slave)                                                \
@@ -193,7 +190,8 @@ static int terminated = 0;
   CB(mpi_resort_particles_slave)                                               \
   CB(mpi_get_pairs_slave)                                                      \
   CB(mpi_get_particles_slave)                                                  \
-  CB(mpi_rotate_system_slave)
+  CB(mpi_rotate_system_slave)                                                  \
+  CB(mpi_set_particle_property_slave)
 
 // create the forward declarations
 #define CB(name) void name(int node, int param);
@@ -336,7 +334,8 @@ void mpi_bcast_event_slave(int node, int event) {
     break;
 #endif
 
-  default:;
+  default:
+    ;
   }
 }
 
@@ -392,13 +391,13 @@ void mpi_place_new_particle_slave(int pnode, int part) {
 }
 
 /****************** REQ_SET_V ************/
-void mpi_send_v(int pnode, int part, double* v) {
+void mpi_send_v(int pnode, int part, double *v) {
   mpi_call(mpi_send_v_slave, pnode, part);
 
   if (pnode == this_node) {
     Particle *p = local_particles[part];
 
-    p->m.v = {v[0],v[1],v[2]};
+    p->m.v = {v[0], v[1], v[2]};
   } else
     MPI_Send(v, 3, MPI_DOUBLE, pnode, SOME_TAG, comm_cart);
 
@@ -408,7 +407,8 @@ void mpi_send_v(int pnode, int part, double* v) {
 void mpi_send_v_slave(int pnode, int part) {
   if (pnode == this_node) {
     Particle *p = local_particles[part];
-    MPI_Recv(p->m.v.data(), 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart, MPI_STATUS_IGNORE);
+    MPI_Recv(p->m.v.data(), 3, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
+             MPI_STATUS_IGNORE);
   }
 
   on_particle_change();
@@ -555,34 +555,6 @@ void mpi_send_solvation_slave(int pnode, int part) {
 #endif
 }
 
-/********************* REQ_SET_M ********/
-void mpi_send_mass(int pnode, int part, double mass) {
-#ifdef MASS
-  mpi_call(mpi_send_mass_slave, pnode, part);
-
-  if (pnode == this_node) {
-    Particle *p = local_particles[part];
-    p->p.mass = mass;
-  } else {
-    MPI_Send(&mass, 1, MPI_DOUBLE, pnode, SOME_TAG, comm_cart);
-  }
-
-  on_particle_change();
-#endif
-}
-
-void mpi_send_mass_slave(int pnode, int part) {
-#ifdef MASS
-  if (pnode == this_node) {
-    Particle *p = local_particles[part];
-    MPI_Recv(&p->p.mass, 1, MPI_DOUBLE, 0, SOME_TAG, comm_cart,
-             MPI_STATUS_IGNORE);
-  }
-
-  on_particle_change();
-#endif
-}
-
 /********************* REQ_SET_RINERTIA ********/
 
 void mpi_send_rotational_inertia(int pnode, int part, double rinertia[3]) {
@@ -704,51 +676,6 @@ void mpi_send_out_direction_slave(int pnode, int part) {
 
   on_particle_change();
 #endif
-}
-
-/********************* REQ_SET_TYPE ********/
-void mpi_send_type(int pnode, int part, int type) {
-  mpi_call(mpi_send_type_slave, pnode, part);
-
-  if (pnode == this_node) {
-    Particle *p = local_particles[part];
-    p->p.type = type;
-  } else
-    MPI_Send(&type, 1, MPI_INT, pnode, SOME_TAG, comm_cart);
-
-  on_particle_change();
-}
-
-void mpi_send_type_slave(int pnode, int part) {
-  if (pnode == this_node) {
-    Particle *p = local_particles[part];
-    MPI_Recv(&p->p.type, 1, MPI_INT, 0, SOME_TAG, comm_cart, MPI_STATUS_IGNORE);
-  }
-
-  on_particle_change();
-}
-
-/********************* REQ_SET_MOLID ********/
-void mpi_send_mol_id(int pnode, int part, int mid) {
-  mpi_call(mpi_send_mol_id_slave, pnode, part);
-
-  if (pnode == this_node) {
-    Particle *p = local_particles[part];
-    p->p.mol_id = mid;
-  } else
-    MPI_Send(&mid, 1, MPI_INT, pnode, SOME_TAG, comm_cart);
-
-  on_particle_change();
-}
-
-void mpi_send_mol_id_slave(int pnode, int part) {
-  if (pnode == this_node) {
-    Particle *p = local_particles[part];
-    MPI_Recv(&p->p.mol_id, 1, MPI_INT, 0, SOME_TAG, comm_cart,
-             MPI_STATUS_IGNORE);
-  }
-
-  on_particle_change();
 }
 
 /********************* REQ_SET_QUAT ********/
@@ -1590,7 +1517,7 @@ void mpi_send_ext_torque(int pnode, int part, int flag, int mask,
     p->p.ext_flag |= flag;
 
     if (mask & PARTICLE_EXT_TORQUE)
-      p->p.ext_torque ={torque[0],torque[1],torque[2]};
+      p->p.ext_torque = {torque[0], torque[1], torque[2]};
   } else {
     int s_buf[2];
     s_buf[0] = flag;
@@ -1639,7 +1566,7 @@ void mpi_send_ext_force(int pnode, int part, int flag, int mask,
     /* set new values */
     p->p.ext_flag |= flag;
     if (mask & PARTICLE_EXT_FORCE)
-      p->p.ext_force ={force[0],force[1],force[2]};
+      p->p.ext_force = {force[0], force[1], force[2]};
   } else {
     int s_buf[2];
     s_buf[0] = flag;
@@ -1864,7 +1791,9 @@ void mpi_send_exclusion_slave(int part1, int part2) {
 }
 
 /************** REQ_SET_FLUID **************/
-void mpi_send_fluid(int node, int index, double rho, const std::array<double, 3> &j, const std::array<double, 6> &pi) {
+void mpi_send_fluid(int node, int index, double rho,
+                    const std::array<double, 3> &j,
+                    const std::array<double, 6> &pi) {
 #ifdef LB
   if (node == this_node) {
     lb_calc_n_from_rho_j_pi(index, rho, j, pi);
@@ -1883,7 +1812,8 @@ void mpi_send_fluid_slave(int node, int index) {
     double data[10];
     MPI_Recv(data, 10, MPI_DOUBLE, 0, SOME_TAG, comm_cart, MPI_STATUS_IGNORE);
     std::array<double, 3> j = {{data[1], data[2], data[3]}};
-    std::array<double, 6> pi = {{data[4], data[5], data[6], data[7], data[8], data[9]}};
+    std::array<double, 6> pi = {
+        {data[4], data[5], data[6], data[7], data[8], data[9]}};
     lb_calc_n_from_rho_j_pi(index, data[0], j, pi);
   }
 #endif
