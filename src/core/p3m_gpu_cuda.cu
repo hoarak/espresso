@@ -58,6 +58,7 @@ struct P3MGpuData {
   /** Charge mesh */
   CUFFT_TYPE_COMPLEX *charge_mesh;
   /** Force meshes */
+  CUFFT_TYPE_COMPLEX *force_mesh;
   CUFFT_TYPE_COMPLEX *force_mesh_x;
   CUFFT_TYPE_COMPLEX *force_mesh_y;
   CUFFT_TYPE_COMPLEX *force_mesh_z;
@@ -88,7 +89,8 @@ P3MGpuData p3m_gpu_data;
 struct p3m_gpu_fft_plans_t {
   /** FFT plans */
   cufftHandle forw_plan;
-  cufftHandle back_plan;
+  cufftHandle back_plan_vector;
+  cufftHandle back_plan_scalar;
 } p3m_gpu_fft_plans;
 
 static char p3m_gpu_data_initialized = 0;
@@ -381,7 +383,7 @@ __global__ void apply_diff_op(const P3MGpuData p) {
       (blockIdx.y > p.mesh[1] / 2) ? blockIdx.y - p.mesh[1] : blockIdx.y;
   const int nz = threadIdx.x;
 
-  const CUFFT_TYPE_COMPLEX meshw = p.charge_mesh[linear_index];
+  const CUFFT_TYPE_COMPLEX &meshw = p.charge_mesh[linear_index];
   CUFFT_TYPE_COMPLEX buf;
   buf.x = -2.0 * PI * meshw.y;
   buf.y = 2.0 * PI * meshw.x;
@@ -732,17 +734,18 @@ void p3m_gpu_init(int cao, int mesh[3], double alpha) {
     if ((p3m_gpu_data_initialized == 1) && (mesh_changed == 1)) {
       cuda_safe_mem(cudaFree(p3m_gpu_data.charge_mesh));
       p3m_gpu_data.charge_mesh = 0;
-      cuda_safe_mem(cudaFree(p3m_gpu_data.force_mesh_x));
+      cuda_safe_mem(cudaFree(p3m_gpu_data.force_mesh));
+      p3m_gpu_data.force_mesh = 0;
       p3m_gpu_data.force_mesh_x = 0;
-      cuda_safe_mem(cudaFree(p3m_gpu_data.force_mesh_y));
       p3m_gpu_data.force_mesh_y = 0;
-      cuda_safe_mem(cudaFree(p3m_gpu_data.force_mesh_z));
       p3m_gpu_data.force_mesh_z = 0;
+
       cuda_safe_mem(cudaFree(p3m_gpu_data.G_hat));
       p3m_gpu_data.G_hat = 0;
 
       cufftDestroy(p3m_gpu_fft_plans.forw_plan);
-      cufftDestroy(p3m_gpu_fft_plans.back_plan);
+      cufftDestroy(p3m_gpu_fft_plans.back_plan_vector);
+      cufftDestroy(p3m_gpu_fft_plans.back_plan_scalar);
 
       p3m_gpu_data_initialized = 0;
     }
@@ -754,19 +757,20 @@ void p3m_gpu_init(int cao, int mesh[3], double alpha) {
 
       cuda_safe_mem(cudaMalloc((void **)&(p3m_gpu_data.charge_mesh),
                                cmesh_size * sizeof(CUFFT_TYPE_COMPLEX)));
-      cuda_safe_mem(cudaMalloc((void **)&(p3m_gpu_data.force_mesh_x),
-                               cmesh_size * sizeof(CUFFT_TYPE_COMPLEX)));
-      cuda_safe_mem(cudaMalloc((void **)&(p3m_gpu_data.force_mesh_y),
-                               cmesh_size * sizeof(CUFFT_TYPE_COMPLEX)));
-      cuda_safe_mem(cudaMalloc((void **)&(p3m_gpu_data.force_mesh_z),
-                               cmesh_size * sizeof(CUFFT_TYPE_COMPLEX)));
+      cuda_safe_mem(cudaMalloc((void **)&(p3m_gpu_data.force_mesh),
+                               3 * cmesh_size * sizeof(CUFFT_TYPE_COMPLEX)));
+      p3m_gpu_data.force_mesh_x = p3m_gpu_data.force_mesh + 0 * cmesh_size;
+      p3m_gpu_data.force_mesh_y = p3m_gpu_data.force_mesh + 1 * cmesh_size;
+      p3m_gpu_data.force_mesh_z = p3m_gpu_data.force_mesh + 2 * cmesh_size;
+
       cuda_safe_mem(cudaMalloc((void **)&(p3m_gpu_data.G_hat),
                                cmesh_size * sizeof(REAL_TYPE)));
 
       cufftPlan3d(&(p3m_gpu_fft_plans.forw_plan), mesh[0], mesh[1], mesh[2],
                   CUFFT_PLAN_FORW_FLAG);
-      cufftPlan3d(&(p3m_gpu_fft_plans.back_plan), mesh[0], mesh[1], mesh[2],
+      cufftPlan3d(&(p3m_gpu_fft_plans.back_plan_scalar), mesh[0], mesh[1], mesh[2],
                   CUFFT_PLAN_BACK_FLAG);
+      cufftPlanMany(&(p3m_gpu_fft_plans.back_plan_vector), 3, mesh, NULL, 1, 0, NULL, 1, 0, CUFFT_PLAN_BACK_FLAG, 3);
     }
 
     if (((reinit_if == 1) || (p3m_gpu_data_initialized == 0)) &&
@@ -863,12 +867,8 @@ void p3m_gpu_add_farfield_force() {
   KERNELCALL(apply_diff_op, gridConv, threadsConv, (p3m_gpu_data));
 
   /** Transform the components of the electric field back */
-  CUFFT_BACK_FFT(p3m_gpu_fft_plans.back_plan, p3m_gpu_data.force_mesh_x,
-                 (REAL_TYPE *)p3m_gpu_data.force_mesh_x);
-  CUFFT_BACK_FFT(p3m_gpu_fft_plans.back_plan, p3m_gpu_data.force_mesh_y,
-                 (REAL_TYPE *)p3m_gpu_data.force_mesh_y);
-  CUFFT_BACK_FFT(p3m_gpu_fft_plans.back_plan, p3m_gpu_data.force_mesh_z,
-                 (REAL_TYPE *)p3m_gpu_data.force_mesh_z);
+  CUFFT_BACK_FFT(p3m_gpu_fft_plans.back_plan_vector, p3m_gpu_data.force_mesh,
+                 (REAL_TYPE *)p3m_gpu_data.force_mesh);
 
   /** Assign the forces from the mesh back to the particles */
   assign_forces(lb_particle_gpu, p3m_gpu_data, lb_particle_force_gpu,
