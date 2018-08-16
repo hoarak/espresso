@@ -32,6 +32,7 @@
 #include "electrostatics/p3m-dipolar.hpp"
 
 #include "short_range_loop.hpp"
+#include "electrostatics/coulomb.hpp"
 
 Observable_stat virials  = {0, {}, 0,0,0,0,0};
 Observable_stat total_pressure = {0, {}, 0,0,0,0,0};

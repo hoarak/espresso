@@ -55,7 +55,7 @@
 #include "nonbonded_interactions/ljcos2.hpp"
 #include "nonbonded_interactions/ljgen.hpp"
 #include "electrostatics/maggs.hpp"
-#include "mdlc_correction.hpp"
+#include "core/electrostatics/mdlc_correction.hpp"
 #include "minimize_energy.hpp"
 #include "electrostatics/mmm1d.hpp"
 #include "electrostatics/mmm2d.hpp"
@@ -78,6 +78,7 @@
 #include "bonded_interactions/bonded_tab.hpp"
 #include "topology.hpp"
 #include "virtual_sites.hpp"
+#include "electrostatics/coulomb.hpp"
 
 #include "utils.hpp"
 #include "utils/make_unique.hpp"
@@ -86,7 +87,6 @@
 
 #include <boost/mpi.hpp>
 #include <boost/serialization/array.hpp>
-#include <boost/serialization/string.hpp>
 
 using namespace std;
 

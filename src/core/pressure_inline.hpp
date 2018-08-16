@@ -32,6 +32,7 @@
 #include "pressure.hpp"
 #include "thermostat.hpp"
 #include "utils.hpp"
+#include "electrostatics/coulomb.hpp"
 
 /** Calculate non bonded energies between a pair of particles.
     @param p1        pointer to particle 1.

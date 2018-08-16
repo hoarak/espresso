@@ -26,14 +26,13 @@
 #include "cells.hpp"
 #include "communication.hpp"
 #include "errorhandling.hpp"
-#include "nonbonded_interactions/nonbonded_interaction_data.hpp"
 #include "mmm-common.hpp"
 #include "electrostatics/p3m.hpp"
 #include "particle_data.hpp"
 #include "pressure.hpp"
 #include "utils.hpp"
+#include "coulomb.hpp"
 #include <cmath>
-#include <mpi.h>
 
 #ifdef P3M
 

@@ -36,8 +36,6 @@ set(EspressoCore_SRC
     lb.cpp
     lb-d3q19.cpp
     lbgpu.cpp
-    magnetic_non_p3m_methods.cpp
-    mdlc_correction.cpp
     metadynamics.cpp
     minimize_energy.cpp
     molforces.cpp

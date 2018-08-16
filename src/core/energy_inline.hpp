@@ -70,6 +70,8 @@
 #include "electrostatics/scafacos.hpp"
 #include "electrostatics/p3m-dipolar.hpp"
 #include "electrostatics/p3m.hpp"
+#include "electrostatics/coulomb.hpp"
+
 #include "statistics.hpp"
 #include "thermostat.hpp"
 

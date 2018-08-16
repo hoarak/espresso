@@ -37,8 +37,7 @@
 #include "short_range_loop.hpp"
 #include "immersed_boundaries.hpp" 
 #include "lb.hpp"
-
-#include <cassert>
+#include "electrostatics/coulomb.hpp"
 
 ActorList forceActors;
 

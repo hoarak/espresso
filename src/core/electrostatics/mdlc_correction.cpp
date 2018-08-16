@@ -42,6 +42,7 @@
 #include "particle_data.hpp"
 #include "utils.hpp"
 #include "debug.hpp"
+#include "coulomb.hpp"
 
 #ifdef DIPOLES
 

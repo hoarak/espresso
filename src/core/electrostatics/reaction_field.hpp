@@ -32,6 +32,7 @@
 #include "utils.hpp"
 #include "nonbonded_interactions/nonbonded_interaction_data.hpp"
 #include "particle_data.hpp"
+#include "coulomb.hpp"
 
 #ifdef ELECTROSTATICS
 

@@ -43,8 +43,8 @@
 #include "nonbonded_interactions/ljcos2.hpp"
 #include "nonbonded_interactions/ljgen.hpp"
 #include "electrostatics/maggs.hpp"
-#include "magnetic_non_p3m_methods.hpp"
-#include "mdlc_correction.hpp"
+#include "core/electrostatics/magnetic_non_p3m_methods.hpp"
+#include "core/electrostatics/mdlc_correction.hpp"
 #include "initialize.hpp"
 #include "nonbonded_interaction_data.hpp"
 #include "actor/DipolarDirectSum.hpp"
@@ -68,15 +68,15 @@
 #include "thermostat.hpp"
 #include "utils.hpp"
 #include "utils/serialization/IA_parameters.hpp"
-#include <cstdlib>
-#include <cstring>
+#include "electrostatics/coulomb.hpp"
+
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/string.hpp>
-#include <boost/serialization/vector.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream.hpp>
 
+#include <cstdlib>
 
 /****************************************
  * variables
@@ -85,14 +85,6 @@ int max_seen_particle_type = 0;
 std::vector<IA_parameters> ia_params;
 
 #if defined(ELECTROSTATICS) || defined(DIPOLES)
-Coulomb_parameters coulomb = {
-#ifdef ELECTROSTATICS
-  0.0, COULOMB_NONE,
-#endif
-#ifdef DIPOLES
-  0.0, DIPOLAR_NONE,
-#endif
-};
 #endif
 
 #ifdef ELECTROSTATICS

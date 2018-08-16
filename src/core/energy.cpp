@@ -28,13 +28,14 @@
 #include "forces.hpp"
 #include "initialize.hpp"
 #include "electrostatics/maggs.hpp"
-#include "magnetic_non_p3m_methods.hpp"
-#include "mdlc_correction.hpp"
+#include "core/electrostatics/magnetic_non_p3m_methods.hpp"
+#include "core/electrostatics/mdlc_correction.hpp"
 #include "electrostatics/scafacos.hpp"
 #include "constraints.hpp"
 #include <cassert>
 
 #include "short_range_loop.hpp"
+#include "electrostatics/coulomb.hpp"
 
 ActorList energyActors;
 

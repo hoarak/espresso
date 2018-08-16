@@ -60,12 +60,12 @@
 #include "npt.hpp"
 #include "collision.hpp"
 #include "forces.hpp"
+#include "electrostatics/coulomb.hpp"
 
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <mpi.h>
 
 #ifdef VALGRIND_INSTRUMENTATION
 #include <callgrind.h>

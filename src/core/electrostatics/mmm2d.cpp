@@ -30,13 +30,13 @@
 #include "communication.hpp"
 #include "grid.hpp"
 #include "particle_data.hpp"
-#include "nonbonded_interactions/nonbonded_interaction_data.hpp"
 #include "cells.hpp"
 #include "electrostatics/mmm2d.hpp"
 #include "mmm-common.hpp"
 #include "specfunc.hpp"
 #include "integrate.hpp"
 #include "layered.hpp"
+#include "coulomb.hpp"
 
 #ifdef ELECTROSTATICS
 char const *mmm2d_errors[] = {

@@ -68,6 +68,8 @@
 #include "virtual_sites.hpp"
 
 #include "utils/mpi/all_compare.hpp"
+#include "electrostatics/coulomb.hpp"
+
 /** whether the thermostat has to be reinitialized before integration */
 static int reinit_thermo = 1;
 static int reinit_electrostatics = 0;

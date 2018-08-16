@@ -47,6 +47,7 @@
 #include "global.hpp"
 #include "nonbonded_interactions/nonbonded_interaction_data.hpp"
 #include "p3m_gpu_common.hpp"
+#include "coulomb.hpp"
 
 #if defined(OMPI_MPI_H) || defined(_MPI_H)
 #error CU-file includes mpi.h! This should not happen!

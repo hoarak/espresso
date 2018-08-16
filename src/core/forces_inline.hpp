@@ -59,8 +59,8 @@
 #include "nonbonded_interactions/morse.hpp"
 #include "nonbonded_interactions/soft_sphere.hpp"
 #include "nonbonded_interactions/steppot.hpp"
-#include "magnetic_non_p3m_methods.hpp"
-#include "mdlc_correction.hpp"
+#include "core/electrostatics/magnetic_non_p3m_methods.hpp"
+#include "core/electrostatics/mdlc_correction.hpp"
 #include "metadynamics.hpp"
 #include "electrostatics/mmm1d.hpp"
 #include "electrostatics/mmm2d.hpp"
@@ -91,6 +91,8 @@
 #endif
 #ifdef DPD
 #include "dpd.hpp"
+#include "electrostatics/coulomb.hpp"
+
 #endif
 
 /** initialize the forces for a ghost particle */
