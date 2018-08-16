@@ -1472,7 +1472,6 @@ void mpi_bcast_coulomb_params_slave(int node, int parm) {
     MPI_Bcast(&maggs, sizeof(MAGGS_struct), MPI_BYTE, 0, comm_cart);
     break;
   case COULOMB_RF:
-  case COULOMB_INTER_RF:
     MPI_Bcast(&rf_params, sizeof(Reaction_field_params), MPI_BYTE, 0,
               comm_cart);
     break;

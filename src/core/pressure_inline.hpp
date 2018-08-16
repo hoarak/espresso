@@ -124,9 +124,6 @@ inline void add_non_bonded_pair_virials(Particle *p1, Particle *p2, double d[3],
       virials.coulomb[0] += force[0] * d[0] + force[1] * d[1] + force[2] * d[2];
       break;
     }
-    case COULOMB_INTER_RF:
-      // this is done together with the other short range interactions
-      break;
     default:
       fprintf(stderr, "calculating pressure for electrostatics method that "
                       "doesn't have it implemented\n");

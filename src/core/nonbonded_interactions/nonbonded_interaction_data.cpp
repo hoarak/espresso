@@ -179,7 +179,6 @@ double calc_electrostatics_cutoff() {
   case COULOMB_DH:
     return dh_params.r_cut;
   case COULOMB_RF:
-  case COULOMB_INTER_RF:
     return rf_params.r_cut;
 #ifdef SCAFACOS
   case COULOMB_SCAFACOS:
@@ -534,7 +533,6 @@ switch (coulomb.method) {
       dh_params.r_cut = 0.0;
       dh_params.kappa = 0.0;
     case COULOMB_RF:
-    case COULOMB_INTER_RF:
       rf_params.kappa = 0.0;
       rf_params.epsilon1 = 0.0;
       rf_params.epsilon2 = 0.0;

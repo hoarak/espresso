@@ -48,7 +48,6 @@
 #define MORSE
 #define BUCKINGHAM
 #define SOFT_SPHERE
-#define INTER_RF
 #define OVERLAPPED
 #define THOLE
 
