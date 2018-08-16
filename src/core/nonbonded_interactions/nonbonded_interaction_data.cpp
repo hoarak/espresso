@@ -88,13 +88,6 @@ std::vector<IA_parameters> ia_params;
 #endif
 
 #ifdef ELECTROSTATICS
-Debye_hueckel_params dh_params = {0.0, 0.0};
-Reaction_field_params rf_params = {0.0, 0.0};
-
-/** Induced field (for const. potential feature) **/
-double field_induced;
-/** Applied field (for const. potential feature) **/
-double field_applied;
 #endif
 
 

@@ -4,11 +4,18 @@
 
 #include "coulomb.hpp"
 
+#include "debye_hueckel.hpp"
+#include "reaction_field.hpp"
+
 Coulomb_parameters coulomb = {
-#ifdef ELECTROSTATICS
         0.0, COULOMB_NONE,
-#endif
-#ifdef DIPOLES
         0.0, DIPOLAR_NONE,
-#endif
 };
+
+Debye_hueckel_params dh_params = {0.0, 0.0};
+Reaction_field_params rf_params = {0.0, 0.0};
+
+/** Induced field (for const. potential feature) **/
+double field_induced;
+/** Applied field (for const. potential feature) **/
+double field_applied;

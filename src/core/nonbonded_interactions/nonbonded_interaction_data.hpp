@@ -26,6 +26,7 @@
 
 #include "particle_data.hpp"
 #include "utils.hpp"
+#include "electrostatics/coulomb.hpp"
 
 #include "TabulatedPotential.hpp"
 
@@ -49,34 +50,7 @@
 /*@}*/
 
 #ifdef DIPOLES
-/** \name Type codes for the type of dipolar interaction
-  Enumeration of implemented methods for the magnetostatic
-  interaction.
- */
-/************************************************************/
-/*@{*/
-enum DipolarInteraction {
-  /** dipolar interation switched off (NONE). */
-  DIPOLAR_NONE = 0,
-  /** dipolar method is P3M. */
-  DIPOLAR_P3M,
-  /** Dipolar method is P3M plus DLC. */
-  DIPOLAR_MDLC_P3M,
-  /** Dipolar method is all with all and no replicas */
-  DIPOLAR_ALL_WITH_ALL_AND_NO_REPLICA,
-  /** Dipolar method is magnetic dipolar direct sum */
-  DIPOLAR_DS,
-  /** Dipolar method is direct sum plus DLC. */
-  DIPOLAR_MDLC_DS,
-  /** Direct summation on gpu */
-  DIPOLAR_DS_GPU,
-#ifdef DIPOLAR_BARNES_HUT
-  /** Direct summation on gpu by Barnes-Hut algorithm */
-  DIPOLAR_BH_GPU,
-#endif
-  /** Scafacos library */
-  DIPOLAR_SCAFACOS
-};
+
 #endif
 
 /* Data Types */
@@ -334,11 +308,6 @@ extern std::vector<IA_parameters> ia_params;
 /*@{*/
 
 #ifdef ELECTROSTATICS
-
-/** Induced field (for const. potential feature). **/
-extern double field_induced;
-/** Applied field (for const. potential feature) **/
-extern double field_applied;
 
 #endif
 
