@@ -13,7 +13,6 @@ add_library(nonbonded_interactions SHARED
     morse.cpp
     nonbonded_interaction_data.cpp
     nonbonded_tab.cpp
-    reaction_field.cpp
     soft_sphere.cpp
     steppot.cpp
     thole.cpp

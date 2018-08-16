@@ -57,7 +57,7 @@
 #include "random.hpp"
 #include "rattle.hpp"
 #include "reaction_ensemble.hpp"
-#include "nonbonded_interactions/reaction_field.hpp"
+#include "core/electrostatics/reaction_field.hpp"
 #include "rotation.hpp"
 #include "electrostatics/scafacos.hpp"
 #include "statistics.hpp"

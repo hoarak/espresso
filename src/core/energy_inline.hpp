@@ -43,7 +43,7 @@
 #include "electrostatics/debye_hueckel.hpp"
 #include "nonbonded_interactions/soft_sphere.hpp"
 #include "nonbonded_interactions/morse.hpp"
-#include "nonbonded_interactions/reaction_field.hpp"
+#include "core/electrostatics/reaction_field.hpp"
 #include "bonded_interactions/bonded_interaction_data.hpp"
 #include "bonded_interactions/umbrella.hpp"
 #include "bonded_interactions/quartic.hpp"

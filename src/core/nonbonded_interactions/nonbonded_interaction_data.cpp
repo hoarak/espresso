@@ -60,7 +60,7 @@
 #include "electrostatics/p3m.hpp"
 #include "pressure.hpp"
 #include "rattle.hpp"
-#include "reaction_field.hpp"
+#include "core/electrostatics/reaction_field.hpp"
 #include "electrostatics/scafacos.hpp"
 #include "nonbonded_interactions/soft_sphere.hpp"
 #include "nonbonded_interactions/steppot.hpp"

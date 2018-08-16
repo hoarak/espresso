@@ -11,6 +11,7 @@ add_library(electrostatics_core SHARED
     p3m.cpp
     p3m-dipolar.cpp
     p3m_gpu.cpp
+        reaction_field.cpp
     scafacos.cpp
 )
 

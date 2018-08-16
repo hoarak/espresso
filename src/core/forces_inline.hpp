@@ -79,7 +79,7 @@
 #ifdef ELECTROSTATICS
 #include "bonded_interactions/bonded_coulomb.hpp"
 #include "electrostatics/debye_hueckel.hpp"
-#include "nonbonded_interactions/reaction_field.hpp"
+#include "core/electrostatics/reaction_field.hpp"
 #include "electrostatics/scafacos.hpp"
 #endif
 #ifdef P3M
