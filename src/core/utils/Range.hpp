@@ -22,8 +22,8 @@ public:
   Range(Iterator begin, Iterator end)
       : m_begin(std::move(begin)), m_end(std::move(end)) {}
 
-  Iterator begin() { return m_begin; }
-  Iterator end() { return m_end; }
+  Iterator begin() const { return m_begin; }
+  Iterator end() const { return m_end; }
 
   bool empty() const { return m_begin == m_end; }
   difference_type size() const {

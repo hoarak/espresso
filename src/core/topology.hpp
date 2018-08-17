@@ -26,9 +26,10 @@
  *  This file contains functions for handling the system topology.
  */
 
-#include "config.hpp"
+#include "ParticleRange.hpp"
+#include "Vector.hpp"
 
-#include "utils/List.hpp"
+#include <boost/mpi/communicator.hpp>
 
 #include <vector>
 
@@ -39,37 +40,23 @@
 
 /** Structure holding information about a molecule */
 struct Molecule {
-  /** Type of the molecule */
-  int type;
-  /** List of particle identities contained in that molecule */
-  IntList part;
+  int mol_id = -1;
+  int n_part = 0;
+  Vector3d com;
+  double mass;
 };
 
 /*@}*/
-
-/************************************************************/
-/** \name Exported Variables */
-/************************************************************/
-/*@{*/
-
-/** List of molecules. */
-extern std::vector<Molecule> topology;
-
-extern int topo_part_info_synced;
-
-/*@{*/
 
 /************************************************************/
 /** \name Exported Functions */
 /************************************************************/
 /*@{*/
 
-/** reallocate the topology information. All unnecessary entries
-    will be freed correctly, all new entries have a zero size
-    particle list. */
-void realloc_topology(int new_size);
+void update_topology_info(const boost::mpi::communicator &comm,
+                          const ParticleRange &particles);
+const std::vector<Molecule> &topology_info();
 
-void sync_topo_part_info();
 /*@}*/
 
 #endif

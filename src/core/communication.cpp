@@ -74,7 +74,6 @@
 #include "statistics_fluid.hpp"
 #include "swimmer_reaction.hpp"
 #include "tab.hpp"
-#include "topology.hpp"
 #include "virtual_sites.hpp"
 
 #include "utils.hpp"
@@ -1727,53 +1726,6 @@ void mpi_update_mol_ids() {
 
 void mpi_update_mol_ids_slave(int node, int parm) {
   update_mol_ids_setchains();
-}
-
-/******************* REQ_SYNC_TOPO ********************/
-int mpi_sync_topo_part_info() {
-  int i;
-  int molsize = 0;
-  int moltype = 0;
-
-  mpi_call(mpi_sync_topo_part_info_slave, -1, 0);
-  int n_mols = topology.size();
-  MPI_Bcast(&n_mols, 1, MPI_INT, 0, comm_cart);
-
-  for (i = 0; i < n_mols; i++) {
-    molsize = topology[i].part.n;
-    moltype = topology[i].type;
-
-    MPI_Bcast(&molsize, 1, MPI_INT, 0, comm_cart);
-    MPI_Bcast(&moltype, 1, MPI_INT, 0, comm_cart);
-    MPI_Bcast(topology[i].part.e, topology[i].part.n, MPI_INT, 0, comm_cart);
-    MPI_Bcast(&topology[i].type, 1, MPI_INT, 0, comm_cart);
-  }
-
-  sync_topo_part_info();
-
-  return 1;
-}
-
-void mpi_sync_topo_part_info_slave(int node, int parm) {
-  int i;
-  int molsize = 0;
-  int moltype = 0;
-  int n_mols = 0;
-
-  MPI_Bcast(&n_mols, 1, MPI_INT, 0, comm_cart);
-  realloc_topology(n_mols);
-  for (i = 0; i < n_mols; i++) {
-
-    MPI_Bcast(&molsize, 1, MPI_INT, 0, comm_cart);
-    MPI_Bcast(&moltype, 1, MPI_INT, 0, comm_cart);
-    topology[i].type = moltype;
-    topology[i].part.resize(molsize);
-
-    MPI_Bcast(topology[i].part.e, topology[i].part.n, MPI_INT, 0, comm_cart);
-    MPI_Bcast(&topology[i].type, 1, MPI_INT, 0, comm_cart);
-  }
-
-  sync_topo_part_info();
 }
 
 /******************* REQ_BCAST_LBPAR ********************/

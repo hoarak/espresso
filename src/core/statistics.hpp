@@ -27,7 +27,6 @@
 #include "grid.hpp"
 #include "interaction_data.hpp"
 #include "particle_data.hpp"
-#include "topology.hpp"
 #include "utils.hpp"
 #include "PartCfg.hpp"
 

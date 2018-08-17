@@ -27,28 +27,37 @@
  *   */
 
 #include "topology.hpp"
-#include "particle_data.hpp"
 
-std::vector<Molecule> topology;
-int topo_part_info_synced = 0;
+#include <boost/serialization/utility.hpp>
 
-void realloc_topology(int size) {
-  topology.resize(size);
-  topo_part_info_synced = 0;
+#include <unordered_map>
+
+namespace std {
+template <> struct hash<Molecule> {
+  size_t operator()(const Molecule &m) const { return hash<int>{}(m.mol_id); }
+};
 }
 
-// Parallel function for synchronising topology and particle data
-void sync_topo_part_info() {
-  for (unsigned molid = 0; molid < topology.size(); molid++) {
-    auto const &mol = topology.at(molid);
-    for (auto const &pid : mol.part) {
-      auto p = local_particles[pid];
+/**
+ * @brief The molecules this node is bookkeeping.
+ */
+std::unordered_map<int, Molecule> m_mol;
 
-      if (p) {
-        p->p.mol_id = molid;
-      }
+void update_topology_info(const boost::mpi::communicator &comm,
+                          const ParticleRange &particles) {
+  std::unordered_map<int, int> local_counts;
+
+  for (auto const &p : particles) {
+    auto const mol_id = p.p.mol_id;
+    if (mol_id > -1) {
+      local_counts[mol_id]++;
     }
   }
 
-  topo_part_info_synced = 1;
+  auto const n_nodes = comm.size();
+
+  for (auto const &c : local_counts) {
+    const auto node = c.first % n_nodes;
+    comm.isend(node, 42, c);
+  }
 }
