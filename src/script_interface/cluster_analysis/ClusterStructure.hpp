@@ -25,7 +25,6 @@
 #include "../pair_criteria/pair_criteria.hpp"
 #include "ScriptInterface.hpp"
 #include "core/cluster_analysis/ClusterStructure.hpp"
-#include "core/utils/Factory.hpp"
 
 namespace ScriptInterface {
 namespace ClusterAnalysis {
