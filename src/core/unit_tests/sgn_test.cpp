@@ -27,14 +27,14 @@
 using Utils::sgn;
 
 BOOST_AUTO_TEST_CASE(pos) {
-  static_assert(sgn(89) == 1);
+  static_assert(sgn(89) == 1, "");
   BOOST_CHECK(1 == sgn(89));
 }
 BOOST_AUTO_TEST_CASE(nul) {
-  static_assert(sgn(0) == 0);
+  static_assert(sgn(0) == 0, "");
   BOOST_CHECK(0 == sgn(0));
 }
 BOOST_AUTO_TEST_CASE(neg) {
-  static_assert(sgn(-89) == -1);
+  static_assert(sgn(-89) == -1, "");
   BOOST_CHECK(-1 == sgn(-89));
 }
