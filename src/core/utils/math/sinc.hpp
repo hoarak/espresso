@@ -27,6 +27,8 @@
 
 #include <cmath>
 
+#include "utils/math/abs.hpp"
+
 namespace Utils {
 /**
  * @brief Calculates the sinc-function as sin(PI*x)/(PI*x).
@@ -46,7 +48,7 @@ template <typename T> constexpr T sinc(T d) {
 
   const auto PId = boost::math::constants::pi<T>() * d;
 
-  if (std::abs(d) > epsi)
+  if (Utils::abs(d) > epsi)
     return std::sin(PId) / PId;
   else {
     /** Coefficients of the Taylor expansion of sinc */
