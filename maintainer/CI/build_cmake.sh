@@ -41,12 +41,8 @@ function end {
 }
 
 # execute and output a command
-function cmd {
-    echo ">$1"
-    eval $1
-}
-
 # handle environment variables
+[ -z "$cuda_job" ] && cuda_job="false"
 [ -z "$insource" ] && insource="false"
 [ -z "$srcdir" ] && srcdir=`pwd`
 [ -z "$cmake_params" ] && cmake_params=""
@@ -62,11 +58,19 @@ function cmd {
 [ -z "$make_check" ] && make_check="true"
 [ -z "$check_odd_only" ] && check_odd_only="false"
 [ -z "$check_gpu_only" ] && check_gpu_only="false"
+[ -z "$check_skip_long" ] && check_skip_long="false"
+[ -z "$make_check_tutorials" ] && make_check_tutorials="false"
+[ -z "$make_check_samples" ] && make_check_samples="false"
 [ -z "$python_version" ] && python_version="2"
 [ -z "$with_cuda" ] && with_cuda="true"
 [ -z "$build_type" ] && build_type="Debug"
 [ -z "$with_ccache" ] && with_ccache="false"
 [ -z "$test_timeout" ] && test_timeout="300"
+[ -z "$hide_gpu" ] && hide_gpu="false" 
+
+if [ $make_check ] || [ $make_check_tutorials ] || [ $make_check_samples ]; then
+  run_checks="true"
+fi
 
 # If there are no user-provided flags they
 # are added according to with_coverage.
@@ -74,7 +78,7 @@ if [ -z "$cxx_flags" ]; then
     if $with_coverage; then
         cxx_flags="-Og"
     else
-        if $make_check; then
+        if $run_checks; then
             cxx_flags="-O3"
         else
             cxx_flags="-O0"
@@ -82,7 +86,7 @@ if [ -z "$cxx_flags" ]; then
     fi
 fi
 
-if [[ ! -z ${with_coverage+x} ]]; then
+if [ ! -z ${with_coverage+x} ]; then
   bash <(curl -s https://codecov.io/env) &> /dev/null;
 fi
 
@@ -94,13 +98,20 @@ if $with_ccache; then
   cmake_params="$cmake_params -DWITH_CCACHE=ON"
 fi
 
+command -v nvidia-smi && nvidia-smi
+if [ $hide_gpu = "true" ]; then
+  echo "Hiding gpu from Cuda via CUDA_VISIBLE_DEVICES"
+  export CUDA_VISIBLE_DEVICES=
+fi
+
 if $insource; then
     builddir=$srcdir
 elif [ -z "$builddir" ]; then
     builddir=$srcdir/build
 fi
 
-outp insource srcdir builddir make_check \
+outp insource srcdir builddir \
+    make_check make_check_tutorials make_check_samples \
     cmake_params with_fftw \
     with_python_interface with_coverage \
     with_ubsan with_asan \
@@ -222,13 +233,13 @@ else
     cp $myconfig_file $builddir/myconfig.hpp
 fi
 
-cmd "cmake $cmake_params $srcdir" || exit 1
+cmake $cmake_params $srcdir || exit 1
 end "CONFIGURE"
 
 # BUILD
 start "BUILD"
 
-cmd "make -k -j${build_procs}" || cmd "make -k -j1" || exit $?
+make -k -j${build_procs} || make -k -j1 || exit $?
 
 end "BUILD"
 
@@ -241,32 +252,49 @@ if [ $with_cuda != "true" -o "$(echo $NVCC | grep -o clang)" = "clang" ]; then
     fi
 fi
 
-if $make_check; then
+if $run_checks; then
     start "TEST"
 
-    if [ -z "$run_tests" ]; then
-        if $check_odd_only; then
-            cmd "make -j${build_procs} check_python_parallel_odd $make_params" || exit 1
-        elif $check_gpu_only; then
-            cmd "make -j${build_procs} check_python_gpu $make_params" || exit 1
+    # integration and unit tests
+    if $make_check; then
+        if [ -z "$run_tests" ]; then
+            if $check_odd_only; then
+                make -j${build_procs} check_python_parallel_odd $make_params || exit 1
+            elif $check_gpu_only; then
+                make -j${build_procs} check_python_gpu $make_params || exit 1
+            elif $check_skip_long; then
+                make -j${build_procs} check_python_skip_long $make_params || exit 1
+            else
+                make -j${build_procs} check_python $make_params || exit 1
+            fi
         else
-            cmd "make -j${build_procs} check_python $make_params" || exit 1
+            make python_tests $make_params
+            for t in $run_tests; do
+                ctest --timeout 60 --output-on-failure -R $t || exit 1
+            done
         fi
-    else
-        cmd "make python_tests $make_params"
-        for t in $run_tests; do
-            cmd "ctest --timeout 60 --output-on-failure -R $t" || exit 1
-        done
+        make -j${build_procs} check_unit_tests $make_params || exit 1
     fi
-    cmd "make -j${build_procs} check_unit_tests $make_params" || exit 1
-    cmd "make check_cmake_install $make_params" || exit 1
+
+    # tutorial tests
+    if $make_check_tutorials; then
+        make -j${build_procs} check_tutorials $make_params || exit 1
+    fi
+
+    # sample tests
+    if $make_check_samples; then
+        make -j${build_procs} check_samples $make_params || exit 1
+    fi
+
+    # installation tests
+    make check_cmake_install $make_params || exit 1
 
     end "TEST"
 else
     start "TEST"
 
     if [ "$HIP_PLATFORM" != "hcc" ]; then
-      cmd "mpiexec -n $check_procs ./pypresso $srcdir/testsuite/python/particle.py" || exit 1
+      mpiexec -n $check_procs ./pypresso $srcdir/testsuite/python/particle.py || exit 1
     fi
 
     end "TEST"
@@ -274,14 +302,14 @@ fi
 
 if $with_coverage; then
     cd $builddir
-    lcov -q --directory . --capture --output-file coverage.info # capture coverage info
+    lcov -q --directory . --ignore-errors graph --capture --output-file coverage.info # capture coverage info
     lcov -q --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
     lcov -q --remove coverage.info '*/doc/*' --output-file coverage.info # filter out docs
     # Uploading report to CodeCov
     if [ -z "$CODECOV_TOKEN" ]; then
-        bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+        bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
     else
-        bash <(curl -s https://codecov.io/bash) -t "$CODECOV_TOKEN" || echo "Codecov did not collect coverage reports"
+        bash <(curl -s https://codecov.io/bash) -t "$CODECOV_TOKEN" -X gcov || echo "Codecov did not collect coverage reports"
     fi
 fi
 

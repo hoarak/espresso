@@ -27,18 +27,19 @@
 #include "cells.hpp"
 #include "algorithm/link_cell.hpp"
 #include "communication.hpp"
+#include "debug.hpp"
 #include "domain_decomposition.hpp"
+#include "event.hpp"
 #include "ghosts.hpp"
 #include "grid.hpp"
-#include "initialize.hpp"
 #include "integrate.hpp"
 #include "layered.hpp"
 #include "nonbonded_interactions/nonbonded_interaction_data.hpp"
 #include "nsquare.hpp"
 #include "particle_data.hpp"
-#include "utils.hpp"
-#include "utils/NoOp.hpp"
-#include "utils/mpi/gather_buffer.hpp"
+
+#include <utils/NoOp.hpp>
+#include <utils/mpi/gather_buffer.hpp>
 
 #include <boost/iterator/indirect_iterator.hpp>
 
@@ -94,7 +95,7 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
                          boost::make_indirect_iterator(local_cells.end()),
                          Utils::NoOp{}, pair_kernel,
                          [](Particle const &p1, Particle const &p2) {
-                           return distance2(p1.r.p, p2.r.p);
+                           return (p1.r.p - p2.r.p).norm2();
                          });
     break;
   case CELL_STRUCTURE_NSQUARE:
@@ -102,9 +103,7 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
                          boost::make_indirect_iterator(local_cells.end()),
                          Utils::NoOp{}, pair_kernel,
                          [](Particle const &p1, Particle const &p2) {
-                           double vec21[3];
-                           get_mi_vector(vec21, p1.r.p, p2.r.p);
-                           return sqrlen(vec21);
+                           return get_mi_vector(p1.r.p, p2.r.p).norm2();
                          });
     break;
   case CELL_STRUCTURE_LAYERED:
@@ -112,11 +111,10 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
                          boost::make_indirect_iterator(local_cells.end()),
                          Utils::NoOp{}, pair_kernel,
                          [](Particle const &p1, Particle const &p2) {
-                           double vec21[3];
-                           get_mi_vector(vec21, p1.r.p, p2.r.p);
+                           auto vec21 = get_mi_vector(p1.r.p, p2.r.p);
                            vec21[2] = p1.r.p[2] - p2.r.p[2];
 
-                           return sqrlen(vec21);
+                           return vec21.norm2();
                          });
   }
 
@@ -195,13 +193,13 @@ void topology_init(int cs, CellPList *local) {
     topology_init(cell_structure.type, local);
     break;
   case CELL_STRUCTURE_DOMDEC:
-    dd_topology_init(local);
+    dd_topology_init(local, node_grid);
     break;
   case CELL_STRUCTURE_NSQUARE:
     nsq_topology_init(local);
     break;
   case CELL_STRUCTURE_LAYERED:
-    layered_topology_init(local);
+    layered_topology_init(local, node_grid);
     break;
   default:
     fprintf(stderr,
@@ -368,7 +366,7 @@ void cells_resort_particles(int global_flag) {
     nsq_balance_particles(global_flag);
     break;
   case CELL_STRUCTURE_DOMDEC:
-    dd_exchange_and_sort_particles(global_flag, &displaced_parts);
+    dd_exchange_and_sort_particles(global_flag, &displaced_parts, node_grid);
     break;
   }
 
@@ -417,7 +415,7 @@ void cells_on_geometry_change(int flags) {
 
   switch (cell_structure.type) {
   case CELL_STRUCTURE_DOMDEC:
-    dd_on_geometry_change(flags);
+    dd_on_geometry_change(flags, node_grid);
     break;
   case CELL_STRUCTURE_LAYERED:
     /* there is no fast version, always redo everything. */
@@ -436,7 +434,7 @@ void check_resort_particles() {
   resort_particles |= (std::any_of(local_cells.particles().begin(),
                                    local_cells.particles().end(),
                                    [&skin2](Particle const &p) {
-                                     return distance2(p.r.p, p.l.p_old) > skin2;
+                                     return (p.r.p - p.l.p_old).norm2() > skin2;
                                    }))
                           ? Cells::RESORT_LOCAL
                           : Cells::RESORT_NONE;

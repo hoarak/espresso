@@ -32,6 +32,10 @@
 #include "initialize.hpp"
 #include "utils/Factory.hpp"
 
+/** @namespace ScriptInterface
+ *  @brief Interface to core functions for Python bindings.
+ *  See page @ref script_interface for detailed instructions.
+ */
 namespace ScriptInterface {
   extern Utils::Factory<ScriptInterfaceBase> factory;
 

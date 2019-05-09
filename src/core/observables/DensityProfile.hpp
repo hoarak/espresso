@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define OBSERVABLES_DENSITYPROFILE_HPP
 
 #include "PidProfileObservable.hpp"
-#include "utils/Histogram.hpp"
+#include <utils/Histogram.hpp>
 #include <vector>
 
 namespace Observables {
@@ -36,14 +36,12 @@ public:
          std::make_pair(min_z, max_z)}};
     Utils::Histogram<double, 3> histogram(n_bins, 1, limits);
     for (auto const &id : ids()) {
-      auto const ppos = ::Vector<3, double>(folded_position(partCfg[id]));
-      histogram.update(ppos);
+      histogram.update(folded_position(partCfg[id]));
     }
     histogram.normalize();
     return histogram.get_histogram();
   }
 };
-
 } // Namespace Observables
 
 #endif

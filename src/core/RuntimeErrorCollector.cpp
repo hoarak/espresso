@@ -19,7 +19,7 @@
 #include "RuntimeErrorCollector.hpp"
 
 #include "communication.hpp"
-#include "utils/mpi/gather_buffer.hpp"
+#include <utils/mpi/gather_buffer.hpp>
 
 #include <boost/mpi/collectives.hpp>
 
@@ -32,8 +32,8 @@ using boost::mpi::communicator;
 
 namespace ErrorHandling {
 
-RuntimeErrorCollector::RuntimeErrorCollector(const communicator &comm)
-    : m_comm(comm) {}
+RuntimeErrorCollector::RuntimeErrorCollector(communicator comm)
+    : m_comm(std::move(comm)) {}
 
 RuntimeErrorCollector::~RuntimeErrorCollector() {
   if (!m_errors.empty())

@@ -26,6 +26,8 @@
 #include "ScriptInterface.hpp"
 #include "core/cluster_analysis/ClusterStructure.hpp"
 
+#include <utils/Factory.hpp>
+
 namespace ScriptInterface {
 namespace ClusterAnalysis {
 
@@ -68,7 +70,7 @@ public:
     }
     if (method == "cluster_ids") {
       std::vector<int> cluster_ids;
-      for (auto it : m_cluster_structure.clusters) {
+      for (const auto &it : m_cluster_structure.clusters) {
         cluster_ids.push_back(it.first);
       }
       return cluster_ids;
