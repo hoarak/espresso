@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace ScriptInterface {
 class ScriptInterfaceBase;
 using ObjectId = Utils::ObjectId<ScriptInterfaceBase>;
+using ObjectRef = std::shared_ptr<ScriptInterfaceBase>;
 /**
  * @brief None-"literal".
  */
