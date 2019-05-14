@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "core/field_coupling/couplings/Viscous.hpp"
 
 #include "ScriptInterface.hpp"
+#include "pack.hpp"
 
 namespace ScriptInterface {
 namespace Constraints {
