@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(pack_pair_test) {
 
   BOOST_CHECK((p == unpack_pair<int, double>(pack_pair(p))));
 }
-
+/*
 BOOST_AUTO_TEST_CASE(pack_map_test) {
   using ScriptInterface::pack_map;
   using ScriptInterface::unpack_map;
@@ -139,3 +139,4 @@ BOOST_AUTO_TEST_CASE(pack_map_test) {
 
   BOOST_CHECK((map == unpack_map<double, int>(pack_map(map))));
 }
+*/

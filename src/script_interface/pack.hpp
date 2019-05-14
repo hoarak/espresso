@@ -6,6 +6,7 @@
 #define ESPRESSO_PACK_HPP
 
 #include "Variant.hpp"
+#include "get_value.hpp"
 
 #include <unordered_map>
 #include <utility>
@@ -18,7 +19,7 @@ std::vector<Variant> pack_pair(const std::pair<T, U> &pair) {
 
 template <typename T, typename U>
 const std::pair<T, U> unpack_pair(const std::vector<Variant> &v) {
-  return {boost::get<T>(v.at(0)), boost::get<U>(v.at(1))};
+  return {get_value<T>(v.at(0)), get_value<U>(v.at(1))};
 }
 
 /**
@@ -41,7 +42,7 @@ std::unordered_map<K, V> unpack_map(const std::vector<Variant> &v) {
   std::unordered_map<K, V> ret;
 
   for (auto const &pair : v) {
-    ret.insert(unpack_pair<K, V>(boost::get<const std::vector<Variant>>(pair)));
+    ret.insert(unpack_pair<K, V>(get_value<const std::vector<Variant>>(pair)));
   }
 
   return ret;
