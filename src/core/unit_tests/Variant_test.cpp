@@ -25,6 +25,7 @@
 using namespace ScriptInterface;
 
 #include "get_value.hpp"
+#include "pack.hpp"
 
 BOOST_AUTO_TEST_CASE(is_a) {
   BOOST_CHECK(is_type<None>(Variant(None{})));
