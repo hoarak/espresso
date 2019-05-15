@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define BOOST_TEST_MODULE make_lin_space test
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
+#include <cmath>
 
 #include <utils/math/make_lin_space.hpp>
 
@@ -44,7 +45,8 @@ BOOST_AUTO_TEST_CASE(make_lin_space_test) {
 
     auto const dx = (stop - start) / (num - 1);
     for (int i = 0; i < values.size(); i++) {
-      BOOST_CHECK_CLOSE(values.at(i), start + i * dx, 1e-14);
+      BOOST_CHECK(std::fabs(start + i * dx - values.at(i)) <=
+                  std::numeric_limits<double>::epsilon());
     }
   }
 
@@ -64,7 +66,8 @@ BOOST_AUTO_TEST_CASE(make_lin_space_test) {
 
     auto const dx = (stop - start) / num;
     for (int i = 0; i < values.size(); i++) {
-      BOOST_CHECK_CLOSE(values.at(i), start + i * dx, 1e-14);
+      BOOST_CHECK(std::fabs(start + i * dx - values.at(i)) <=
+                  std::numeric_limits<double>::epsilon());
     }
   }
 }
