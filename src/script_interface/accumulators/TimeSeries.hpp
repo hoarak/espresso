@@ -48,13 +48,6 @@ public:
     return {};
   }
 
-  Variant get_state() const override {
-    std::vector<Variant> state(2);
-    state[0] = ScriptInterfaceBase::get_state();
-    state[1] = m_accumulator->get_internal_state();
-    return state;
-  }
-
   std::shared_ptr<::Accumulators::Accumulator> accumulator() override {
     return std::static_pointer_cast<::Accumulators::Accumulator>(m_accumulator);
   }
@@ -65,12 +58,6 @@ public:
   }
 
 private:
-  void set_state(Variant const &state) override {
-    auto const &state_vec = boost::get<std::vector<Variant>>(state);
-    ScriptInterfaceBase::set_state(state_vec.at(0));
-    m_accumulator->set_internal_state(boost::get<std::string>(state_vec.at(1)));
-  }
-
   /* The actual accumulator */
   std::shared_ptr<::Accumulators::TimeSeries> m_accumulator;
   std::shared_ptr<Observables::Observable> m_obs;

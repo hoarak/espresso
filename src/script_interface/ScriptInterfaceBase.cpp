@@ -22,8 +22,6 @@
 #include "ScriptInterfaceBase.hpp"
 #include "ParallelScriptInterface.hpp"
 #include "ScriptInterface.hpp"
-#include "Serializer.hpp"
-#include "pack.hpp"
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -73,49 +71,11 @@ ScriptInterfaceBase::get_instance(ObjectId id) {
 /* Checkpointing functions. */
 
 /**
- * @brief  Return a Variant representation of the state of the object.
- *
- * This should return the internal state of the instance, so that
- * the instance can be restored from this information.  The default
- * implementation stores all the public parameters, including object
- * parameters that are captured by calling get_state on them.
- */
-Variant ScriptInterfaceBase::get_state() const {
-  std::vector<Variant> state;
-
-  for (auto const &p : get_parameters()) {
-    state.push_back(std::vector<Variant>{
-        {p.first, boost::apply_visitor(Serializer{}, p.second)}});
-  }
-
-  return pack(state);
-}
-
-void ScriptInterfaceBase::set_state(Variant const &state) {
-  VariantMap params;
-  UnSerializer u;
-
-  auto const vv = unpack<std::vector<Variant>>(get_value<std::string>(state));
-
-  for (auto const &v : vv) {
-    auto const &p = get_value<std::vector<Variant>>(v);
-    params[get_value<std::string>(p.at(0))] = boost::apply_visitor(u, p.at(1));
-  }
-
-  this->construct(params);
-}
-
-/**
  * @brief Returns a binary representation of the state often
  *        the instance, as returned by get_state().
  */
 std::string ScriptInterfaceBase::serialize() const {
-  std::stringstream ss;
-  boost::archive::binary_oarchive oa(ss);
-  auto v = Serializer{}(this->id());
-
-  oa << v;
-  return ss.str();
+  return {};
 }
 
 /**
@@ -124,19 +84,7 @@ std::string ScriptInterfaceBase::serialize() const {
  */
 std::shared_ptr<ScriptInterfaceBase>
 ScriptInterfaceBase::unserialize(std::string const &state) {
-  namespace iostreams = boost::iostreams;
-
-  iostreams::array_source src(state.data(), state.size());
-  iostreams::stream<iostreams::array_source> ss(src);
-  boost::archive::binary_iarchive ia(ss);
-
-  Variant v;
-  ia >> v;
-
-  UnSerializer u;
-  auto oid = get_value<ObjectId>(boost::apply_visitor(u, v));
-
-  return get_instance(oid).lock();
+  return {};
 }
 
 } /* namespace ScriptInterface */

@@ -25,6 +25,7 @@
 #include "AccumulatorBase.hpp"
 #include "ScriptInterface.hpp"
 #include "auto_parameters/AutoParameters.hpp"
+#include "pack.hpp"
 
 #include "core/accumulators/Correlator.hpp"
 #include "observables/Observable.hpp"
@@ -90,14 +91,6 @@ public:
     return {};
   }
 
-  Variant get_state() const override {
-    std::vector<Variant> state(2);
-    state[0] = ScriptInterfaceBase::get_state();
-    state[1] = m_correlator->get_internal_state();
-
-    return state;
-  }
-
   std::shared_ptr<::Accumulators::Accumulator> accumulator() override {
     return std::static_pointer_cast<::Accumulators::Accumulator>(m_correlator);
   }
@@ -108,12 +101,6 @@ public:
   }
 
 private:
-  void set_state(Variant const &state) override {
-    auto const &state_vec = get_value<std::vector<Variant>>(state);
-
-    ScriptInterfaceBase::set_state(state_vec.at(0));
-    m_correlator->set_internal_state(get_value<std::string>(state_vec.at(1)));
-  }
 
   /* The actual correlator */
   std::shared_ptr<CoreCorr> m_correlator;
