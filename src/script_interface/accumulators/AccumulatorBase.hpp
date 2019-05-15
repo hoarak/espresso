@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SCRIPTINTERFACE_ACCUMULATORS_ACCUMULATORBASE_HPP
 
 #include "ScriptInterface.hpp"
-#include "core/accumulators/AccumulatorBase.hpp"
+#include "core/accumulators/Accumulator.hpp"
 #include "script_interface/auto_parameters/AutoParameters.hpp"
 
 namespace ScriptInterface {
@@ -35,9 +35,9 @@ public:
                      },
                      [this]() { return accumulator()->delta_N(); }}});
   }
-  virtual std::shared_ptr<const ::Accumulators::AccumulatorBase>
+  virtual std::shared_ptr<const ::Accumulators::Accumulator>
   accumulator() const = 0;
-  virtual std::shared_ptr<::Accumulators::AccumulatorBase> accumulator() = 0;
+  virtual std::shared_ptr<::Accumulators::Accumulator> accumulator() = 0;
 };
 
 } // namespace Accumulators

@@ -20,12 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CORE_ACCUMULATORS_ACCUMULATORBASE
 
 namespace Accumulators {
-
-class AccumulatorBase {
+class Accumulator {
 public:
-  explicit AccumulatorBase(int delta_N = 1) : m_delta_N(delta_N){};
+  explicit Accumulator(int delta_N = 1) : m_delta_N(delta_N){};
   int &delta_N() { return m_delta_N; };
-  virtual ~AccumulatorBase() = default;
+  virtual ~Accumulator() = default;
 
   virtual void update() = 0;
 

@@ -55,14 +55,14 @@ public:
     return state;
   }
 
-  std::shared_ptr<::Accumulators::AccumulatorBase> accumulator() override {
-    return std::static_pointer_cast<::Accumulators::AccumulatorBase>(
+  std::shared_ptr<::Accumulators::Accumulator> accumulator() override {
+    return std::static_pointer_cast<::Accumulators::Accumulator>(
         m_accumulator);
   }
 
-  std::shared_ptr<const ::Accumulators::AccumulatorBase>
+  std::shared_ptr<const ::Accumulators::Accumulator>
   accumulator() const override {
-    return std::static_pointer_cast<::Accumulators::AccumulatorBase>(
+    return std::static_pointer_cast<::Accumulators::Accumulator>(
         m_accumulator);
   }
 

@@ -20,7 +20,7 @@
 #ifndef ESPRESSO_ACCUMULATORS_HPP
 #define ESPRESSO_ACCUMULATORS_HPP
 
-#include "accumulators/AccumulatorBase.hpp"
+#include "accumulators/Accumulator.hpp"
 
 namespace Accumulators {
 /**
@@ -32,8 +32,8 @@ namespace Accumulators {
  */
 void auto_update(int steps);
 int auto_update_next_update();
-void auto_update_add(AccumulatorBase *);
-void auto_update_remove(AccumulatorBase *);
+void auto_update_add(Accumulator *);
+void auto_update_remove(Accumulator *);
 
 } // namespace Accumulators
 

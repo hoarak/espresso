@@ -28,11 +28,11 @@
 namespace Accumulators {
 namespace {
 struct AutoUpdateAccumulator {
-  explicit AutoUpdateAccumulator(AccumulatorBase *acc)
+  explicit AutoUpdateAccumulator(Accumulator *acc)
       : frequency(acc->delta_N()), counter(1), acc(acc) {}
   int frequency;
   int counter;
-  AccumulatorBase *acc;
+  Accumulator *acc;
 };
 
 std::vector<AutoUpdateAccumulator> auto_update_accumulators;
@@ -59,11 +59,11 @@ int auto_update_next_update() {
                            });
 }
 
-void auto_update_add(AccumulatorBase *acc) {
+void auto_update_add(Accumulator *acc) {
   assert(acc);
   auto_update_accumulators.emplace_back(acc);
 }
-void auto_update_remove(AccumulatorBase *acc) {
+void auto_update_remove(Accumulator *acc) {
   auto_update_accumulators.erase(
       boost::remove_if(
           auto_update_accumulators,

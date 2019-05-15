@@ -1,7 +1,7 @@
 #ifndef CORE_ACCUMULATORS_TIMESERIES_HPP
 #define CORE_ACCUMULATORS_TIMESERIES_HPP
 
-#include "AccumulatorBase.hpp"
+#include "Accumulator.hpp"
 #include "observables/Observable.hpp"
 
 namespace Accumulators {
@@ -14,10 +14,10 @@ namespace Accumulators {
  * it is updated.
  *
  */
-class TimeSeries : public AccumulatorBase {
+class TimeSeries : public Accumulator {
 public:
   TimeSeries(std::shared_ptr<Observables::Observable> obs, int delta_N)
-      : AccumulatorBase(delta_N), m_obs(std::move(obs)) {}
+      : Accumulator(delta_N), m_obs(std::move(obs)) {}
 
   void update() override;
   std::string get_internal_state() const;
