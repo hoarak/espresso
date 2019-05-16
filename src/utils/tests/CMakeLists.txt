@@ -33,6 +33,7 @@ unit_test(NAME RunningAverage_test SRC RunningAverage_test.cpp DEPENDS utils)
 unit_test(NAME for_each_pair_test SRC for_each_pair_test.cpp DEPENDS utils)
 unit_test(NAME raster_test SRC raster_test.cpp DEPENDS utils)
 unit_test(NAME make_lin_space_test SRC make_lin_space_test.cpp DEPENDS utils)
+unit_test(NAME type_id_test SRC type_id_test.cpp DEPENDS utils)
 
 unit_test(NAME gather_buffer_test SRC gather_buffer_test.cpp DEPENDS utils Boost::mpi MPI::MPI_CXX NUM_PROC 4)
 unit_test(NAME scatter_buffer_test SRC scatter_buffer_test.cpp DEPENDS utils Boost::mpi MPI::MPI_CXX NUM_PROC 4)
