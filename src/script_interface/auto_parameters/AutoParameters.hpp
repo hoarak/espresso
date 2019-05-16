@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SCRIPT_INTERFACE_AUTO_PARAMETERS_AUTO_PARAMETERS_HPP
 
 #include "AutoParameter.hpp"
-#include "ScriptInterfaceBase.hpp"
+#include "ObjectHandle.hpp"
 
 #include <unordered_map>
 #include <vector>
@@ -82,9 +82,9 @@ namespace ScriptInterface {
  * (this has to be captured in the lambdas to have access to the member
  * functions of the class).
  */
-template <typename Derived, typename Base = ScriptInterfaceBase>
+template <typename Derived, typename Base = ObjectHandle>
 class AutoParameters : public Base {
-  static_assert(std::is_base_of<ScriptInterfaceBase, Base>::value, "");
+  static_assert(std::is_base_of<ObjectHandle, Base>::value, "");
 
 public:
   /** @brief Exception thrown when accessing an unknown parameter */
@@ -112,7 +112,7 @@ protected:
   }
 
 public:
-  /* ScriptInterfaceBase implementation */
+  /* ObjectHandle implementation */
   Utils::Span<const boost::string_ref> valid_parameters() const final {
     static std::vector<boost::string_ref> valid_params;
     valid_params.clear();

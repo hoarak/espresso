@@ -38,7 +38,7 @@ namespace Testing {
 /**
  * @brief Mock to test ScriptInterface.
  */
-struct ScriptInterfaceTest : public ScriptInterface::ScriptInterfaceBase {
+struct ScriptInterfaceTest : public ScriptInterface::ObjectHandle {
   VariantMap get_parameters() const override {
     VariantMap ret;
 
@@ -97,8 +97,8 @@ struct ScriptInterfaceTest : public ScriptInterface::ScriptInterfaceBase {
 using namespace Testing;
 
 BOOST_AUTO_TEST_CASE(non_copyable) {
-  static_assert(!std::is_copy_constructible<ScriptInterfaceBase>::value, "");
-  static_assert(!std::is_copy_assignable<ScriptInterfaceBase>::value, "");
+  static_assert(!std::is_copy_constructible<ObjectHandle>::value, "");
+  static_assert(!std::is_copy_assignable<ObjectHandle>::value, "");
 }
 
 /**
