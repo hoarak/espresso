@@ -54,7 +54,8 @@ public:
     return params;
   }
 
-  void do_set_parameter(std::string const &name, Variant const &value) override {
+  void do_set_parameter(std::string const &name,
+                        Variant const &value) override {
     if ("ids" == name) {
       m_observable->ids() = get_value<std::vector<int>>(value);
     }

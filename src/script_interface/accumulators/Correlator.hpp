@@ -101,7 +101,6 @@ public:
   }
 
 private:
-
   /* The actual correlator */
   std::shared_ptr<CoreCorr> m_correlator;
 
