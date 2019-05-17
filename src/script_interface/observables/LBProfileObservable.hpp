@@ -129,7 +129,7 @@ public:
           [this]() { return profile_observable()->allow_empty_bins; }}});
   }
 
-  Variant call_method(std::string const &method,
+  Variant do_call_method(std::string const &method,
                       VariantMap const &parameters) override {
     if (method == "calculate") {
       return profile_observable()->operator()();

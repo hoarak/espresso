@@ -41,7 +41,7 @@ public:
                     {"write_ordered", m_h5md->write_ordered()}});
   };
 
-  Variant call_method(const std::string &name,
+  Variant do_call_method(const std::string &name,
                       const VariantMap &parameters) override;
 
 private:

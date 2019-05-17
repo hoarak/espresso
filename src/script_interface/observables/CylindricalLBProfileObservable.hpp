@@ -164,7 +164,7 @@ public:
           }}});
   }
 
-  Variant call_method(std::string const &method,
+  Variant do_call_method(std::string const &method,
                       VariantMap const &parameters) override {
     if (method == "calculate") {
       return cylindrical_profile_observable()->operator()();

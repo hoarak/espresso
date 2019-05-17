@@ -174,7 +174,7 @@ public:
    *
    * If not overridden by the implementation, this does nothing.
    */
-  virtual Variant call_method(const std::string &, const VariantMap &) {
+  virtual Variant do_call_method(const std::string &, const VariantMap &) {
     return none;
   }
 
