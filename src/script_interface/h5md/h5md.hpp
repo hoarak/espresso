@@ -42,7 +42,7 @@ public:
   };
 
   Variant do_call_method(const std::string &name,
-                      const VariantMap &parameters) override;
+                         const VariantMap &parameters) override;
 
 private:
   std::shared_ptr<::Writer::H5md::File> m_h5md;
