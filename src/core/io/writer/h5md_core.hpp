@@ -22,7 +22,6 @@
 #ifndef ESPRESSO_H5MD_CORE_HPP
 #define ESPRESSO_H5MD_CORE_HPP
 
-#include "MpiCallbacks.hpp"
 #include "PartCfg.hpp"
 #include "cells.hpp"
 #include "global.hpp"

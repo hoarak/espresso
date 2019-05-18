@@ -60,8 +60,8 @@ public:
 
 protected:
   ObjectHandle() = default;
-  ObjectHandle(const std::string& name, CreationPolicy policy) :
-  m_name(name), m_policy(policy) {}
+  ObjectHandle(const std::string &name, CreationPolicy policy)
+      : m_name(name), m_policy(policy) {}
 
 public:
   /* Copy has unclear semantics, so it should not be allowed. */
@@ -74,8 +74,8 @@ public:
   static std::weak_ptr<ObjectHandle> &get_instance(ObjectId id);
 
 private:
-  /* Members related to object construction, they are
-     only to be used internally. */
+  enum class CallbackAction;
+  std::unique_ptr<Communication::CallbackHandle<CallbackAction>> m_cb_;
 
   std::string m_name;
   CreationPolicy m_policy = CreationPolicy::LOCAL;
@@ -113,7 +113,7 @@ public:
    */
   void construct(VariantMap const &params, CreationPolicy policy,
                  const std::string &name);
-  
+
 private:
   virtual void do_construct(VariantMap const &params) {
     for (auto const &p : params) {
