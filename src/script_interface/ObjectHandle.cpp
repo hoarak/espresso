@@ -98,6 +98,11 @@ void ObjectHandle::construct(VariantMap const &params, CreationPolicy policy,
   this->do_construct(params);
 }
 
+void ObjectHandle::set_parameter(const std::string &name, const Variant &value) {
+  this->do_set_parameter(name, value);
+}
 
-
+Variant ObjectHandle::call_method(const std::string &name, const VariantMap &params) {
+  return this->do_call_method(name, params);
+}
 } /* namespace ScriptInterface */
