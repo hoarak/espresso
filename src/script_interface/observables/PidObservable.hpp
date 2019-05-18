@@ -45,8 +45,12 @@ public:
 
   PidObservable() : m_observable(std::make_shared<CorePidObs>()) {}
 
-  VariantMap get_parameters() const override {
-    return {{"ids", m_observable->ids()}};
+  Variant get_parameter(const std::string& name) const override {
+    if("ids" == name) {
+      return m_observable->ids();
+    }
+
+    return {};
   }
 
   Utils::Span<const boost::string_ref> valid_parameters() const override {

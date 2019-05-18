@@ -126,7 +126,7 @@ public:
    * @brief get current parameters.
    * @return Parameters set in class.
    */
-  virtual VariantMap get_parameters() const {
+  VariantMap get_parameters() const {
     VariantMap values;
 
     for (auto const &p : valid_parameters()) {

@@ -22,6 +22,7 @@
 #include "ObjectHandle.hpp"
 #include "ParallelScriptInterface.hpp"
 #include "ScriptInterface.hpp"
+#include "RemoteObjectHandle.hpp"
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -29,6 +30,14 @@
 #include <boost/iostreams/stream.hpp>
 
 #include <sstream>
+
+namespace {
+Communication::MpiCallbacks *m_cb = nullptr;
+
+void make_remote_handle() { new ScriptInterface::RemoteObjectHandle(m_cb); }
+} // namespace
+
+REGISTER_CALLBACK(make_remote_handle)
 
 namespace ScriptInterface {
 Utils::Factory<ObjectHandle> factory;
@@ -88,5 +97,7 @@ void ObjectHandle::construct(VariantMap const &params, CreationPolicy policy,
 
   this->do_construct(params);
 }
+
+
 
 } /* namespace ScriptInterface */
