@@ -3,6 +3,9 @@ import numpy as np
 from espressomd.utils import is_valid_type, array_locked
 from espressomd.utils cimport Vector3d, make_array_locked
 
+cdef class PObjectRef(object):
+    cdef shared_ptr[ObjectHandle] sip
+
 cdef class PObjectId(object):
     cdef ObjectId id
 
@@ -13,6 +16,10 @@ cdef class PObjectId(object):
             raise NotImplementedError
 
 cdef class PScriptInterface(object):
+    cdef shared_ptr[ObjectHandle] sip
+    cdef set_sip(self, shared_ptr[ObjectHandle] sip)
+    cdef VariantMap _sanitize_params(self, in_params) except *
+
     def __init__(self, name=None, policy="GLOBAL", oid=None, **kwargs):
         cdef CreationPolicy policy_
 
@@ -39,6 +46,11 @@ cdef class PScriptInterface(object):
 
     def _valid_parameters(self):
         return [to_str(p.data()) for p in self.sip.get().valid_parameters()]
+
+    def get_sip(self):
+        ret = PObjectRef()
+        ret.sip = self.sip
+        return ret
 
     cdef set_sip(self, shared_ptr[ObjectHandle] sip):
         self.sip = sip
@@ -107,9 +119,8 @@ cdef class PScriptInterface(object):
         return odict
 
 cdef Variant python_object_to_variant(value):
-    cdef Variant v
     cdef vector[Variant] vec
-    cdef PObjectId oid
+    cdef PObjectRef oref
 
     if value is None:
         return Variant()
@@ -118,9 +129,8 @@ cdef Variant python_object_to_variant(value):
     # be preserved even if the PScriptInterface derived class
     # is iterable.
     if isinstance(value, PScriptInterface):
-        # Map python object do id
-        oid = value.id()
-        return make_variant[ObjectId](oid.id)
+        oref = value.get_sip()
+        return make_variant(oref.sip)
     elif hasattr(value, '__iter__') and not(type(value) == str):
         for e in value:
             vec.push_back(python_object_to_variant(e))
@@ -156,18 +166,13 @@ cdef variant_to_python_object(const Variant & value) except +:
         return get_value[vector[double]](value)
     if is_type[Vector3d](value):
         return make_array_locked(get_value[Vector3d](value))
-    if is_type[ObjectId](value):
+    if is_type[shared_ptr[ObjectHandle]](value):
         # Get the id and build a corresponding object
-        oid = get_value[ObjectId](value)
+        ptr = get_value[shared_ptr[ObjectHandle]](value)
 
         # ObjectId is nullable, and the default
         # id corresponds to "null".
-        if oid != ObjectId():
-            ptr = get_instance(oid).lock()
-
-            if not ptr:
-                raise Exception("Object failed to exist.")
-
+        if ptr:
             so_name = to_str(ptr.get().name())
             if not so_name:
                 raise Exception(

@@ -31,6 +31,8 @@
 #include <sstream>
 
 namespace ScriptInterface {
+std::unordered_map<ObjectId, std::weak_ptr<ObjectHandle>> local_objects;
+
 namespace detail {
 using TransportVariant = boost::make_recursive_variant<
     None, bool, int, double, std::string, std::vector<int>, std::vector<double>,
@@ -42,11 +44,13 @@ struct VariantToTransport : boost::static_visitor<TransportVariant> {
     return std::forward<T>(val);
   }
 
-  TransportVariant operator()(const ObjectRef &so_ptr) const { return so_ptr->id(); }
+  TransportVariant operator()(const ObjectRef &so_ptr) const {
+    return so_ptr->id();
+  }
   TransportVariant operator()(const std::vector<Variant> &vec) const {
     std::vector<TransportVariant> ret(vec.size());
 
-    boost::transform(vec, ret.begin(), [this](const Variant & v) {
+    boost::transform(vec, ret.begin(), [this](const Variant &v) {
       return boost::apply_visitor(*this, v);
     });
 
@@ -55,16 +59,18 @@ struct VariantToTransport : boost::static_visitor<TransportVariant> {
 };
 
 struct TransportToVariant : boost::static_visitor<Variant> {
-  template <class T> Variant operator()(const T &val) const {
-    return val;
+  template <class T> Variant operator()(T &&val) const {
+    return std::forward<T>(val);
   }
 
-  Variant operator()(const ObjectId &id) const { return id; }
+  Variant operator()(const ObjectId &id) const {
+    return local_objects.at(id).lock();
+  }
 
   Variant operator()(const std::vector<TransportVariant> &vec) const {
     std::vector<Variant> ret(vec.size());
 
-    boost::transform(vec, ret.begin(), [this](const TransportVariant& v) {
+    boost::transform(vec, ret.begin(), [this](const TransportVariant &v) {
       return boost::apply_visitor(*this, v);
     });
 
@@ -80,7 +86,8 @@ Variant unpack(const TransportVariant &v) {
   return boost::apply_visitor(TransportToVariant{}, v);
 }
 
-std::vector<std::pair<std::string, TransportVariant>> pack(const VariantMap &v) {
+std::vector<std::pair<std::string, TransportVariant>>
+pack(const VariantMap &v) {
   std::vector<std::pair<std::string, TransportVariant>> ret(v.size());
 
   boost::transform(v, ret.begin(), [](auto const &kv) {
@@ -90,7 +97,8 @@ std::vector<std::pair<std::string, TransportVariant>> pack(const VariantMap &v) 
   return ret;
 }
 
-VariantMap unpack(const std::vector<std::pair<std::string, TransportVariant>> &v) {
+VariantMap
+unpack(const std::vector<std::pair<std::string, TransportVariant>> &v) {
   VariantMap ret;
 
   boost::transform(v, std::inserter(ret, ret.end()), [](auto const &kv) {
@@ -102,11 +110,12 @@ VariantMap unpack(const std::vector<std::pair<std::string, TransportVariant>> &v
 
 struct CallbackAction {
   struct Construct {
+    ObjectId id;
     std::string name;
     std::vector<std::pair<std::string, TransportVariant>> parameters;
 
     template <class Archive> void serialize(Archive &ar, long int) {
-      ar &name &parameters;
+      ar &id &name &parameters;
     }
   };
   struct SetParameter {
@@ -152,8 +161,10 @@ public:
     std::shared_ptr<ObjectHandle> &o;
 
     void operator()(const CallbackAction::Construct &ctor) const {
-      o = ObjectHandle::make_shared(
-          ctor.name, ObjectHandle::CreationPolicy::LOCAL, detail::unpack(ctor.parameters));
+      o = ObjectHandle::make_shared(ctor.name,
+                                    ObjectHandle::CreationPolicy::LOCAL,
+                                    detail::unpack(ctor.parameters));
+      local_objects[ctor.id] = o;
     }
     void operator()(const CallbackAction::SetParameter &param) const {
       assert(o), o->set_parameter(param.name, detail::unpack(param.value));
@@ -234,15 +245,13 @@ void ObjectHandle::construct(VariantMap const &params, CreationPolicy policy,
   m_name = name;
   m_policy = policy;
 
-  switch (policy) {
-  case CreationPolicy::LOCAL:
-    break;
-  case CreationPolicy::GLOBAL:
+  if (m_policy == CreationPolicy::GLOBAL) {
     assert(m_callbacks);
     m_cb_ = std::make_unique<detail::Callback>(m_callbacks,
                                                [](detail::CallbackAction) {});
     m_callbacks->call(make_remote_handle);
-    m_cb_->operator()(CallbackAction{Construct{name, detail::pack(params)}});
+    m_cb_->operator()(
+        CallbackAction{Construct{id(), name, detail::pack(params)}});
   }
 
   this->do_construct(params);
@@ -250,11 +259,27 @@ void ObjectHandle::construct(VariantMap const &params, CreationPolicy policy,
 
 void ObjectHandle::set_parameter(const std::string &name,
                                  const Variant &value) {
+  using detail::CallbackAction;
+  using SetParameter = CallbackAction::SetParameter;
+
+  if (m_policy == CreationPolicy::GLOBAL) {
+    m_cb_->operator()(
+        CallbackAction{SetParameter{name, detail::pack(value)}});
+  }
+
   this->do_set_parameter(name, value);
 }
 
 Variant ObjectHandle::call_method(const std::string &name,
                                   const VariantMap &params) {
+  using detail::CallbackAction;
+  using CallMethod = CallbackAction::CallMethod;
+
+  if (m_policy == CreationPolicy::GLOBAL) {
+    m_cb_->operator()(
+        CallbackAction{CallMethod{name, detail::pack(params)}});
+  }
+
   return this->do_call_method(name, params);
 }
 
