@@ -208,12 +208,6 @@ ObjectHandle::make_shared(std::string const &name, CreationPolicy policy,
   return sp;
 }
 
-std::weak_ptr<ObjectHandle> &ObjectHandle::get_instance(ObjectId id) {
-  return Utils::AutoObjectId<ObjectHandle>::get_instance(id);
-}
-
-/* Checkpointing functions. */
-
 /**
  * @brief Returns a binary representation of the state often
  *        the instance, as returned by get_state().
