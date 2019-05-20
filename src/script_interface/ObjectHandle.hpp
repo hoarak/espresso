@@ -34,11 +34,12 @@
 #include <memory>
 #include <type_traits>
 
-namespace Communication {
-class MpiCallbacks;
+namespace ScriptInterface {
+namespace detail {
+  struct CallbackAction;
+  using Callback = Communication::CallbackHandle<detail::CallbackAction>;
 }
 
-namespace ScriptInterface {
 /**
  * @brief Make a Variant from argument.
  *
@@ -74,8 +75,7 @@ public:
   static std::weak_ptr<ObjectHandle> &get_instance(ObjectId id);
 
 private:
-  enum class CallbackAction;
-  std::unique_ptr<Communication::CallbackHandle<CallbackAction>> m_cb_;
+  std::unique_ptr<detail::Callback> m_cb_;
 
   std::string m_name;
   CreationPolicy m_policy = CreationPolicy::LOCAL;
@@ -182,6 +182,8 @@ private:
   }
 
 public:
+  static void initialize(Communication::MpiCallbacks &cb);
+
   /**
    * @brief Get a new reference counted instance of a script interface by
    * name.
