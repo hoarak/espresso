@@ -36,9 +36,9 @@
 
 namespace ScriptInterface {
 namespace detail {
-  struct CallbackAction;
-  using Callback = Communication::CallbackHandle<detail::CallbackAction>;
-}
+struct CallbackAction;
+using Callback = Communication::CallbackHandle<detail::CallbackAction>;
+} // namespace detail
 
 /**
  * @brief Make a Variant from argument.
@@ -61,8 +61,6 @@ public:
 
 protected:
   ObjectHandle() = default;
-  ObjectHandle(const std::string &name, CreationPolicy policy)
-      : m_name(name), m_policy(policy) {}
 
 public:
   /* Copy has unclear semantics, so it should not be allowed. */
@@ -75,7 +73,7 @@ public:
   static std::weak_ptr<ObjectHandle> &get_instance(ObjectId id);
 
 private:
-  std::unique_ptr<detail::Callback> m_cb_;
+  std::unique_ptr<detail::Callback> m_cb;
 
   std::string m_name;
   CreationPolicy m_policy = CreationPolicy::LOCAL;
@@ -153,14 +151,13 @@ public:
    * @param name Name of the parameter
    * @return Value of parameter @p name
    */
-  virtual Variant get_parameter(const std::string &name) const {
-    return {};
-  }
+  virtual Variant get_parameter(const std::string &name) const { return {}; }
 
   /**
- * @brief Set single parameter.
- */
+   * @brief Set single parameter.
+   */
   void set_parameter(const std::string &name, const Variant &value);
+
 private:
   virtual void do_set_parameter(const std::string &, const Variant &) {}
 
@@ -171,6 +168,7 @@ public:
    * If not overridden by the implementation, this does nothing.
    */
   Variant call_method(const std::string &name, const VariantMap &params);
+
 private:
   /**
    * @brief Call a method on the object.

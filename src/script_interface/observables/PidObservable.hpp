@@ -45,8 +45,8 @@ public:
 
   PidObservable() : m_observable(std::make_shared<CorePidObs>()) {}
 
-  Variant get_parameter(const std::string& name) const override {
-    if("ids" == name) {
+  Variant get_parameter(const std::string &name) const override {
+    if ("ids" == name) {
       return m_observable->ids();
     }
 
