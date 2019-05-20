@@ -20,7 +20,7 @@ cdef class PScriptInterface(object):
     cdef set_sip(self, shared_ptr[ObjectHandle] sip)
     cdef VariantMap _sanitize_params(self, in_params) except *
 
-    def __init__(self, name=None, policy="GLOBAL", oid=None, **kwargs):
+    def __init__(self, name=None, policy="GLOBAL", sip=None, **kwargs):
         cdef CreationPolicy policy_
 
         if policy == "GLOBAL":
@@ -30,8 +30,8 @@ cdef class PScriptInterface(object):
         else:
             raise Exception("Unknown policy '{}'.".format(policy))
 
-        if oid:
-            self.set_sip_via_oid(oid)
+        if sip:
+            self.set_set(sip.sip)
         else:
             self.set_sip(make_shared(to_char_pointer(name), policy_, self._sanitize_params(kwargs)))
 
@@ -54,15 +54,6 @@ cdef class PScriptInterface(object):
 
     cdef set_sip(self, shared_ptr[ObjectHandle] sip):
         self.sip = sip
-
-    def set_sip_via_oid(self, PObjectId id):
-        """Set the shared_ptr to the script object in the core via the object id"""
-        oid = id.id
-        try:
-            ptr = get_instance(oid).lock()
-            self.set_sip(ptr)
-        except:
-            raise Exception("Could not get sip for given_id")
 
     def id(self):
         oid = PObjectId()
@@ -147,7 +138,6 @@ cdef Variant python_object_to_variant(value):
         raise TypeError("Unknown type for conversion to Variant")
 
 cdef variant_to_python_object(const Variant & value) except +:
-    cdef ObjectId oid
     cdef vector[Variant] vec
     cdef shared_ptr[ObjectHandle] ptr
     if is_none(value):
@@ -186,10 +176,10 @@ cdef variant_to_python_object(const Variant & value) except +:
                 # for the script object name
                 pclass = ScriptInterfaceHelper
 
-            poid = PObjectId()
-            poid.id = ptr.get().id()
+            pptr = PObjectRef()
+            pptr.sip = ptr
 
-            return pclass(oid=poid)
+            return pclass(sip=pptr)
         else:
             return None
     if is_type[vector[Variant]](value):
