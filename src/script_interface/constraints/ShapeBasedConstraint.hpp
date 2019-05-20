@@ -51,7 +51,7 @@ public:
                        };
                      },
                      [this]() {
-                       return (m_shape != nullptr) ? m_shape->id() : ObjectId();
+                       return m_shape;
                      }},
                     {"particle_velocity", m_constraint->velocity()}});
   }
