@@ -21,14 +21,10 @@
 
 #include "ObjectHandle.hpp"
 #include "ScriptInterface.hpp"
+#include "pack.hpp"
 
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/iostreams/device/array.hpp>
-#include <boost/iostreams/stream.hpp>
+#include <boost/range/algorithm/for_each.hpp>
 #include <boost/serialization/utility.hpp>
-
-#include <sstream>
 
 namespace ScriptInterface {
 using ObjectId = std::size_t;
@@ -50,11 +46,7 @@ using PackedMap = std::vector<std::pair<std::string, PackedVariant>>;
 
 template <class D, class V, class R>
 struct recursive_visitor : boost::static_visitor<R> {
-  template <class T> R operator()(T &&val) const {
-    return std::forward<T>(val);
-  }
-
-  R operator()(const std::vector<V> &vec) const {
+  std::enable_if_t<not std::is_void<R>::value, R> operator()(const std::vector<V> &vec) const {
     std::vector<R> ret(vec.size());
 
     boost::transform(vec, ret.begin(),
@@ -66,10 +58,24 @@ struct recursive_visitor : boost::static_visitor<R> {
   }
 };
 
+template <class D, class V>
+struct recursive_visitor<D, V, void> : boost::static_visitor<void> {
+  void
+  operator()(const std::vector<V> &vec) const {
+    boost::for_each(vec, [visitor = static_cast<const D *>(this)](const V &v) {
+      boost::apply_visitor(*visitor, v);
+    });
+  }
+};
+
 struct VariantToTransport
     : recursive_visitor<VariantToTransport, Variant, PackedVariant> {
   using recursive_visitor<VariantToTransport, Variant, PackedVariant>::
   operator();
+
+  template <class T> PackedVariant operator()(T &&val) const {
+    return std::forward<T>(val);
+  }
 
   PackedVariant operator()(const ObjectRef &so_ptr) const {
     return object_id(so_ptr);
@@ -80,6 +86,10 @@ struct TransportToVariant
     : recursive_visitor<TransportToVariant, PackedVariant, Variant> {
   using recursive_visitor<TransportToVariant, PackedVariant, Variant>::
   operator();
+
+  template <class T> Variant operator()(T &&val) const {
+    return std::forward<T>(val);
+  }
 
   Variant operator()(const ObjectId &id) const { return local_objects.at(id); }
 };

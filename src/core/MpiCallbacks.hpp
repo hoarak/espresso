@@ -37,6 +37,9 @@
 #include <utility>
 
 namespace Communication {
+
+class MpiCallbacks;
+
 /**
  * This namespace contains tag types
  * to indicate what to do with the return

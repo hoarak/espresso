@@ -170,7 +170,7 @@ public:
               const VariantMap &parameters = {});
 
 public:
-  std::string serialize() const;
+  virtual std::string serialize() const;
   static std::shared_ptr<ObjectHandle> unserialize(std::string const &state);
 };
 } /* namespace ScriptInterface */
