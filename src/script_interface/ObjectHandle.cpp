@@ -21,6 +21,7 @@
 
 #include "ObjectHandle.hpp"
 #include "ScriptInterface.hpp"
+#include "Serializer.hpp"
 #include "pack.hpp"
 
 #include <boost/range/algorithm/for_each.hpp>
@@ -43,30 +44,6 @@ using PackedVariant = boost::make_recursive_variant<
     Utils::Vector3d, Utils::Vector4d>::type;
 
 using PackedMap = std::vector<std::pair<std::string, PackedVariant>>;
-
-template <class D, class V, class R>
-struct recursive_visitor : boost::static_visitor<R> {
-  std::enable_if_t<not std::is_void<R>::value, R> operator()(const std::vector<V> &vec) const {
-    std::vector<R> ret(vec.size());
-
-    boost::transform(vec, ret.begin(),
-                     [visitor = static_cast<const D *>(this)](const V &v) {
-                       return boost::apply_visitor(*visitor, v);
-                     });
-
-    return ret;
-  }
-};
-
-template <class D, class V>
-struct recursive_visitor<D, V, void> : boost::static_visitor<void> {
-  void
-  operator()(const std::vector<V> &vec) const {
-    boost::for_each(vec, [visitor = static_cast<const D *>(this)](const V &v) {
-      boost::apply_visitor(*visitor, v);
-    });
-  }
-};
 
 struct VariantToTransport
     : recursive_visitor<VariantToTransport, Variant, PackedVariant> {
