@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/variant.hpp>
 
 #include "None.hpp"
-#include "utils/AutoObjectId.hpp"
 #include "utils/Vector.hpp"
 #include "utils/serialization/unordered_map.hpp"
 
@@ -33,7 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace ScriptInterface {
 class ObjectHandle;
-using ObjectId = Utils::ObjectId<ObjectHandle>;
 using ObjectRef = std::shared_ptr<ObjectHandle>;
 /**
  * @brief None-"literal".
