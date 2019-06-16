@@ -139,8 +139,8 @@ void ObjectHandle::initialize(::Communication::MpiCallbacks &cb) {
   m_callbacks = &cb;
 }
 
-Variant ObjectHandle::get_state() const {
-  std::vector<Variant> state;
+PackedVariant ObjectHandle::get_state() const {
+  std::vector<PackedVariant> state;
 
   auto params = this->get_parameters();
   state.reserve(3 + params.size());
@@ -149,7 +149,7 @@ Variant ObjectHandle::get_state() const {
   state.push_back(m_name);
 
   for (auto const &p : params) {
-    state.push_back(std::vector<Variant>{
+    state.push_back(std::vector<PackedVariant>{
         {p.first, boost::apply_visitor(Serializer{}, p.second)}});
   }
 
@@ -165,13 +165,15 @@ void ObjectHandle::set_state(Variant const &state) {
   auto const policy = CreationPolicy(get<int>(state_.at(0)));
   auto const &name = get<std::string>(state_.at(1));
 
-  UnSerializer u;
   VariantMap params;
 
+  /*
+  UnSerializer u;
   for (auto const &v : make_iterator_range(state_.begin() + 2, state_.end())) {
     auto const &p = get<vector<Variant>>(v);
     params[get<std::string>(p.at(0))] = boost::apply_visitor(u, p.at(1));
   }
+  */
 
   this->construct(params, policy, name);
 }

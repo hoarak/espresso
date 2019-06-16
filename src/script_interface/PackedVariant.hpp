@@ -10,10 +10,10 @@
 namespace ScriptInterface {
 using ObjectId = std::size_t;
 
-ObjectId object_id(const ObjectHandle *p) {
+inline ObjectId object_id(const ObjectHandle *p) {
   return std::hash<const ObjectHandle *>{}(p);
 }
-ObjectId object_id(ObjectRef const &p) { return object_id(p.get()); }
+inline ObjectId object_id(ObjectRef const &p) { return object_id(p.get()); }
 
 using PackedVariant = boost::make_recursive_variant<
     None, bool, int, double, std::string, std::vector<int>, std::vector<double>,
@@ -54,16 +54,16 @@ struct UnpackVisitor
   Variant operator()(const ObjectId &id) const { return local_objects.at(id); }
 };
 
-PackedVariant pack(const Variant &v) {
+inline PackedVariant pack(const Variant &v) {
   return boost::apply_visitor(PackVisitor{}, v);
 }
 
-Variant unpack(const PackedVariant &v,
+inline Variant unpack(const PackedVariant &v,
                std::unordered_map<ObjectId, ObjectRef> const &local_objects) {
   return boost::apply_visitor(UnpackVisitor{local_objects}, v);
 }
 
-PackedMap pack(const VariantMap &v) {
+inline PackedMap pack(const VariantMap &v) {
   std::vector<std::pair<std::string, PackedVariant>> ret(v.size());
 
   boost::transform(v, ret.begin(), [](auto const &kv) {
@@ -73,7 +73,7 @@ PackedMap pack(const VariantMap &v) {
   return ret;
 }
 
-VariantMap unpack(const PackedMap &v,
+inline VariantMap unpack(const PackedMap &v,
                   std::unordered_map<ObjectId, ObjectRef> const&local_objects) {
   VariantMap ret;
 

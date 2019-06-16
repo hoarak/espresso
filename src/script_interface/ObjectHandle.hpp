@@ -21,6 +21,7 @@
 #define SCRIPT_INTERFACE_SCRIPT_INTERFACE_BASE_HPP
 
 #include "MpiCallbacks.hpp"
+#include "PackedVariant.hpp"
 #include "Variant.hpp"
 
 #include <utils/Span.hpp>
@@ -184,7 +185,7 @@ public:
  * implementation stores all the public parameters, including object
  * parameters that are captured by calling get_state on them.
  */
-  virtual Variant get_state() const;
+  virtual PackedVariant get_state() const;
   virtual void set_state(Variant const &state);
 };
 } /* namespace ScriptInterface */

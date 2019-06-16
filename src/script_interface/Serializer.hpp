@@ -29,20 +29,22 @@ namespace ScriptInterface {
  * ObjectId values are flattened by the get_state function of
  * the ScriptObject they refer to.
  */
-class Serializer : public recursive_visitor<Serializer, Variant, Variant> {
+class Serializer : public recursive_visitor<Serializer, Variant, PackedVariant> {
 public:
-  template <typename T> Variant operator()(T const &val) const {
-    return std::vector<Variant>{{val}};
+  using recursive_visitor<Serializer, Variant, PackedVariant>::operator();
+
+  template <typename T> PackedVariant operator()(T const &val) const {
+    return std::vector<PackedVariant>{{val}};
   }
 
-  Variant operator()(const ObjectHandle *so_ptr) const {
+  PackedVariant operator()(const ObjectHandle *so_ptr) const {
     if (so_ptr) {
-      return std::vector<Variant>{{so_ptr->name(), so_ptr->get_state()}};
+      return std::vector<PackedVariant>{{so_ptr->name(), so_ptr->get_state()}};
     }
-    return std::vector<Variant>{None{}};
+    return std::vector<PackedVariant>{None{}};
   }
 
-  Variant operator()(ObjectRef const &so_ptr) const {
+  PackedVariant operator()(ObjectRef const &so_ptr) const {
     return this->operator()(so_ptr.get());
   }
 };
@@ -53,17 +55,17 @@ public:
  * ObjectId values are flattened by the get_state function of
  * the ScriptObject they refer to.
  */
-class UnSerializer : public recursive_visitor<UnSerializer, Variant, Variant> {
+class UnSerializer : public boost::static_visitor<Variant> {
 public:
-  template <typename T> Variant operator()(T const & /* val */) {
-    throw std::runtime_error("Invalid format.");
+  template <typename T> Variant operator()(const T& val) const {
+    return val;
   }
 
-  Variant operator()(std::vector<Variant> const &val) {
+  Variant operator()(std::vector<PackedVariant> const &val) const {
     using boost::get;
     switch (val.size()) {
     case 1: /* Normal value */
-      return val[0];
+      return operator()(val[0]);
     case 2: /* Object value */
     {
       auto so_ptr = ObjectHandle::make_shared(get<std::string>(val.at(0)));
