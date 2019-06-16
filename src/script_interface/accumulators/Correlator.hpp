@@ -25,7 +25,6 @@
 #include "AccumulatorBase.hpp"
 #include "ScriptInterface.hpp"
 #include "auto_parameters/AutoParameters.hpp"
-#include "pack.hpp"
 
 #include "core/accumulators/Correlator.hpp"
 #include "observables/Observable.hpp"
