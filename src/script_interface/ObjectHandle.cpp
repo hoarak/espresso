@@ -20,9 +20,9 @@
 */
 
 #include "ObjectHandle.hpp"
+#include "PackedVariant.hpp"
 #include "ScriptInterface.hpp"
 #include "Serializer.hpp"
-#include "PackedVariant.hpp"
 
 #include <utils/serialization/pack.hpp>
 
@@ -32,21 +32,23 @@
 namespace ScriptInterface {
 namespace {
 Communication::MpiCallbacks *m_callbacks = nullptr;
+std::unordered_map<ObjectId, ObjectRef> local_objects;
 
 void make_remote_handle(ObjectId id, const std::string &name,
                         const PackedMap &parameters) {
-  local_objects[id] = ObjectHandle::make_shared(
-      name, ObjectHandle::CreationPolicy::LOCAL, unpack(parameters));
+  local_objects[id] =
+      ObjectHandle::make_shared(name, ObjectHandle::CreationPolicy::LOCAL,
+                                unpack(parameters, local_objects));
 }
 
 void remote_set_parameter(ObjectId id, std::string const &name,
                           PackedVariant const &value) {
-  local_objects.at(id)->set_parameter(name, unpack(value));
+  local_objects.at(id)->set_parameter(name, unpack(value, local_objects));
 }
 
 void remote_call_method(ObjectId id, std::string const &name,
                         PackedMap const &arguments) {
-  local_objects.at(id)->call_method(name, unpack(arguments));
+  local_objects.at(id)->call_method(name, unpack(arguments, local_objects));
 }
 
 void delete_remote_handle(ObjectId id) { local_objects.erase(id); }
@@ -59,10 +61,20 @@ REGISTER_CALLBACK(delete_remote_handle)
 
 Utils::Factory<ObjectHandle> factory;
 
+/**
+ * @brief Make an unintialized object handle.
+ * @param name Class name.
+ * @return Pointer to the new object.
+ */
+std::shared_ptr<ObjectHandle>
+ObjectHandle::make_shared(std::string const &name) {
+  return factory.make(name);
+}
+
 std::shared_ptr<ObjectHandle>
 ObjectHandle::make_shared(std::string const &name, CreationPolicy policy,
                           const VariantMap &parameters) {
-  std::shared_ptr<ObjectHandle> sp = factory.make(name);
+  auto sp = make_shared(name);
 
   sp->construct(parameters, policy, name);
 
@@ -74,7 +86,7 @@ ObjectHandle::make_shared(std::string const &name, CreationPolicy policy,
  *        the instance, as returned by get_state().
  */
 std::string ObjectHandle::serialize() const {
-  //return Utils::pack(Serializer{}(this));
+  // return Utils::pack(Serializer{}(this));
   return {};
 }
 
@@ -145,13 +157,13 @@ Variant ObjectHandle::get_state() const {
 }
 
 void ObjectHandle::set_state(Variant const &state) {
-  using boost::make_iterator_range;
   using boost::get;
+  using boost::make_iterator_range;
   using std::vector;
 
-  auto const& state_ = get<vector<Variant>>(state);
+  auto const &state_ = get<vector<Variant>>(state);
   auto const policy = CreationPolicy(get<int>(state_.at(0)));
-  auto const& name = get<std::string>(state_.at(1));
+  auto const &name = get<std::string>(state_.at(1));
 
   UnSerializer u;
   VariantMap params;

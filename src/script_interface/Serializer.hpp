@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SCRIPT_INTERFACE_SERIALIZER_HPP
 
 #include "ObjectHandle.hpp"
+#include "PackedVariant.hpp"
 
 namespace ScriptInterface {
 /**
@@ -34,11 +35,9 @@ public:
     return std::vector<Variant>{{val}};
   }
 
-  Variant operator()(const ObjectHandle * so_ptr) const {
+  Variant operator()(const ObjectHandle *so_ptr) const {
     if (so_ptr) {
-      return std::vector<Variant>{{so_ptr->name(),
-                                      static_cast<int>(so_ptr->policy()),
-                                      so_ptr->get_state()}};
+      return std::vector<Variant>{{so_ptr->name(), so_ptr->get_state()}};
     }
     return std::vector<Variant>{None{}};
   }
@@ -65,12 +64,12 @@ public:
     switch (val.size()) {
     case 1: /* Normal value */
       return val[0];
-    case 3: /* Object value */
+    case 2: /* Object value */
     {
-      return ObjectHandle::make_shared(
-          get<std::string>(val[0]),
-          ObjectHandle::CreationPolicy(get<int>(val[1])));
-      // , val[2]
+      auto so_ptr = ObjectHandle::make_shared(get<std::string>(val.at(0)));
+      so_ptr->set_state(val.at(1));
+
+      return so_ptr;
     }
     default: /* Error */
       throw std::runtime_error("Invalid format.");

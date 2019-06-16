@@ -169,6 +169,9 @@ public:
   make_shared(std::string const &name, CreationPolicy policy,
               const VariantMap &parameters = {});
 
+    static std::shared_ptr<ObjectHandle>
+    make_shared(std::string const &name);
+
 public:
   virtual std::string serialize() const;
   static std::shared_ptr<ObjectHandle> unserialize(std::string const &state);
@@ -182,9 +185,7 @@ public:
  * parameters that are captured by calling get_state on them.
  */
   virtual Variant get_state() const;
-
-protected:
-    virtual void set_state(Variant const &state);
+  virtual void set_state(Variant const &state);
 };
 } /* namespace ScriptInterface */
 #endif
