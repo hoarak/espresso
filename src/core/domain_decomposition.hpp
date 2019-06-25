@@ -67,7 +67,7 @@ struct DomainDecomposition {
       : cell_grid{0, 0, 0}, ghost_cell_grid{0, 0, 0}, cell_size{0, 0, 0},
         inv_cell_size{0, 0, 0} {}
   /** linked cell grid in nodes spatial domain. */
-  int cell_grid[3];
+  Utils::Vector3i cell_grid;
   /** linked cell grid with ghost frame. */
   Utils::Vector3i ghost_cell_grid;
   /** cell size.

@@ -315,6 +315,18 @@ Vector<T, 3> vector_product(Vector<T, 3> const &a, Vector<T, 3> const &b) {
           a[0] * b[1] - a[1] * b[0]};
 }
 
+template <class T, class U, size_t N>
+auto hadamard_product(Vector<T, N> const &a, Vector<U, N> const &b) {
+  using std::declval;
+  using R = decltype(declval<T>() * declval<U>());
+
+  Vector<R, N> ret;
+  std::transform(a.cbegin(), a.cend(), b.cbegin(), ret.begin(),
+                 [](auto ai, auto bi) { return ai * bi; });
+
+  return ret;
+}
+
 /**
  * @brief Meta function to turns a Vector<1, T> into T.
  */
