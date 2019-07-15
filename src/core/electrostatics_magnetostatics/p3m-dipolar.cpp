@@ -189,37 +189,6 @@ double dp3m_rtbisection(double box_size, double prefac, double r_cut_iL,
 static double dp3m_average_dipolar_self_energy(double box_l, int mesh);
 static double dp3m_perform_aliasing_sums_dipolar_self_energy(const int n[3]);
 
-dp3m_data_struct::dp3m_data_struct() {
-  params.epsilon = P3M_EPSILON_MAGNETIC;
-
-  /* local_mesh is uninitialized */
-  /* sm is uninitialized */
-  rs_mesh = nullptr;
-  rs_mesh_dip[0] = nullptr;
-  rs_mesh_dip[1] = nullptr;
-  rs_mesh_dip[2] = nullptr;
-  ks_mesh = nullptr;
-
-  sum_dip_part = 0;
-  sum_mu2 = 0.0;
-
-  for (auto &i : int_caf)
-    i = nullptr;
-  pos_shift = 0.0;
-  meshift = nullptr;
-
-  d_op = nullptr;
-  g_force = nullptr;
-  g_energy = nullptr;
-
-  ca_num = 0;
-  ca_frac = nullptr;
-  ca_fmp = nullptr;
-  ks_pnum = 0;
-
-  energy_correction = 0.0;
-}
-
 void dp3m_deactivate() {
   dp3m.params.alpha = 0.0;
   dp3m.params.alpha_L = 0.0;

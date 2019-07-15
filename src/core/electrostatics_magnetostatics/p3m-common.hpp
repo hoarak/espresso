@@ -93,7 +93,7 @@ enum P3M_TUNE_ERROR {
  ************************************************/
 
 /** Structure to hold P3M parameters and some dependent variables. */
-typedef struct {
+struct P3MParameters {
   /** tuning or production? */
   bool tuning = false;
   /** Ewald splitting parameter (0<alpha<1), rescaled to
@@ -115,7 +115,7 @@ typedef struct {
   double accuracy = 0.0;
 
   /** epsilon of the "surrounding dielectric". */
-  double epsilon = P3M_EPSILON;
+  double epsilon = P3M_EPSILON_METALLIC;
   /** cutoff for charge assignment. */
   double cao_cut[3] = {};
   /** mesh constant. */
@@ -143,7 +143,7 @@ typedef struct {
     ar &a &ai &alpha &r_cut &inter2 &cao3 &additional_mesh;
   }
 
-} P3MParameters;
+};
 
 /** One of the aliasing sums used by \ref p3m_k_space_error.
  *  Fortunately the one which is most important (because it converges

@@ -13,21 +13,21 @@
  */
 class HaloComm {
   /** dimensions of the mesh */
-  int dim[3];
+  int dim[3] = {};
   /** dimension of sub meshes to send. */
-  int s_dim[6][3];
+  int s_dim[6][3] = {};
   /** left down corners of sub meshes to send. */
-  int s_ld[6][3];
+  int s_ld[6][3] = {};
   /** up right corners of sub meshes to send. */
-  int s_ur[6][3];
+  int s_ur[6][3] = {};
   /** sizes for send buffers. */
   int s_size[6] = {};
   /** dimension of sub meshes to recv. */
-  int r_dim[6][3];
+  int r_dim[6][3] = {};
   /** left down corners of sub meshes to recv. */
-  int r_ld[6][3];
+  int r_ld[6][3] = {};
   /** up right corners of sub meshes to recv. */
-  int r_ur[6][3];
+  int r_ur[6][3] = {};
   /** sizes for recv buffers. */
   int r_size[6] = {};
   /** maximal size for send/recv buffers. */

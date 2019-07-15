@@ -213,23 +213,6 @@ template <int cao> static void p3m_do_charge_assign();
 template <int cao>
 void p3m_do_assign_charge(double q, Utils::Vector3d &real_pos, int cp_cnt);
 
-p3m_data_struct::p3m_data_struct() {
-  /* local_mesh is uninitialized */
-  /* sm is uninitialized */
-
-  rs_mesh = nullptr;
-  sum_qpart = 0;
-  sum_q2 = 0.0;
-  square_sum_q = 0.0;
-
-  pos_shift = 0.0;
-
-#ifdef P3M_STORE_CA_FRAC
-  ca_num = 0;
-#endif
-  ks_pnum = 0;
-}
-
 void p3m_init() {
   if (coulomb.prefactor <= 0.0) {
     p3m.params.r_cut = 0.0;

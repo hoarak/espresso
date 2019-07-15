@@ -69,29 +69,29 @@
  ************************************************/
 
 struct p3m_data_struct {
-  p3m_data_struct();
+  p3m_data_struct() = default;
 
   P3MParameters params;
 
   /** local mesh. */
   LocalMesh local_mesh;
   /** real space mesh (local) for CA/FFT.*/
-  double *rs_mesh;
+  double *rs_mesh = nullptr;
   /** k-space mesh (local) for k-space calculation and FFT.*/
   std::vector<double> ks_mesh;
 
   /** number of charged particles (only on master node). */
-  int sum_qpart;
+  int sum_qpart = 0;
   /** Sum of square of charges (only on master node). */
-  double sum_q2;
+  double sum_q2 = 0;
   /** square of sum of charges (only on master node). */
-  double square_sum_q;
+  double square_sum_q = 0;
 
   /** interpolation of the charge assignment function. */
   std::array<std::vector<double>, 7> int_caf;
 
   /** position shift for calc. of first assignment mesh point. */
-  double pos_shift;
+  double pos_shift = {};
   /** help variable for calculation of aliasing sums */
   std::vector<double> meshift_x;
   std::vector<double> meshift_y;
@@ -107,7 +107,7 @@ struct p3m_data_struct {
 
 #ifdef P3M_STORE_CA_FRAC
   /** number of charged particles on the node. */
-  int ca_num;
+  int ca_num = 0;
   /** Charge fractions for mesh assignment. */
   std::vector<double> ca_frac;
   /** index of first mesh point for charge assignment. */
@@ -115,7 +115,7 @@ struct p3m_data_struct {
 #endif
 
   /** number of permutations in k_space */
-  int ks_pnum;
+  int ks_pnum = 0;
 
   /** send/recv mesh sizes */
   HaloComm sm;
