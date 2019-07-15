@@ -100,14 +100,10 @@ void HaloComm::gather(Utils::Span<double *const> data,
     }
 
     /* communication */
-    if (node_neighbors[s_dir] != comm.rank()) {
-      MPI_Sendrecv(send_buffer.data(), data.size() * s_size[s_dir], MPI_DOUBLE,
-                   node_neighbors[s_dir], 201, recv_buffer.data(),
-                   data.size() * r_size[r_dir], MPI_DOUBLE,
-                   node_neighbors[r_dir], 201, comm, MPI_STATUS_IGNORE);
-    } else {
-      std::swap(send_buffer, recv_buffer);
-    }
+    MPI_Sendrecv(send_buffer.data(), data.size() * s_size[s_dir], MPI_DOUBLE,
+                 node_neighbors[s_dir], 201, recv_buffer.data(),
+                 data.size() * r_size[r_dir], MPI_DOUBLE, node_neighbors[r_dir],
+                 201, comm, MPI_STATUS_IGNORE);
 
     /* add recv blocks */
     if (r_size[r_dir] > 0) {
@@ -139,7 +135,7 @@ void HaloComm::spread(Utils::Span<double *const> data,
     auto const r_dir = (s_dir % 2 == 0) ? s_dir + 1 : s_dir - 1;
 
     /* pack send block */
-    if (r_size[s_dir] > 0) {
+    if (r_size[r_dir] > 0) {
       boost::accumulate(data, send_buffer.data(),
                         [&](double *send_buf, const double *in_buf) {
                           return pack_block(in_buf, send_buf, r_ld[r_dir],
@@ -148,14 +144,10 @@ void HaloComm::spread(Utils::Span<double *const> data,
     }
 
     /* communication */
-    if (node_neighbors[r_dir] != comm.rank()) {
-      MPI_Sendrecv(send_buffer.data(), data.size() * r_size[r_dir], MPI_DOUBLE,
-                   node_neighbors[r_dir], 202, recv_buffer.data(),
-                   data.size() * s_size[s_dir], MPI_DOUBLE,
-                   node_neighbors[s_dir], 202, comm, MPI_STATUS_IGNORE);
-    } else {
-      std::swap(recv_buffer, send_buffer);
-    }
+    MPI_Sendrecv(send_buffer.data(), data.size() * r_size[r_dir], MPI_DOUBLE,
+                 node_neighbors[r_dir], 202, recv_buffer.data(),
+                 data.size() * s_size[s_dir], MPI_DOUBLE, node_neighbors[s_dir],
+                 202, comm, MPI_STATUS_IGNORE);
     /* un pack recv block */
     if (s_size[s_dir] > 0) {
       boost::accumulate(data, static_cast<const double *>(recv_buffer.data()),
