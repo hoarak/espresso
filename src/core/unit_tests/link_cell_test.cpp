@@ -72,11 +72,6 @@ BOOST_AUTO_TEST_CASE(link_cell) {
                          return std::make_pair(p1.p.identity, p2.p.identity);
                        });
 
-  /* Check that the particle kernel has been executed exactly once for every
-   * particle. */
-  BOOST_CHECK(std::all_of(id_counts.begin(), id_counts.end(),
-                          [](int count) { return count == 1; }));
-
   BOOST_CHECK(lc_pairs.size() == (n_part * (n_part - 1) / 2));
 
   auto it = lc_pairs.begin();

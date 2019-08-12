@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ALGORITHM_LINK_CELL_HPP
 
 namespace Algorithm {
-
 /**
  * @brief Iterates over all particles in the cell range,
  *        and over all pairs within the cells and with

@@ -93,11 +93,6 @@ BOOST_AUTO_TEST_CASE(verlet_ia) {
       },
       VerletCriterion{}, /* rebuild */ true);
 
-  /* Check that the particle kernel has been executed exactly once for every
-   * particle. */
-  BOOST_CHECK(std::all_of(id_counts.begin(), id_counts.end(),
-                          [](int count) { return count == 1; }));
-
   check_pairs(n_part, pairs);
 
   /* Reset everything */
@@ -115,11 +110,6 @@ BOOST_AUTO_TEST_CASE(verlet_ia) {
       },
       VerletCriterion{}, /* rebuild */ false);
 
-  /* Check that the particle kernel has been executed exactly once for every
-   * particle. */
-  BOOST_CHECK(std::all_of(id_counts.begin(), id_counts.end(),
-                          [](int count) { return count == 1; }));
-
   check_pairs(n_part, pairs);
 
   /* Reset everything */
@@ -136,11 +126,6 @@ BOOST_AUTO_TEST_CASE(verlet_ia) {
         return Distance{p1.p.identity <= p2.p.identity};
       },
       VerletCriterion{}, /* rebuild */ true);
-
-  /* Check that the particle kernel has been executed exactly once for every
-   * particle. */
-  BOOST_CHECK(std::all_of(id_counts.begin(), id_counts.end(),
-                          [](int count) { return count == 1; }));
 
   check_pairs(n_part, pairs);
 
