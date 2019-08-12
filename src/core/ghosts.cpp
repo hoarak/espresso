@@ -111,9 +111,6 @@ static int calc_transmit_size(GhostCommunication *gc, unsigned int data_parts) {
 
 static void prepare_send_buffer(GhostCommunication *gc,
                                 unsigned int data_parts) {
-  GHOST_TRACE(fprintf(stderr, "%d: prepare sending to/bcast from %d\n",
-                      this_node, gc->node));
-
   /* reallocate send buffer */
   n_s_buffer = calc_transmit_size(gc, data_parts);
   if (n_s_buffer > max_s_buffer) {

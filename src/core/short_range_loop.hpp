@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <profiler/profiler.hpp>
 
 #include <utility>
+#include <utils/NoOp.hpp>
 
 /**
  * @brief Distance vector and length handed to pair kernels.
@@ -107,30 +108,36 @@ void decide_distance(CellIterator first, CellIterator last,
 struct True {
   template <class... T> bool operator()(T...) const { return true; }
 };
+
+template<class T>
+auto constexpr is_noop = std::is_same<Utils::NoOp, std::remove_reference_t<T>>::value;
 } // namespace detail
 
 template <class ParticleKernel, class PairKernel,
           class VerletCriterion = detail::True>
-void short_range_loop(ParticleKernel &&particle_kernel,
+void short_range_loop(ParticleKernel particle_kernel,
                       PairKernel &&pair_kernel,
                       const VerletCriterion &verlet_criterion = {}) {
   ESPRESSO_PROFILER_CXX_MARK_FUNCTION;
+  using detail::is_noop;
 
   assert(get_resort_particles() == Cells::RESORT_NONE);
 
-  if (cell_structure.min_range != INACTIVE_CUTOFF) {
+  if(not is_noop<ParticleKernel>) {
+    for (auto &p : cell_structure.local_cells().particles()) {
+      particle_kernel(p);
+    }
+  }
+
+  if (not is_noop<PairKernel> && cell_structure.min_range != INACTIVE_CUTOFF) {
     auto first = boost::make_indirect_iterator(local_cells.begin());
     auto last = boost::make_indirect_iterator(local_cells.end());
 
     detail::decide_distance(
-        first, last, std::forward<ParticleKernel>(particle_kernel),
+        first, last, Utils::NoOp{},
         std::forward<PairKernel>(pair_kernel), verlet_criterion);
 
     rebuild_verletlist = 0;
-  } else {
-    for (auto &p : cell_structure.local_cells().particles()) {
-      particle_kernel(p);
-    }
   }
 }
 
