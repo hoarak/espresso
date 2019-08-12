@@ -62,6 +62,7 @@
 #include <boost/range/algorithm/min_element.hpp>
 #include <cmath>
 #include <cstdio>
+#include <electrostatics_magnetostatics/icc.hpp>
 #include <mpi.h>
 
 #ifdef VALGRIND_INSTRUMENTATION
@@ -204,6 +205,10 @@ void integrate_vv(int n_steps, int reuse_forces) {
     virtual_sites()->update();
 #endif
 
+#ifdef ELECTROSTATICS
+    iccp3m_iteration(local_cells.particles(), cell_structure.ghost_cells().particles());
+#endif
+
     // Communication step: distribute ghost positions
     cells_update_ghosts();
 
@@ -286,6 +291,10 @@ void integrate_vv(int n_steps, int reuse_forces) {
       cells_update_ghosts();
     }
     virtual_sites()->update();
+#endif
+
+#ifdef ELECTROSTATICS
+    iccp3m_iteration(local_cells.particles(), cell_structure.ghost_cells().particles());
 #endif
 
     // Communication step: distribute ghost positions

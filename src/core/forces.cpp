@@ -91,9 +91,6 @@ void force_calc(CellStructure &cell_structure) {
 #endif
 
   auto particles = cell_structure.local_cells().particles();
-#ifdef ELECTROSTATICS
-  iccp3m_iteration(particles, cell_structure.ghost_cells().particles());
-#endif
   init_forces(particles);
 
   for (auto &forceActor : forceActors) {
@@ -189,7 +186,6 @@ void calc_long_range_forces(const ParticleRange &particles) {
 #ifdef ELECTROSTATICS
   /* calculate k-space part of electrostatic interaction. */
   Coulomb::calc_long_range_force(particles);
-
 #endif /*ifdef ELECTROSTATICS */
 
 #ifdef DIPOLES
