@@ -95,7 +95,7 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
   case CELL_STRUCTURE_DOMDEC:
     Algorithm::link_cell(boost::make_indirect_iterator(local_cells.begin()),
                          boost::make_indirect_iterator(local_cells.end()),
-                         Utils::NoOp{}, pair_kernel,
+                         pair_kernel,
                          [](Particle const &p1, Particle const &p2) {
                            return (p1.r.p - p2.r.p).norm2();
                          });
@@ -103,15 +103,15 @@ std::vector<std::pair<int, int>> get_pairs(double distance) {
   case CELL_STRUCTURE_NSQUARE:
     Algorithm::link_cell(
         boost::make_indirect_iterator(local_cells.begin()),
-        boost::make_indirect_iterator(local_cells.end()), Utils::NoOp{},
-        pair_kernel, [](Particle const &p1, Particle const &p2) {
+        boost::make_indirect_iterator(local_cells.end()), pair_kernel,
+        [](Particle const &p1, Particle const &p2) {
           return get_mi_vector(p1.r.p, p2.r.p, box_geo).norm2();
         });
     break;
   case CELL_STRUCTURE_LAYERED:
     Algorithm::link_cell(boost::make_indirect_iterator(local_cells.begin()),
                          boost::make_indirect_iterator(local_cells.end()),
-                         Utils::NoOp{}, pair_kernel,
+                         pair_kernel,
                          [](Particle const &p1, Particle const &p2) {
                            auto vec21 = get_mi_vector(p1.r.p, p2.r.p, box_geo);
                            vec21[2] = p1.r.p[2] - p2.r.p[2];

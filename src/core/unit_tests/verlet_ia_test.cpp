@@ -85,7 +85,6 @@ BOOST_AUTO_TEST_CASE(verlet_ia) {
   /* Build VL */
   Algorithm::verlet_ia(
       cells.begin(), cells.end(),
-      [&id_counts](Particle const &p) { id_counts[p.p.identity]++; },
       [&pairs](Particle const &p1, Particle const &p2, Distance const &) {
         pairs.emplace_back(p1.p.identity, p2.p.identity);
       },
@@ -108,7 +107,6 @@ BOOST_AUTO_TEST_CASE(verlet_ia) {
   /* Now check the Verlet lists */
   Algorithm::verlet_ia(
       cells.begin(), cells.end(),
-      [&id_counts](Particle const &p) { id_counts[p.p.identity]++; },
       [&pairs](Particle const &p1, Particle const &p2, Distance const &) {
         pairs.emplace_back(p1.p.identity, p2.p.identity);
       },
@@ -131,7 +129,6 @@ BOOST_AUTO_TEST_CASE(verlet_ia) {
   /* Rebuild again */
   Algorithm::verlet_ia(
       cells.begin(), cells.end(),
-      [&id_counts](Particle const &p) { id_counts[p.p.identity]++; },
       [&pairs](Particle const &p1, Particle const &p2, Distance const &) {
         pairs.emplace_back(p1.p.identity, p2.p.identity);
       },

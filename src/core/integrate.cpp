@@ -206,7 +206,8 @@ void integrate_vv(int n_steps, int reuse_forces) {
 #endif
 
 #ifdef ELECTROSTATICS
-    iccp3m_iteration(local_cells.particles(), cell_structure.ghost_cells().particles());
+    iccp3m_iteration(local_cells.particles(),
+                     cell_structure.ghost_cells().particles());
 #endif
 
     // Communication step: distribute ghost positions
@@ -294,7 +295,8 @@ void integrate_vv(int n_steps, int reuse_forces) {
 #endif
 
 #ifdef ELECTROSTATICS
-    iccp3m_iteration(local_cells.particles(), cell_structure.ghost_cells().particles());
+    iccp3m_iteration(local_cells.particles(),
+                     cell_structure.ghost_cells().particles());
 #endif
 
 #ifdef COLLISION_DETECTION

@@ -78,25 +78,23 @@ void decide_distance(CellIterator first, CellIterator last,
   switch (cell_structure.type) {
   case CELL_STRUCTURE_DOMDEC:
     Algorithm::for_each_pair(
-        first, last, std::forward<ParticleKernel>(particle_kernel),
-        std::forward<PairKernel>(pair_kernel), EuclidianDistance{},
+        first, last, std::forward<PairKernel>(pair_kernel), EuclidianDistance{},
         std::forward<VerletCriterion>(verlet_criterion),
         cell_structure.use_verlet_list, rebuild_verletlist);
     break;
   case CELL_STRUCTURE_NSQUARE:
-    Algorithm::for_each_pair(
-        first, last, std::forward<ParticleKernel>(particle_kernel),
-        std::forward<PairKernel>(pair_kernel), MinimalImageDistance{box_geo},
-        std::forward<VerletCriterion>(verlet_criterion),
-        cell_structure.use_verlet_list, rebuild_verletlist);
+    Algorithm::for_each_pair(first, last, std::forward<PairKernel>(pair_kernel),
+                             MinimalImageDistance{box_geo},
+                             std::forward<VerletCriterion>(verlet_criterion),
+                             cell_structure.use_verlet_list,
+                             rebuild_verletlist);
     break;
   case CELL_STRUCTURE_LAYERED:
-    Algorithm::for_each_pair(
-        first, last, std::forward<ParticleKernel>(particle_kernel),
-        std::forward<PairKernel>(pair_kernel),
-        LayeredMinimalImageDistance{box_geo},
-        std::forward<VerletCriterion>(verlet_criterion),
-        cell_structure.use_verlet_list, rebuild_verletlist);
+    Algorithm::for_each_pair(first, last, std::forward<PairKernel>(pair_kernel),
+                             LayeredMinimalImageDistance{box_geo},
+                             std::forward<VerletCriterion>(verlet_criterion),
+                             cell_structure.use_verlet_list,
+                             rebuild_verletlist);
     break;
   }
 }
@@ -109,21 +107,21 @@ struct True {
   template <class... T> bool operator()(T...) const { return true; }
 };
 
-template<class T>
-auto constexpr is_noop = std::is_same<Utils::NoOp, std::remove_reference_t<T>>::value;
+template <class T>
+auto constexpr is_noop =
+    std::is_same<Utils::NoOp, std::remove_reference_t<T>>::value;
 } // namespace detail
 
 template <class ParticleKernel, class PairKernel,
           class VerletCriterion = detail::True>
-void short_range_loop(ParticleKernel particle_kernel,
-                      PairKernel &&pair_kernel,
+void short_range_loop(ParticleKernel particle_kernel, PairKernel &&pair_kernel,
                       const VerletCriterion &verlet_criterion = {}) {
   ESPRESSO_PROFILER_CXX_MARK_FUNCTION;
   using detail::is_noop;
 
   assert(get_resort_particles() == Cells::RESORT_NONE);
 
-  if(not is_noop<ParticleKernel>) {
+  if (not is_noop<ParticleKernel>) {
     for (auto &p : cell_structure.local_cells().particles()) {
       particle_kernel(p);
     }
@@ -133,9 +131,9 @@ void short_range_loop(ParticleKernel particle_kernel,
     auto first = boost::make_indirect_iterator(local_cells.begin());
     auto last = boost::make_indirect_iterator(local_cells.end());
 
-    detail::decide_distance(
-        first, last, Utils::NoOp{},
-        std::forward<PairKernel>(pair_kernel), verlet_criterion);
+    detail::decide_distance(first, last, Utils::NoOp{},
+                            std::forward<PairKernel>(pair_kernel),
+                            verlet_criterion);
 
     rebuild_verletlist = 0;
   }
