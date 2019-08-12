@@ -86,10 +86,6 @@ void force_calc(CellStructure &cell_structure) {
 
   espressoSystemInterface.update();
 
-#ifdef COLLISION_DETECTION
-  prepare_local_collision_queue();
-#endif
-
   auto particles = cell_structure.local_cells().particles();
   init_forces(particles);
 

@@ -297,6 +297,10 @@ void integrate_vv(int n_steps, int reuse_forces) {
     iccp3m_iteration(local_cells.particles(), cell_structure.ghost_cells().particles());
 #endif
 
+#ifdef COLLISION_DETECTION
+    prepare_local_collision_queue();
+#endif
+
     // Communication step: distribute ghost positions
     cells_update_ghosts();
 
