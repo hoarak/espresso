@@ -113,9 +113,10 @@ auto constexpr is_noop =
 } // namespace detail
 
 template <class ParticleKernel, class PairKernel,
-          class VerletCriterion = detail::True>
+          class VerletCriterion = detail::True, class LongRange = Utils::NoOp>
 void short_range_loop(ParticleKernel particle_kernel, PairKernel &&pair_kernel,
-                      const VerletCriterion &verlet_criterion = {}) {
+                      const VerletCriterion &verlet_criterion = {},
+                      LongRange long_range = {}) {
   ESPRESSO_PROFILER_CXX_MARK_FUNCTION;
   using detail::is_noop;
 
@@ -136,6 +137,10 @@ void short_range_loop(ParticleKernel particle_kernel, PairKernel &&pair_kernel,
                             verlet_criterion);
 
     rebuild_verletlist = 0;
+  }
+
+  if (not is_noop<LongRange>) {
+    long_range(cell_structure.local_cells());
   }
 }
 

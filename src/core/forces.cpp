@@ -123,34 +123,6 @@ void force_calc(CellStructure &cell_structure) {
                                    coulomb_cutoff, dipole_cutoff,
                                    collision_detection_cutoff()});
 
-  Constraints::constraints.add_forces(particles, sim_time);
-
-#ifdef OIF_GLOBAL_FORCES
-  if (max_oif_objects) {
-    double area_volume[2]; // There are two global quantities that need to be
-    // evaluated: object's surface and object's volume. One
-    // can add another quantity.
-    area_volume[0] = 0.0;
-    area_volume[1] = 0.0;
-    for (int i = 0; i < max_oif_objects; i++) {
-      calc_oif_global(area_volume, i, particles);
-      if (fabs(area_volume[0]) < 1e-100 && fabs(area_volume[1]) < 1e-100)
-        break;
-      add_oif_global_forces(area_volume, i, particles);
-    }
-  }
-#endif
-
-  // Must be done here. Forces need to be ghost-communicated
-  immersed_boundaries.volume_conservation();
-
-  lb_lbcoupling_calc_particle_lattice_ia(thermo_virtual, particles);
-
-#ifdef METADYNAMICS
-  /* Metadynamics main function */
-  meta_perform(particles);
-#endif
-
 #ifdef CUDA
   copy_forces_from_GPU(particles);
 #endif
@@ -179,6 +151,35 @@ void force_calc(CellStructure &cell_structure) {
 
 void calc_long_range_forces(const ParticleRange &particles) {
   ESPRESSO_PROFILER_CXX_MARK_FUNCTION;
+
+  Constraints::constraints.add_forces(particles, sim_time);
+
+#ifdef OIF_GLOBAL_FORCES
+  if (max_oif_objects) {
+    double area_volume[2]; // There are two global quantities that need to be
+    // evaluated: object's surface and object's volume. One
+    // can add another quantity.
+    area_volume[0] = 0.0;
+    area_volume[1] = 0.0;
+    for (int i = 0; i < max_oif_objects; i++) {
+      calc_oif_global(area_volume, i, particles);
+      if (fabs(area_volume[0]) < 1e-100 && fabs(area_volume[1]) < 1e-100)
+        break;
+      add_oif_global_forces(area_volume, i, particles);
+    }
+  }
+#endif
+
+  // Must be done here. Forces need to be ghost-communicated
+  immersed_boundaries.volume_conservation();
+
+  lb_lbcoupling_calc_particle_lattice_ia(thermo_virtual, particles);
+
+#ifdef METADYNAMICS
+  /* Metadynamics main function */
+  meta_perform(particles);
+#endif
+
 #ifdef ELECTROSTATICS
   /* calculate k-space part of electrostatic interaction. */
   Coulomb::calc_long_range_force(particles);

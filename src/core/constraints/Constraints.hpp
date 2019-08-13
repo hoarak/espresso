@@ -65,7 +65,7 @@ public:
   const_iterator begin() const { return m_constraints.begin(); }
   const_iterator end() const { return m_constraints.end(); }
 
-  void add_forces(ParticleRange &particles, double t) const {
+  void add_forces(const ParticleRange &particles, double t) const {
     if (m_constraints.empty())
       return;
 
