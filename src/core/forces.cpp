@@ -118,8 +118,6 @@ void force_calc(CellStructure &cell_structure) {
           detect_collision(&p1, &p2, d.dist2);
 #endif
       },
-      VerletCriterion{skin, cell_structure.min_range, coulomb_cutoff,
-                      dipole_cutoff, collision_detection_cutoff()},
       [](const ParticleRange &particles) {
         Constraints::constraints.add_forces(particles, sim_time);
 
@@ -151,7 +149,9 @@ void force_calc(CellStructure &cell_structure) {
 #endif
 
         calc_long_range_forces(particles);
-      });
+      },
+      VerletCriterion{skin, cell_structure.min_range, coulomb_cutoff,
+                      dipole_cutoff, collision_detection_cutoff()});
 
 #ifdef CUDA
   copy_forces_from_GPU(particles);

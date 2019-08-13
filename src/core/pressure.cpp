@@ -127,12 +127,12 @@ void pressure_calc(double *result, double *result_t, double *result_nb,
       [](Particle &p1, Particle &p2, Distance &d) {
         add_non_bonded_pair_virials(&(p1), &(p2), d.vec21, sqrt(d.dist2),
                                     d.dist2);
+      }, [](const ParticleRange & particles) {
+        calc_long_range_virials(particles);
       });
 
   /* rescale kinetic energy (=ideal contribution) */
   virials.data.e[0] /= (3.0 * volume * time_step * time_step);
-
-  calc_long_range_virials(local_cells.particles());
 
 #ifdef VIRTUAL_SITES
   virtual_sites()->pressure_and_stress_tensor_contribution(

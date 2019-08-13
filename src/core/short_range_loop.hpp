@@ -115,8 +115,8 @@ auto constexpr is_noop =
 template <class ParticleKernel, class PairKernel,
           class VerletCriterion = detail::True, class LongRange = Utils::NoOp>
 void short_range_loop(ParticleKernel particle_kernel, PairKernel &&pair_kernel,
-                      const VerletCriterion &verlet_criterion = {},
-                      LongRange long_range = {}) {
+                      LongRange long_range = {},
+                      const VerletCriterion &verlet_criterion = {}) {
   ESPRESSO_PROFILER_CXX_MARK_FUNCTION;
   using detail::is_noop;
 
