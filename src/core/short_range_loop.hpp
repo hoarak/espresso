@@ -140,7 +140,7 @@ void short_range_loop(ParticleKernel particle_kernel, PairKernel &&pair_kernel,
   }
 
   if (not is_noop<LongRange>) {
-    long_range(cell_structure.local_cells());
+    long_range(cell_structure.local_cells().particles());
   }
 }
 

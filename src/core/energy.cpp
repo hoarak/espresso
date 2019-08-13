@@ -95,12 +95,13 @@ void energy_calc(double *result, const double time) {
       [](Particle const &p) { add_single_particle_energy(&p); },
       [](Particle const &p1, Particle const &p2, Distance const &d) {
         add_non_bonded_pair_energy(&p1, &p2, d.vec21, sqrt(d.dist2), d.dist2);
-      });
+      }, [](auto...) { return true; },
+      [time](const ParticleRange &particles) {
+        Constraints::constraints.add_energy(particles, time, energy);
 
-  calc_long_range_energies(local_cells.particles());
-
-  auto local_parts = local_cells.particles();
-  Constraints::constraints.add_energy(local_parts, time, energy);
+        calc_long_range_energies(particles);
+      }
+      );
 
 #ifdef CUDA
   copy_energy_from_GPU();

@@ -96,8 +96,6 @@ void force_calc(CellStructure &cell_structure) {
 #endif
   }
 
-  calc_long_range_forces(particles);
-
 #ifdef ELECTROSTATICS
   auto const coulomb_cutoff = Coulomb::cutoff(box_geo.length());
 #else
@@ -110,18 +108,50 @@ void force_calc(CellStructure &cell_structure) {
   auto const dipole_cutoff = INACTIVE_CUTOFF;
 #endif
 
-  short_range_loop([](Particle &p) { add_single_particle_force(&p); },
-                   [](Particle &p1, Particle &p2, Distance &d) {
-                     add_non_bonded_pair_force(&(p1), &(p2), d.vec21,
-                                               sqrt(d.dist2), d.dist2);
+  short_range_loop(
+      [](Particle &p) { add_single_particle_force(&p); },
+      [](Particle &p1, Particle &p2, Distance &d) {
+        add_non_bonded_pair_force(&(p1), &(p2), d.vec21, sqrt(d.dist2),
+                                  d.dist2);
 #ifdef COLLISION_DETECTION
-                     if (collision_params.mode != COLLISION_MODE_OFF)
-                       detect_collision(&p1, &p2, d.dist2);
+        if (collision_params.mode != COLLISION_MODE_OFF)
+          detect_collision(&p1, &p2, d.dist2);
 #endif
-                   },
-                   VerletCriterion{skin, cell_structure.min_range,
-                                   coulomb_cutoff, dipole_cutoff,
-                                   collision_detection_cutoff()});
+      },
+      VerletCriterion{skin, cell_structure.min_range, coulomb_cutoff,
+                      dipole_cutoff, collision_detection_cutoff()},
+      [](const ParticleRange &particles) {
+        Constraints::constraints.add_forces(particles, sim_time);
+
+#ifdef OIF_GLOBAL_FORCES
+        if (max_oif_objects) {
+          double
+              area_volume[2]; // There are two global quantities that need to be
+          // evaluated: object's surface and object's volume. One
+          // can add another quantity.
+          area_volume[0] = 0.0;
+          area_volume[1] = 0.0;
+          for (int i = 0; i < max_oif_objects; i++) {
+            calc_oif_global(area_volume, i, particles);
+            if (fabs(area_volume[0]) < 1e-100 && fabs(area_volume[1]) < 1e-100)
+              break;
+            add_oif_global_forces(area_volume, i, particles);
+          }
+        }
+#endif
+
+        // Must be done here. Forces need to be ghost-communicated
+        immersed_boundaries.volume_conservation();
+
+        lb_lbcoupling_calc_particle_lattice_ia(thermo_virtual, particles);
+
+#ifdef METADYNAMICS
+        /* Metadynamics main function */
+        meta_perform(particles);
+#endif
+
+        calc_long_range_forces(particles);
+      });
 
 #ifdef CUDA
   copy_forces_from_GPU(particles);
@@ -151,35 +181,6 @@ void force_calc(CellStructure &cell_structure) {
 
 void calc_long_range_forces(const ParticleRange &particles) {
   ESPRESSO_PROFILER_CXX_MARK_FUNCTION;
-
-  Constraints::constraints.add_forces(particles, sim_time);
-
-#ifdef OIF_GLOBAL_FORCES
-  if (max_oif_objects) {
-    double area_volume[2]; // There are two global quantities that need to be
-    // evaluated: object's surface and object's volume. One
-    // can add another quantity.
-    area_volume[0] = 0.0;
-    area_volume[1] = 0.0;
-    for (int i = 0; i < max_oif_objects; i++) {
-      calc_oif_global(area_volume, i, particles);
-      if (fabs(area_volume[0]) < 1e-100 && fabs(area_volume[1]) < 1e-100)
-        break;
-      add_oif_global_forces(area_volume, i, particles);
-    }
-  }
-#endif
-
-  // Must be done here. Forces need to be ghost-communicated
-  immersed_boundaries.volume_conservation();
-
-  lb_lbcoupling_calc_particle_lattice_ia(thermo_virtual, particles);
-
-#ifdef METADYNAMICS
-  /* Metadynamics main function */
-  meta_perform(particles);
-#endif
-
 #ifdef ELECTROSTATICS
   /* calculate k-space part of electrostatic interaction. */
   Coulomb::calc_long_range_force(particles);
