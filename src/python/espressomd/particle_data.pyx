@@ -659,9 +659,7 @@ cdef class ParticleHandle:
             # is constexpr.
             IF VIRTUAL_SITES:
                 self.update_particle_data()
-                cdef const bool * x = NULL
-                pointer_to_virtual(self.particle_data, x)
-                return x[0]
+                return self.particle_data.p.is_virtual
             ELSE:
                 return False
 

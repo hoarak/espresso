@@ -40,6 +40,7 @@ cdef extern from "particle_data.hpp":
         int    mol_id
         int    type
         double mass
+        bool   is_virtual
 
     ctypedef struct particle_position "ParticlePosition":
         Vector3d p
@@ -135,7 +136,6 @@ cdef extern from "particle_data.hpp":
 
     IF VIRTUAL_SITES:
         void set_particle_virtual(int part, int isVirtual)
-        void pointer_to_virtual(const particle * P, const bint * & res)
 
     IF LANGEVIN_PER_PARTICLE:
         void set_particle_temperature(int part, double T)
@@ -161,6 +161,10 @@ cdef extern from "particle_data.hpp":
         void pointer_to_vs_quat(const particle * P, const double * & res)
         void set_particle_vs_relative(int part, int vs_relative_to, double vs_distance, double * rel_ori)
         void set_particle_vs_quat(int part, double * vs_quat)
+
+    IF VIRTUAL_SITES_TRIANGLE:
+        void set_partile_vs_triangle(int part, int p1, int p2, int p3)
+        const int* pointer_to_vs_triangle(const particle * p)
 
     void pointer_to_q(const particle * P, const double * & res)
 

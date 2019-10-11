@@ -947,6 +947,10 @@ void set_particle_vs_triangle(int part, int p1, int p2, int p3) {
       Utils::Vector3i,
       &ParticleProperties::vs_triangle>(part, ids);
 }
+
+const int* pointer_to_vs_triangle(const Particle * p) {
+  return p->p.vs_triangle.data();
+}
 #endif
 
 void set_particle_q(int part, double q) {
