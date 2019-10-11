@@ -163,7 +163,7 @@ cdef extern from "particle_data.hpp":
         void set_particle_vs_quat(int part, double * vs_quat)
 
     IF VIRTUAL_SITES_TRIANGLE:
-        void set_partile_vs_triangle(int part, int p1, int p2, int p3)
+        void set_particle_vs_triangle(int part, int p1, int p2, int p3)
         const int* pointer_to_vs_triangle(const particle * p)
 
     void pointer_to_q(const particle * P, const double * & res)

@@ -663,6 +663,20 @@ cdef class ParticleHandle:
             ELSE:
                 return False
 
+    IF VIRTUAL_SITES_TRIANGLE:
+        property vs_triangle:
+            def __set__(self, ids):
+                if len(ids) != 3:
+                    raise ValueError(
+                        "vs_triangle has to be an array-like of length 3.")
+
+                set_particle_vs_triangle(self._id, ids[0], ids[1], ids[2])
+
+            def __get__(self):
+                self.update_particle_data()
+                p = pointer_to_vs_triangle(self.particle_data)
+                return [p[0], p[1], p[2]]
+
     IF VIRTUAL_SITES_RELATIVE:
         property vs_quat:
             """ Virtual site quaternion.

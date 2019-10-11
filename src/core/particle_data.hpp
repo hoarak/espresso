@@ -938,14 +938,15 @@ void pointer_to_quat(Particle const *p, double const *&res);
 
 void pointer_to_q(Particle const *p, double const *&res);
 
-#ifdef VIRTUAL_SITES
-void pointer_to_virtual(Particle const *p, bool const *&res);
-#endif
-
 #ifdef VIRTUAL_SITES_RELATIVE
 void pointer_to_vs_quat(Particle const *p, double const *&res);
 void pointer_to_vs_relative(Particle const *p, int const *&res1,
                             double const *&res2, double const *&res3);
+#endif
+
+#ifdef VIRTUAL_SITES_TRIANGLE
+void set_particle_vs_triangle(int part, int p1, int p2, int p3);
+const int* pointer_to_vs_triangle(const Particle * p);
 #endif
 
 void pointer_to_dipm(Particle const *P, double const *&res);

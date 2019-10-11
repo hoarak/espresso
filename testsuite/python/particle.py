@@ -184,6 +184,11 @@ class ParticleProperties(ut.TestCase):
                 res[2], np.array((0.5, -0.5, -0.5, -0.5)),
                 err_msg="vs_relative: " + res.__str__(), atol=self.tol)
 
+    @utx.skipIfMissingFeatures("VIRTUAL_SITES_TRIANGLE")
+    def test_vs_triangle(self):
+        self.system.part[self.pid].vs_triangle = [1,2,3]
+        self.assertEqual(self.system.part[self.pid].vs_triangle, [1,2,3])
+
     @utx.skipIfMissingFeatures("DIPOLES")
     def test_contradicting_properties_dip_dipm(self):
         with self.assertRaises(ValueError):
