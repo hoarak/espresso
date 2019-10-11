@@ -156,6 +156,9 @@ using UpdatePropertyMessage = boost::variant
         , UpdateProperty<ParticleProperties::VirtualSitesRelativeParameteres,
                          &Prop::vs_relative>
 #endif
+#ifdef VIRTUAL_SITES_TRIANGLE
+        , UpdateProperty<Utils::Vector3i, &Prop::vs_triangle>
+#endif
 #endif
 #ifdef LANGEVIN_PER_PARTICLE
         , UpdateProperty<double, &Prop::T>
@@ -936,6 +939,16 @@ void set_particle_vs_relative(int part, int vs_relative_to, double vs_distance,
 }
 #endif
 
+#ifdef VIRTUAL_SITES_TRIANGLE
+void set_particle_vs_triangle(int part, int p1, int p2, int p3) {
+  Utils::Vector3i ids = {p1, p2, p3};
+
+  mpi_update_particle_property<
+      Utils::Vector3i,
+      &ParticleProperties::vs_triangle>(part, ids);
+}
+#endif
+
 void set_particle_q(int part, double q) {
 #ifdef ELECTROSTATICS
   mpi_update_particle_property<double, &ParticleProperties::q>(part, q);
@@ -1511,12 +1524,6 @@ void pointer_to_quat(Particle const *p, double const *&res) {
 #endif
 
 void pointer_to_q(Particle const *p, double const *&res) { res = &(p->p.q); }
-
-#ifdef VIRTUAL_SITES
-void pointer_to_virtual(Particle const *p, bool const *&res) {
-  res = &(p->p.is_virtual);
-}
-#endif
 
 #ifdef VIRTUAL_SITES_RELATIVE
 void pointer_to_vs_quat(Particle const *p, double const *&res) {

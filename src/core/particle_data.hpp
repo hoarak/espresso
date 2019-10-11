@@ -161,7 +161,9 @@ struct ParticleProperties {
       ar &quat;
     }
   } vs_relative;
-
+#endif
+#ifdef VIRTUAL_SITES_TRIANGLE
+  Utils::Vector3i vs_triangle = {-1, -1, -1};
 #endif
 #else  /* VIRTUAL_SITES */
   static constexpr const bool is_virtual = false;
