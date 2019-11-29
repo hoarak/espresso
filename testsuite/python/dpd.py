@@ -77,6 +77,7 @@ class DPDThermostat(ut.TestCase):
         s.part.add(pos=s.box_l * np.random.random((N, 3)))
         kT = 2.3
         gamma = 1.5
+        s.thermostat.set_langevin(kT=kT, gamma=gamma, seed=41)
         s.thermostat.set_dpd(kT=kT, seed=42)
         s.non_bonded_inter[0, 0].dpd.set_params(
             weight_function=0, gamma=gamma, r_cut=1.5,
@@ -445,6 +446,7 @@ class DPDThermostat(ut.TestCase):
         np.testing.assert_array_almost_equal(np.copy(dpd_stress), stress)
         np.testing.assert_array_almost_equal(np.copy(obs_stress), stress)
 
+    @utx.skipIfMissingFeatures("MASS")
     def test_momentum_conservation(self):
         r_cut = 1.0
         gamma = 5.

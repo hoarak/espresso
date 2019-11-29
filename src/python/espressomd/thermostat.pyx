@@ -205,7 +205,6 @@ cdef class Thermostat:
         lb_lbcoupling_set_gamma(0.0)
         return True
 
-    @AssertThermostatType(THERMO_LANGEVIN)
     def set_langevin(self, kT=None, gamma=None, gamma_rotation=None,
                      act_on_virtual=False, seed=None):
         """
