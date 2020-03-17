@@ -69,7 +69,8 @@ BOOST_AUTO_TEST_CASE(test_noise_uniform_1d) {
   std::tie(means, variances, covariance, correlation) = noise_statistics(
       std::function<std::vector<VariantVectorXd>()>(
           [counter = 0]() mutable -> std::vector<VariantVectorXd> {
-            return {{Random::noise_uniform<RNGSalt::NPTISOV, 1>(counter++, 0)}};
+            return {
+                {Random::noise_uniform<RNGSalt::NPTISOV, 1>(counter++, 0, 0)}};
           }),
       sample_size);
   // check pooled mean and variance
@@ -87,7 +88,8 @@ BOOST_AUTO_TEST_CASE(test_noise_uniform_3d) {
   std::tie(means, variances, covariance, correlation) = noise_statistics(
       std::function<std::vector<VariantVectorXd>()>(
           [counter = 0]() mutable -> std::vector<VariantVectorXd> {
-            return {{Random::noise_uniform<RNGSalt::LANGEVIN>(counter++, 0)}};
+            return {
+                {Random::noise_uniform<RNGSalt::LANGEVIN>(counter++, 0, 0)}};
           }),
       sample_size);
   // check pooled mean and variance
@@ -114,7 +116,7 @@ BOOST_AUTO_TEST_CASE(test_noise_gaussian_4d) {
       std::function<std::vector<VariantVectorXd>()>(
           [counter = 0]() mutable -> std::vector<VariantVectorXd> {
             return {{Random::noise_gaussian<RNGSalt::BROWNIAN_WALK, 4>(
-                counter++, 0)}};
+                counter++, 0, 0)}};
           }),
       sample_size);
   // check pooled mean and variance

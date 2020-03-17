@@ -70,18 +70,19 @@ namespace Random {
  *
  */
 template <RNGSalt salt>
-Utils::Vector<uint64_t, 4> philox_4_uint64s(uint64_t counter, int key1,
-                                            int key2 = 0) {
+Utils::Vector<uint64_t, 4> philox_4_uint64s(uint64_t counter, uint32_t seed,
+                                            int key1, int key2 = 0) {
 
   using rng_type = r123::Philox4x64;
   using ctr_type = rng_type::ctr_type;
   using key_type = rng_type::key_type;
 
-  const ctr_type c{{counter, static_cast<uint64_t>(salt)}};
+  const ctr_type c{counter};
 
   auto const id1 = static_cast<uint32_t>(key1);
   auto const id2 = static_cast<uint32_t>(key2);
-  const key_type k{id1, id2};
+  const key_type k{Utils::u32_to_u64(id1, id2),
+                   Utils::u32_to_u64(static_cast<uint32_t>(salt), seed)};
 
   auto const res = rng_type{}(c, k);
   return {res[0], res[1], res[2], res[3]};
@@ -104,7 +105,7 @@ Utils::Vector<uint64_t, 4> philox_4_uint64s(uint64_t counter, int key1,
  */
 template <RNGSalt salt, size_t N = 3,
           std::enable_if_t<(N > 1) and (N <= 4), int> = 0>
-auto noise_uniform(uint64_t counter, int key1, int key2 = 0) {
+auto noise_uniform(uint64_t counter, uint32_t seed, int key1, int key2 = 0) {
 
   auto const integers = philox_4_uint64s<salt>(counter, key1, key2);
   Utils::VectorXd<N> noise{};
@@ -114,7 +115,7 @@ auto noise_uniform(uint64_t counter, int key1, int key2 = 0) {
 }
 
 template <RNGSalt salt, size_t N, std::enable_if_t<N == 1, int> = 0>
-auto noise_uniform(uint64_t counter, int key1, int key2 = 0) {
+auto noise_uniform(uint64_t counter, uint32_t seed, int key1, int key2 = 0) {
 
   auto const integers = philox_4_uint64s<salt>(counter, key1, key2);
   return Utils::uniform(integers[0]) - 0.5;
@@ -141,7 +142,7 @@ auto noise_uniform(uint64_t counter, int key1, int key2 = 0) {
  */
 template <RNGSalt salt, size_t N = 3,
           class = std::enable_if_t<(N >= 1) and (N <= 4)>>
-auto noise_gaussian(uint64_t counter, int key1, int key2 = 0) {
+auto noise_gaussian(uint64_t counter, uint32_t seed, int key1, int key2 = 0) {
 
   auto const integers = philox_4_uint64s<salt>(counter, key1, key2);
   static const double epsilon = std::numeric_limits<double>::min();
