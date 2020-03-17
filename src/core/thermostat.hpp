@@ -90,6 +90,7 @@ extern bool thermo_virtual;
 extern Utils::Counter<uint64_t> thermostat_counter;
 
 void reset_thermostat_counter(uint64_t value);
+uint64_t get_thermostat_counter();
 
 /************************************************
  * parameter structs
@@ -101,8 +102,7 @@ public:
   void rng_initialize(uint64_t const seed) {
     m_rng_seed = static_cast<uint32_t>(seed);
   }
-  /** Is the RNG counter initialized */
-  bool rng_is_initialized() const { return !!m_rng_seed; }
+
   uint32_t rng_seed() const { return m_rng_seed.value(); }
 
 private:
@@ -334,7 +334,7 @@ void thermo_init();
  */
 template <size_t step>
 inline Utils::Vector3d
-friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso, uint64_t counter,
+friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso,
                        Utils::Vector3d const &vel, int p_identity) {
   static_assert(step == 1 or step == 2, "NPT only has 2 integration steps");
   constexpr auto const salt =
@@ -343,7 +343,7 @@ friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso, uint64_t counter,
     if (npt_iso.pref_noise_0 > 0.0) {
       return npt_iso.pref_rescale_0 * vel +
              npt_iso.pref_noise_0 *
-                 Random::noise_uniform<salt>(counter, npt_iso.rng_seed(),
+                 Random::noise_uniform<salt>(thermostat_counter.value(), npt_iso.rng_seed(),
                                              p_identity);
     }
     return npt_iso.pref_rescale_0 * vel;
@@ -355,12 +355,12 @@ friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso, uint64_t counter,
  *  nptiso_struct::p_diff
  */
 inline double friction_thermV_nptiso(IsotropicNptThermostat const &npt_iso,
-                                     uint64_t counter, double p_diff) {
+                                     double p_diff) {
   if (thermo_switch & THERMO_NPT_ISO) {
     if (npt_iso.pref_noise_V > 0.0) {
       return npt_iso.pref_rescale_V * p_diff +
              npt_iso.pref_noise_V * Random::noise_uniform<RNGSalt::NPTISOV, 1>(
-                                        counter, npt_iso.rng_seed(), 0);
+                                        thermostat_counter.value(), npt_iso.rng_seed(), 0);
     }
     return npt_iso.pref_rescale_V * p_diff;
   }

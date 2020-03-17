@@ -49,6 +49,10 @@ void reset_thermostat_counter(uint64_t value) {
   mpi_call_all(reset_thermostat_counter, value);
 }
 
+uint64_t get_thermostat_counter() {
+  return thermostat_counter.value();
+}
+
 LangevinThermostat langevin = {};
 BrownianThermostat brownian = {};
 IsotropicNptThermostat npt_iso = {};

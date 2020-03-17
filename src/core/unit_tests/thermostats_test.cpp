@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(test_noise_statistics) {
   auto const correlation = std::get<3>(noise_statistics(
       std::function<std::vector<VariantVectorXd>()>(
           [&p1, &p2, &thermostat]() -> std::vector<VariantVectorXd> {
-            thermostat.rng_increment();
+            thermostat_counter.increment();
             return {{friction_thermo_langevin(thermostat, p1),
                      -friction_thermo_langevin(thermostat, p1),
                      friction_thermo_langevin(thermostat, p2)}};
