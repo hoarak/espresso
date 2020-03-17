@@ -35,38 +35,19 @@
 int thermo_switch = THERMO_OFF;
 double temperature = 0.0;
 bool thermo_virtual = true;
+Utils::Counter<uint64_t> thermostat_counter;
 
 using Thermostat::GammaType;
 
-/**
- * @brief Register a thermostat's MPI callbacks
- *
- * @param thermostat        The thermostat global variable
- */
-#define REGISTER_THERMOSTAT_CALLBACKS(thermostat)                              \
-  void mpi_bcast_##thermostat##_rng_counter_slave(const uint64_t seed) {       \
-    (thermostat).rng_initialize(seed);                                         \
-  }                                                                            \
-                                                                               \
-  REGISTER_CALLBACK(mpi_bcast_##thermostat##_rng_counter_slave)                \
-                                                                               \
-  void mpi_bcast_##thermostat##_rng_counter(const uint64_t seed) {             \
-    mpi_call(mpi_bcast_##thermostat##_rng_counter_slave, seed);                \
-  }                                                                            \
-                                                                               \
-  void thermostat##_rng_counter_increment() { (thermostat).rng_increment(); }  \
-                                                                               \
-  bool thermostat##_is_seed_required() {                                       \
-    /* Seed is required if rng is not initialized */                           \
-    return !(thermostat).rng_is_initialized();                                 \
-  }                                                                            \
-                                                                               \
-  void thermostat##_set_rng_state(const uint64_t seed) {                       \
-    mpi_bcast_##thermostat##_rng_counter(seed);                                \
-    (thermostat).rng_initialize(seed);                                         \
-  }                                                                            \
-                                                                               \
-  uint64_t thermostat##_get_rng_state() { return (thermostat).rng_get(); }
+static void mpi_reset_thermostat_counter(const uint64_t value) {
+  thermostat_counter = Utils::Counter<uint64_t>{value};
+}
+
+REGISTER_CALLBACK(mpi_reset_thermostat_counter);
+
+void reset_thermostat_counter(uint64_t value) {
+  mpi_call_all(reset_thermostat_counter, value);
+}
 
 LangevinThermostat langevin = {};
 BrownianThermostat brownian = {};
@@ -74,14 +55,6 @@ IsotropicNptThermostat npt_iso = {};
 ThermalizedBondThermostat thermalized_bond = {};
 #ifdef DPD
 DPDThermostat dpd = {};
-#endif
-
-REGISTER_THERMOSTAT_CALLBACKS(langevin)
-REGISTER_THERMOSTAT_CALLBACKS(brownian)
-REGISTER_THERMOSTAT_CALLBACKS(npt_iso)
-REGISTER_THERMOSTAT_CALLBACKS(thermalized_bond)
-#ifdef DPD
-REGISTER_THERMOSTAT_CALLBACKS(dpd)
 #endif
 
 void thermo_init() {

@@ -97,19 +97,6 @@ class LangevinThermostat(ut.TestCase):
         force3 = np.copy(system.part[0].f)
         np.testing.assert_equal(np.any(np.not_equal(force2, force3)), True)
 
-        # Same seed should give the same force
-        system.part.clear()
-        system.part.add(pos=[0, 0, 0])
-        system.thermostat.set_langevin(kT=kT, gamma=gamma, seed=41)
-        system.integrator.run(1)
-        force4 = np.copy(system.part[0].f)
-        system.part.clear()
-        system.part.add(pos=[0, 0, 0])
-        system.thermostat.set_langevin(kT=kT, gamma=gamma, seed=41)
-        system.integrator.run(1)
-        force5 = np.copy(system.part[0].f)
-        np.testing.assert_almost_equal(force4, force5)
-
     def test_02__friction_trans(self):
         """Tests the translational friction-only part of the thermostat."""
 

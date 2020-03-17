@@ -87,6 +87,10 @@ extern double temperature;
 /** True if the thermostat should act on virtual particles. */
 extern bool thermo_virtual;
 
+extern Utils::Counter<uint64_t> thermostat_counter;
+
+void reset_thermostat_counter(uint64_t value);
+
 /************************************************
  * parameter structs
  ************************************************/
@@ -97,17 +101,11 @@ public:
   void rng_initialize(uint64_t const seed) {
     m_rng_seed = static_cast<uint32_t>(seed);
   }
-  /** Increment the RNG counter */
-  void rng_increment() { rng_counter.increment(); }
-  /** Get current value of the RNG */
-  uint64_t rng_get() const { return rng_counter.value(); }
   /** Is the RNG counter initialized */
   bool rng_is_initialized() const { return !!m_rng_seed; }
   uint32_t rng_seed() const { return m_rng_seed.value(); }
 
 private:
-  /** RNG counter. */
-  Utils::Counter<uint64_t> rng_counter;
   /** RNG seed */
   boost::optional<uint32_t> m_rng_seed;
 };
@@ -321,25 +319,6 @@ struct DPDThermostat : public BaseThermostat {};
  * functions
  ************************************************/
 
-/**
- * @brief Register a thermostat public interface
- *
- * @param thermostat        The thermostat name
- */
-#define NEW_THERMOSTAT(thermostat)                                             \
-  bool thermostat##_is_seed_required();                                        \
-  void thermostat##_rng_counter_increment();                                   \
-  void thermostat##_set_rng_state(uint64_t counter);                           \
-  uint64_t thermostat##_get_rng_state();
-
-NEW_THERMOSTAT(langevin)
-NEW_THERMOSTAT(brownian)
-NEW_THERMOSTAT(npt_iso)
-NEW_THERMOSTAT(thermalized_bond)
-#ifdef DPD
-NEW_THERMOSTAT(dpd)
-#endif
-
 /** Initialize constants of the thermostat at the start of integration */
 void thermo_init();
 
@@ -355,7 +334,7 @@ void thermo_init();
  */
 template <size_t step>
 inline Utils::Vector3d
-friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso,
+friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso, uint64_t counter,
                        Utils::Vector3d const &vel, int p_identity) {
   static_assert(step == 1 or step == 2, "NPT only has 2 integration steps");
   constexpr auto const salt =
@@ -364,8 +343,8 @@ friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso,
     if (npt_iso.pref_noise_0 > 0.0) {
       return npt_iso.pref_rescale_0 * vel +
              npt_iso.pref_noise_0 *
-                 Random::noise_uniform<salt>(npt_iso.rng_get(),
-                                             npt_iso.rng_seed(), p_identity);
+                 Random::noise_uniform<salt>(counter, npt_iso.rng_seed(),
+                                             p_identity);
     }
     return npt_iso.pref_rescale_0 * vel;
   }
@@ -376,13 +355,12 @@ friction_therm0_nptiso(IsotropicNptThermostat const &npt_iso,
  *  nptiso_struct::p_diff
  */
 inline double friction_thermV_nptiso(IsotropicNptThermostat const &npt_iso,
-                                     double p_diff) {
+                                     uint64_t counter, double p_diff) {
   if (thermo_switch & THERMO_NPT_ISO) {
     if (npt_iso.pref_noise_V > 0.0) {
       return npt_iso.pref_rescale_V * p_diff +
-             npt_iso.pref_noise_V *
-                 Random::noise_uniform<RNGSalt::NPTISOV, 1>(
-                     npt_iso.rng_get(), npt_iso.rng_seed(), 0);
+             npt_iso.pref_noise_V * Random::noise_uniform<RNGSalt::NPTISOV, 1>(
+                                        counter, npt_iso.rng_seed(), 0);
     }
     return npt_iso.pref_rescale_V * p_diff;
   }
