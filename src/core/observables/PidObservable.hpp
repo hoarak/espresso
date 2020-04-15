@@ -52,21 +52,35 @@ public:
   std::vector<int> const &ids() const { return m_ids; }
 };
 
-template <class ObsType> class ParticleObservable : public PidObservable {
-  std::vector<size_t> shape_(Utils::Vector3d res) const { return {3}; }
-  std::vector<size_t> shape_(double res) const { return {1}; }
-  std::vector<size_t> shape_(std::vector<Utils::Vector3d> const &res) const {
-    return {res.size(), 3};
-  }
-  std::vector<size_t> shape_(std::vector<double> const &res) const {
-    return {res.size(), 1};
-  }
+namespace detail {
+template <class T> struct shape_impl;
 
+template <> struct shape_impl<double> {
+  static std::vector<size_t> eval(size_t /* n_part */) { return {1}; }
+};
+template <class _, size_t N> struct shape_impl<Utils::Vector<_, N>> {
+  static std::vector<size_t> eval(size_t /* n_part */) { return {N}; }
+};
+template <class T> struct shape_impl<std::vector<T>> {
+  static std::vector<size_t> eval(size_t n_part) {
+    std::vector<size_t> ret{n_part};
+    boost::copy(shape_impl<T>::eval(n_part), std::back_inserter(ret));
+
+    return ret;
+  }
+};
+} // namespace detail
+
+template <class ObsType> class ParticleObservable : public PidObservable {
 public:
   using PidObservable::PidObservable;
   std::vector<size_t> shape() const override {
-    return shape_(ObsType{}(std::vector<Particle>(ids().size())));
+    using std::declval;
+
+    return detail::shape_impl<decltype(declval<ObsType>()(
+        declval<Utils::Span<const Particle *const>>()))>::eval(ids().size());
   }
+
   std::vector<double>
   evaluate(Utils::Span<const Particle *const> particles) const override {
     return ObsType{}(particles);
