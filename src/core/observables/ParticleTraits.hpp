@@ -19,33 +19,14 @@ template <> struct traits<const ::Particle *> {
   }
   auto charge(Particle const *const p) const { return p->p.q; }
   auto force(Particle const *const p) const {
-#ifdef VIRTUAL_SITES
-    if (p->p.is_virtual)
-      return decltype(p->f.f){};
-#endif
+    //#ifdef VIRTUAL_SITES
+    //    if (p->p.is_virtual)
+    //      return decltype(p->f.f){};
+    //#endif
     return p->f.f;
   }
 };
-template <> struct traits<Particle> {
-  using Particle = ::Particle;
 
-  auto position(Particle const &p) const { return p.r.p; }
-  auto velocity(Particle const &p) const { return p.m.v; }
-  auto force(Particle const &p) const {
-#ifdef VIRTUAL_SITES
-    if (p.p.is_virtual)
-      return decltype(p.f.f){};
-#endif
-    return p.f.f;
-  }
-  auto mass(Particle const &p) const {
-#ifdef VIRTUAL_SITES
-    if (p.p.is_virtual)
-      return decltype(p.p.mass){};
-#endif
-    return p.p.mass;
-  }
-};
 } // namespace Observables
 
 #endif

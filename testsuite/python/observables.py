@@ -181,7 +181,7 @@ class Observables(ut.TestCase):
         np.testing.assert_array_almost_equal(
             obs_data, part_data, err_msg="Data did not agree for observable 'DipoleMoment'", decimal=9)
 
-    def test_com_force(self):
+    def test_TotalForce(self):
         id_list = sorted(
             np.random.choice(
                 self.system.part[:].id,
@@ -190,7 +190,7 @@ class Observables(ut.TestCase):
                 replace=False))
 
         particles = self.system.part.select(
-            lambda p: p.id in id_list and not p.virtual)
+            lambda p: p.id in id_list)
 
         np.testing.assert_allclose(
             np.sum(particles.f, axis=0),
